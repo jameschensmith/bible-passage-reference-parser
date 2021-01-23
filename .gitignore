@@ -1,0 +1,8 @@
+# Documentation: https://git-scm.com/docs/gitignore
+
+# General rules
+.*
+
+# Dot-files to not ignore
+!.editorconfig
+!.gitignore
