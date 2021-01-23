@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser",
   "devDependencies": {
-    "coffeescript": "^2.5.1"
+    "coffeescript": "^2.5.1",
+    "pegjs": "^0.10.0"
   }
 }
