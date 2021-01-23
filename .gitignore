@@ -6,3 +6,6 @@
 # Dot-files to not ignore
 !.editorconfig
 !.gitignore
+
+# Node.js
+**/node_modules/

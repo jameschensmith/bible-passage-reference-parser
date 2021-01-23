@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/faithfulsource/bible-passage-reference-parser/issues"
   },
-  "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser"
+  "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser",
+  "devDependencies": {
+    "coffeescript": "^2.5.1"
+  }
 }
