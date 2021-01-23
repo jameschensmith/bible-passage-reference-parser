@@ -1,5 +1,5 @@
 {
-  "name": "bible-passage-reference-parser",
+  "name": "@faithfulsource/bible-passage-reference-parser",
   "version": "2.0.1",
   "description": "Identifies and parses Bible references (like John 3:16) in over 40 languages.",
   "main": "js/",
@@ -13,16 +13,16 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/openbibleinfo/Bible-Passage-Reference-Parser.git"
+    "url": "git://github.com/faithfulsource/bible-passage-reference-parser.git"
   },
   "keywords": [
     "bible",
     "verses"
   ],
-  "author": "OpenBible.info <openbibleinfo@gmail.com> (http://www.openbible.info/)",
+  "author": "Faithful Source",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/openbibleinfo/Bible-Passage-Reference-Parser/issues"
+    "url": "https://github.com/faithfulsource/bible-passage-reference-parser/issues"
   },
-  "homepage": "https://github.com/openbibleinfo/Bible-Passage-Reference-Parser"
+  "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser"
 }
