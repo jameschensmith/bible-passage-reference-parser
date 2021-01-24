@@ -4,7 +4,7 @@ lang = "en"
 max_length = 100
 
 get_abbrevs = (lang) ->
-	lines = fs.readFileSync("../../src/#{lang}/book_names.txt").toString().split "\n"
+	lines = fs.readFileSync("src/#{lang}/book_names.txt").toString().split "\n"
 	out = []
 	for line in lines
 		[osis, abbrev] = line.split "\t"
@@ -15,18 +15,18 @@ get_translations = (lang) ->
 	["AMP", "ASV", "CEB", "CEV", "ERV", "ESV", "HCSB", "KJV", "MSG", "NAB", "NABRE", "NAS", "NASB", "NIRV", "NIV", "NKJV", "NLT", "NRSV", "RSV", "TNIV"]
 
 get_options = ->
-	lines = fs.readFileSync("../../Readme.md").toString().split "\n"
+	lines = fs.readFileSync("README.adoc").toString().split "\n"
 	out = {}
 	option = ""
 	go = false
 	for line in lines
-		break if go and line.match /^### /
-		go = true if line.match /^### Options/
+		break if go and line.match /^=== /
+		go = true if line.match /^=== Options/
 		continue unless go
 		if result = line.match /^\* `(\w+):/
 			option = result[1]
 			out[option] = []
-		else if result = line.match /^\t\* `(\w+)`/
+		else if result = line.match /^\*\* `(\w+)`/
 			out[option].push result[1]
 	out.passage_existence_strategy = ["b", "bc", "bcv", "bv", "c", "cv", "v", "none"]
 	out.include_apocrypha = [true, false]
