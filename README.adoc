@@ -504,57 +504,58 @@ Using the files in link:https://github.com/openbibleinfo/Bible-Passage-Reference
 
 Most of these languages are in link:https://translate.google.com/[Google Translate].
 
-<table>
-	<tr><th>Prefix</th><th>Language</th>
-	<tr><td>ar</td><td>Arabic</td></tr>
-	<tr><td>bg</td><td>Bulgarian</td></tr>
-	<tr><td>ceb</td><td>Cebuano</td></tr>
-	<tr><td>cs</td><td>Czech</td></tr>
-	<tr><td>cy</td><td>Welsh</td></tr>
-	<tr><td>da</td><td>Danish</td></tr>
-	<tr><td>de</td><td>German</td></tr>
-	<tr><td>el</td><td>Greek (mostly ancient)</td></tr>
-	<tr><td>en</td><td>English</td></tr>
-	<tr><td>es</td><td>Spanish</td></tr>
-	<tr><td>fi</td><td>Finnish</td></tr>
-	<tr><td>fr</td><td>French</td></tr>
-	<tr><td>he</td><td>Hebrew</td></tr>
-	<tr><td>hi</td><td>Hindi</td></tr>
-	<tr><td>hr</td><td>Croatian</td></tr>
-	<tr><td>ht</td><td>Haitian Creole</td></tr>
-	<tr><td>hu</td><td>Hungarian</td></tr>
-	<tr><td>is</td><td>Icelandic</td></tr>
-	<tr><td>it</td><td>Italian</td></tr>
-	<tr><td>ja</td><td>Japanese</td></tr>
-	<tr><td>jv</td><td>Javanese</td></tr>
-	<tr><td>ko</td><td>Korean</td></tr>
-	<tr><td>la</td><td>Latin</td></tr>
-	<tr><td>mk</td><td>Macedonian</td></tr>
-	<tr><td>mr</td><td>Marathi</td></tr>
-	<tr><td>ne</td><td>Nepali</td></tr>
-	<tr><td>nl</td><td>Dutch</td></tr>
-	<tr><td>no</td><td>Norwegian</td></tr>
-	<tr><td>or</td><td>Oriya</td></tr>
-	<tr><td>pa</td><td>Punjabi</td></tr>
-	<tr><td>pl</td><td>Polish</td></tr>
-	<tr><td>pt</td><td>Portuguese</td></tr>
-	<tr><td>ro</td><td>Romanian</td></tr>
-	<tr><td>ru</td><td>Russian</td></tr>
-	<tr><td>sk</td><td>Slovak</td></tr>
-	<tr><td>so</td><td>Somali</td></tr>
-	<tr><td>sq</td><td>Albanian</td></tr>
-	<tr><td>sr</td><td>Serbian</td></tr>
-	<tr><td>sv</td><td>Swedish</td></tr>
-	<tr><td>sw</td><td>Swahili</td></tr>
-	<tr><td>ta</td><td>Tamil</td></tr>
-	<tr><td>th</td><td>Thai</td></tr>
-	<tr><td>tl</td><td>Tagalog</td></tr>
-	<tr><td>tr</td><td>Turkish</td></tr>
-	<tr><td>uk</td><td>Ukrainian</td></tr>
-	<tr><td>ur</td><td>Urdu</td></tr>
-	<tr><td>vi</td><td>Vietnamese</td></tr>
-	<tr><td>zh</td><td>Chinese (both traditional and simplified)</td></tr>
-</table>
+[options="header"]
+|===
+|Prefix |Language
+|ar |Arabic
+|bg |Bulgarian
+|ceb |Cebuano
+|cs |Czech
+|cy |Welsh
+|da |Danish
+|de |German
+|el |Greek (mostly ancient)
+|en |English
+|es |Spanish
+|fi |Finnish
+|fr |French
+|he |Hebrew
+|hi |Hindi
+|hr |Croatian
+|ht |Haitian Creole
+|hu |Hungarian
+|is |Icelandic
+|it |Italian
+|ja |Japanese
+|jv |Javanese
+|ko |Korean
+|la |Latin
+|mk |Macedonian
+|mr |Marathi
+|ne |Nepali
+|nl |Dutch
+|no |Norwegian
+|or |Oriya
+|pa |Punjabi
+|pl |Polish
+|pt |Portuguese
+|ro |Romanian
+|ru |Russian
+|sk |Slovak
+|so |Somali
+|sq |Albanian
+|sr |Serbian
+|sv |Swedish
+|sw |Swahili
+|ta |Tamil
+|th |Thai
+|tl |Tagalog
+|tr |Turkish
+|uk |Ukrainian
+|ur |Urdu
+|vi |Vietnamese
+|zh |Chinese (both traditional and simplified)
+|===
 
 When parsing a language that doesn't use Latin-based numbers (0-9), you probably want to set the `non_latin_digits_strategy` option to `replace`.
 
