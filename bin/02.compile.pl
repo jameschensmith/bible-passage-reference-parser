@@ -1,23 +1,42 @@
 use strict;
 use warnings;
 
-my ($lang) = @ARGV;
+my ($lang_arg) = @ARGV;
 
-die "Please specify a language identifier as the first argument" unless ($lang);
-`pegjs --format globals --export-var grammar -o "temp_${lang}_grammar.js" "src/$lang/grammar.pegjs"`;
-add_pegjs_global("temp_${lang}_grammar.js");
-print "Joining...\n";
-`cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/$lang/translations.coffee" "src/$lang/regexps.coffee" | coffee --no-header --compile --stdio > "js/${lang}_bcv_parser.js"`;
-add_peg('');
-print "Compiling spec...\n";
-`coffee --no-header -c "src/$lang/spec.coffee"`;
-`mv "src/$lang/spec.js" "test/js/${lang}.spec.js"`;
-#compile_closure();
-unlink "temp_${lang}_grammar.js";
+if ($lang_arg)
+{
+	compile($lang_arg);
+}
+else
+{
+	my $dir = 'src';
+    opendir(DIR, $dir) or die $!;
+    while (my $file = readdir(DIR)) {
+        next unless (-d "$dir/$file" && $file !~ /^\.{1,2}$|^template$|^core$/);
+		compile($file);
+    }
+    closedir(DIR);
+}
+
+sub compile
+{
+	my ($lang) = @_;
+	print "Compiling lang '$lang'...\n";
+	`pegjs --format globals --export-var grammar -o "temp_${lang}_grammar.js" "src/$lang/grammar.pegjs"`;
+	add_pegjs_global("temp_${lang}_grammar.js");
+	print "Joining...\n";
+	`cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/$lang/translations.coffee" "src/$lang/regexps.coffee" | coffee --no-header --compile --stdio > "js/${lang}_bcv_parser.js"`;
+	add_peg($lang, '');
+	print "Compiling spec...\n";
+	`coffee --no-header -c "src/$lang/spec.coffee"`;
+	`mv "src/$lang/spec.js" "test/js/${lang}.spec.js"`;
+	#compile_closure();
+	unlink "temp_${lang}_grammar.js";
+}
 
 sub add_peg
 {
-	my ($prefix) = @_;
+	my ($lang, $prefix) = @_;
 	open FILE, "<:utf8", "temp_$prefix${lang}_grammar.js";
 	my $peg = join '', <FILE>;
 	close FILE;
