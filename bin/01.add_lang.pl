@@ -9,6 +9,7 @@ my ($lang) = @ARGV;
 die "The first argument should be a language iso code (e.g., \"fr\")" unless ($lang && $lang =~ /^\w+$/);
 my $dir = '../src';
 my $test_dir = '../test';
+my $tools_dir = '../tools';
 my $regexp_space = "[\\s\x{a0}]";
 my $valid_characters = "[\\d\\s\\xa0.:,;\\x1e\\x1f&\\(\\)\\uff08\\uff09\\[\\]/\"'\\*=~\\-\\u2013\\u2014]";
 my $letters = '';
@@ -26,7 +27,7 @@ make_translations();
 
 sub make_translations
 {
-	my $out = get_file_contents("$dir/template/translations.coffee");
+	my $out = get_file_contents("$tools_dir/template/translations.coffee");
 	my (@regexps, @aliases);
 	foreach my $translation (@{$vars{'$TRANS'}})
 	{
@@ -66,7 +67,7 @@ sub make_translations
 
 sub make_grammar
 {
-	my $out = get_file_contents("$dir/template/grammar.pegjs");
+	my $out = get_file_contents("$tools_dir/template/grammar.pegjs");
 	unless (defined $vars{'$NEXT'})
 	{
 		$out =~ s/\nnext_v\s+=.+\s+\{ return[^\}]+\}\s+\}\s+/\n/;
@@ -93,7 +94,7 @@ sub make_grammar
 
 sub make_regexps
 {
-	my $out = get_file_contents("$dir/template/regexps.coffee");
+	my $out = get_file_contents("$tools_dir/template/regexps.coffee");
 	unless (defined $vars{'$NEXT'})
 	{
 		$out =~ s/\n.+\$NEXT.+\n/\n/;
@@ -678,7 +679,7 @@ sub make_tests
 	push @misc_tests, add_trans_tests();
 	push @misc_tests, add_book_range_tests();
 	push @misc_tests, add_boundary_tests();
-	my $out = get_file_contents("$dir/template/spec.coffee");
+	my $out = get_file_contents("$tools_dir/template/spec.coffee");
 	my $lang_isos = to_json($vars{'$LANG_ISOS'});
 	$out =~ s/\$LANG_ISOS/$lang_isos/g;
 	$out =~ s/\$LANG/$lang/g;
@@ -692,7 +693,7 @@ sub make_tests
 		die "$1\nTests: Capital variable";
 	}
 
-	$out = get_file_contents("$dir/template/SpecRunner.html");
+	$out = get_file_contents("$tools_dir/template/SpecRunner.html");
 	$out =~ s/\$LANG/$lang/g;
 	open OUT, ">:utf8", "$test_dir/$lang.html";
 	print OUT $out;
@@ -1085,7 +1086,7 @@ sub get_vars
 		$out{$key} = [@values];
 	}
 	close FILE;
-	
+
 	foreach my $char (@{$out{'$ALLOWED_CHARACTERS'}})
 	{
 		my $check = quotemeta $char;
@@ -1131,7 +1132,7 @@ sub get_pre_book_characters
 	foreach my $ref (@letters)
 	{
 		my ($start, $end) = @{$ref};
-		push @out, ($end eq $start) ? "$start" : 
+		push @out, ($end eq $start) ? "$start" :
 		"$start-$end";
 	}
 	my $out = join '', @out;

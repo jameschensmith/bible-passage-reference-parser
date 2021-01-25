@@ -12,7 +12,7 @@ else
 	my $dir = 'src';
     opendir(DIR, $dir) or die $!;
     while (my $file = readdir(DIR)) {
-        next unless (-d "$dir/$file" && $file !~ /^\.{1,2}$|^template$|^core$/);
+        next unless (-d "$dir/$file" && $file !~ /^\.{1,2}$|^core$/);
 		compile($file);
     }
     closedir(DIR);
