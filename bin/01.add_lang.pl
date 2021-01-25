@@ -7,9 +7,9 @@ use MIME::Base64;
 
 my ($lang) = @ARGV;
 die "The first argument should be a language iso code (e.g., \"fr\")" unless ($lang && $lang =~ /^\w+$/);
-my $dir = '../src';
-my $test_dir = '../test';
-my $tools_dir = '../tools';
+my $dir = 'src';
+my $test_dir = 'test';
+my $tools_dir = 'tools';
 my $regexp_space = "[\\s\x{a0}]";
 my $valid_characters = "[\\d\\s\\xa0.:,;\\x1e\\x1f&\\(\\)\\uff08\\uff09\\[\\]/\"'\\*=~\\-\\u2013\\u2014]";
 my $letters = '';
@@ -227,7 +227,7 @@ sub make_book_regexp
 			close TEMP;
 			$base64 = '<';
 		}
-		my $regexp = `node ./make_regexps.js "$base64"`;
+		my $regexp = `node ./bin/make_regexps.js "$base64"`;
 		#print Dumper($regexp) if ($osis eq 'Acts');
 		unlink './temp.txt' if ($use_file);
 		$regexp = decode_json($regexp);
@@ -1143,7 +1143,7 @@ sub get_pre_book_characters
 sub get_letters
 {
 	my %out;
-	open FILE, 'letters/letters.txt';
+	open FILE, 'bin/letters/letters.txt';
 	while (<FILE>)
 	{
 		next unless (/^\\u/);
@@ -1191,7 +1191,7 @@ sub get_unicode_blocks
 	my $unicode = join '|', @{$unicodes_ref};
 	$unicode .= '|Basic_Latin' unless ($unicode =~ /Basic_Latin/);
 	my @out;
-	open FILE, 'letters/blocks.txt';
+	open FILE, 'bin/letters/blocks.txt';
 	while (<FILE>)
 	{
 		next unless (/^\w/);
