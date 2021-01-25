@@ -25,6 +25,9 @@
     "url": "https://github.com/faithfulsource/bible-passage-reference-parser/issues"
   },
   "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser",
+  "scripts": {
+    "build:lang": "perl bin/02.compile.pl"
+  },
   "devDependencies": {
     "coffeescript": "^1.12.7",
     "jasmine": "^3.6.4",

@@ -4,21 +4,21 @@ use warnings;
 my ($lang) = @ARGV;
 
 die "Please specify a language identifier as the first argument" unless ($lang);
-`pegjs --format globals --export-var grammar -o "../temp_${lang}_grammar.js" "../src/$lang/grammar.pegjs"`;
-add_pegjs_global("../temp_${lang}_grammar.js");
+`pegjs --format globals --export-var grammar -o "temp_${lang}_grammar.js" "src/$lang/grammar.pegjs"`;
+add_pegjs_global("temp_${lang}_grammar.js");
 print "Joining...\n";
-`cat "../src/core/bcv_parser.coffee" "../src/core/bcv_passage.coffee" "../src/core/bcv_utils.coffee" "../src/$lang/translations.coffee" "../src/$lang/regexps.coffee" | coffee --no-header --compile --stdio > "../js/${lang}_bcv_parser.js"`;
+`cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/$lang/translations.coffee" "src/$lang/regexps.coffee" | coffee --no-header --compile --stdio > "js/${lang}_bcv_parser.js"`;
 add_peg('');
 print "Compiling spec...\n";
-`coffee --no-header -c "../src/$lang/spec.coffee"`;
-`mv "../src/$lang/spec.js" "../test/js/${lang}.spec.js"`;
+`coffee --no-header -c "src/$lang/spec.coffee"`;
+`mv "src/$lang/spec.js" "test/js/${lang}.spec.js"`;
 #compile_closure();
-unlink "../temp_${lang}_grammar.js";
+unlink "temp_${lang}_grammar.js";
 
 sub add_peg
 {
 	my ($prefix) = @_;
-	open FILE, "<:utf8", "../temp_$prefix${lang}_grammar.js";
+	open FILE, "<:utf8", "temp_$prefix${lang}_grammar.js";
 	my $peg = join '', <FILE>;
 	close FILE;
 
@@ -70,7 +70,7 @@ sub add_peg
 	$peg =~ s! \\\\t\\\\r\\\\n\\\\xa0!\\\\s\\\\xa0!gi;
 	#die "Unreplaced PEG space: $peg" if ($peg =~ /parse(?:space|integer|any_integer)\(\) \{\s+var s/i);
 	die "Unreplaced options" unless ($peg =~ /"punctuation_strategy"/);
-	merge_file("../js/#PREFIX${lang}_bcv_parser.js", $peg, $prefix);
+	merge_file("js/#PREFIX${lang}_bcv_parser.js", $peg, $prefix);
 }
 
 sub merge_file
