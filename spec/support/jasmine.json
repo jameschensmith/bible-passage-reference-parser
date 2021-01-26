@@ -1,0 +1,10 @@
+{
+  "spec_dir": "spec",
+  "spec_files": [
+    "../src/*/spec.coffee"
+  ],
+  "helpers": [
+    "helpers/**/*.js"
+  ],
+  "random": false
+}
