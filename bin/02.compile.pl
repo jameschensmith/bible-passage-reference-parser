@@ -27,9 +27,6 @@ sub compile
 	print "Joining...\n";
 	`cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/$lang/translations.coffee" "src/$lang/regexps.coffee" | coffee --no-header --compile --stdio > "js/${lang}_bcv_parser.js"`;
 	add_peg($lang, '');
-	print "Compiling spec...\n";
-	`coffee --no-header -c "src/$lang/spec.coffee"`;
-	`mv "src/$lang/spec.js" "test/js/${lang}.spec.js"`;
 	#compile_closure();
 	unlink "temp_${lang}_grammar.js";
 }
