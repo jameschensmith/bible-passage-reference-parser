@@ -6,6 +6,7 @@
 # Dot-files to not ignore
 !.editorconfig
 !.gitignore
+!.prettierrc.json
 
 # Node.js
 **/node_modules/

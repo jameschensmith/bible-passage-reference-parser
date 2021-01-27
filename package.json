@@ -27,6 +27,8 @@
   "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser",
   "scripts": {
     "build": "perl bin/02.compile.pl",
+    "format": "prettier --write --ignore-path=.gitignore .",
+    "format:check": "prettier --check --ignore-path=.gitignore .",
     "gen:lang": "perl bin/01.add_lang.pl",
     "test": "jasmine --fail-fast=true",
     "test:lang": "bash -c 'jasmine --fail-fast=true src/$0/spec.coffee'"
@@ -35,6 +37,7 @@
     "coffeescript": "^1.12.7",
     "jasmine": "^3.6.4",
     "pegjs": "^0.10.0",
+    "prettier": "^2.2.1",
     "regexgen": "^1.3.0"
   }
 }
