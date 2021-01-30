@@ -30,11 +30,15 @@
     "format": "prettier --write --ignore-path=.gitignore .",
     "format:check": "prettier --check --ignore-path=.gitignore .",
     "gen:lang": "perl bin/01.add_lang.pl",
+    "lint": "eslint . --ignore-path .gitignore",
+    "lint:fix": "eslint . --ignore-path .gitignore --fix",
     "test": "jasmine --fail-fast=true",
     "test:lang": "bash -c 'jasmine --fail-fast=true src/$0/spec.coffee'"
   },
   "devDependencies": {
     "coffeescript": "^1.12.7",
+    "eslint": "^7.18.0",
+    "eslint-config-kentcdodds": "^17.3.2",
     "jasmine": "^3.6.4",
     "pegjs": "^0.10.0",
     "prettier": "^2.2.1",

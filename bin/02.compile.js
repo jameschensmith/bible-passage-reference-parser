@@ -1,10 +1,10 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 
-const lang = process.argv[2];
+const arg_lang = process.argv[2];
 
-if (lang) {
-  compile(lang);
+if (arg_lang) {
+  compile(arg_lang);
 } else {
   fs.readdirSync("src")
     .filter((dir) => dir !== "core")
@@ -48,16 +48,16 @@ function add_peg(lang, prefix) {
         return peg$FAILED;
       }
     }`;
-  const new_parseany_integer = `function peg$parseany_integer() {
-      var res;
-      if (res = /^[0-9]+/.exec(input.substr(peg$currPos))) {
-        peg$savedPos = peg$currPos;
-        peg$currPos += res[0].length;
-        return {"type": "integer", "value": parseInt(res[0], 10), "indices": [peg$savedPos, peg$currPos - 1]}
-      } else {
-        return peg$FAILED;
-      }
-    }`;
+  // const new_parseany_integer = `function peg$parseany_integer() {
+  //     var res;
+  //     if (res = /^[0-9]+/.exec(input.substr(peg$currPos))) {
+  //       peg$savedPos = peg$currPos;
+  //       peg$currPos += res[0].length;
+  //       return {"type": "integer", "value": parseInt(res[0], 10), "indices": [peg$savedPos, peg$currPos - 1]}
+  //     } else {
+  //       return peg$FAILED;
+  //     }
+  //   }`;
   const sequence_regex_var = peg.match(
     /function peg\$parsesequence_sep\(\) \{\s+var s.+;\s+s0 =.+\s+s1 =.+\s+if \((peg\$c\d+)\.test/
   )[1];
@@ -65,7 +65,7 @@ function add_peg(lang, prefix) {
     throw new Error("No sequence var");
   }
   const escaped_regex = sequence_regex_var.replace(
-    /([\.\\\+\*\?\[\^\]\$\(\)])/g,
+    /([.\\+*?[^\]$()])/g,
     "\\$1"
   );
   const re = new RegExp(`${escaped_regex} = \\/\\^\\[,([^\\]]+?\\]\\/)`);
@@ -119,10 +119,10 @@ function merge_file(file, peg, prefix) {
   fs.writeFileSync(dest_file, joined);
 }
 
-function compile_closure() {
-  console.log("Minifying...");
-  // print `node template_closure.js $lang`;
-}
+// function compile_closure() {
+//   console.log("Minifying...");
+//   // print `node template_closure.js $lang`;
+// }
 
 function add_pegjs_global(filename) {
   let data = fs.readFileSync(filename).toString();
