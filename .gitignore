@@ -5,6 +5,7 @@
 
 # Dot-files to not ignore
 !.editorconfig
+!.eslintrc.js
 !.gitignore
 !.prettierrc.json
 
