@@ -6,6 +6,7 @@ describe "Parsing", ->
 		p = new bcv_parser
 		p.options.osis_compaction_strategy = "b"
 		p.options.sequence_combination_strategy = "combine"
+		return
 
 	it "should round-trip OSIS references", ->
 		p.set_options osis_compaction_strategy: "bc"
@@ -17,6 +18,7 @@ describe "Parsing", ->
 			expect(p.parse(bc).osis()).toEqual bc
 			expect(p.parse(bcv).osis()).toEqual bcv
 			expect(p.parse(bcv_range).osis()).toEqual bcv_range
+		return
 
 	it "should round-trip OSIS Apocrypha references", ->
 		p.set_options osis_compaction_strategy: "bc", ps151_strategy: "b"
@@ -37,12 +39,14 @@ describe "Parsing", ->
 		for book in books
 			bc = book + ".1"
 			expect(p.parse(bc).osis()).toEqual ""
+		return
 
 	it "should handle a preceding character", ->
 		expect(p.parse(" Gen 1").osis()).toEqual "Gen.1"
 		expect(p.parse("Matt5John3").osis()).toEqual "Matt.5,John.3"
 		expect(p.parse("1Ps 1").osis()).toEqual ""
 		expect(p.parse("11Sam 1").osis()).toEqual ""
+		return
 
 describe "Localized book Gen (nl)", ->
 	p = {}
@@ -50,6 +54,7 @@ describe "Localized book Gen (nl)", ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Gen (nl)", ->
 		`
 		expect(p.parse("Eerste Mozes 1:1").osis()).toEqual("Gen.1.1")
@@ -76,13 +81,14 @@ describe "Localized book Gen (nl)", ->
 		expect(p.parse("GEN 1:1").osis()).toEqual("Gen.1.1")
 		expect(p.parse("GN 1:1").osis()).toEqual("Gen.1.1")
 		`
-		true
+		return
 describe "Localized book Exod (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Exod (nl)", ->
 		`
 		expect(p.parse("Tweede Mozes 1:1").osis()).toEqual("Exod.1.1")
@@ -109,25 +115,27 @@ describe "Localized book Exod (nl)", ->
 		expect(p.parse("EXOD 1:1").osis()).toEqual("Exod.1.1")
 		expect(p.parse("EX 1:1").osis()).toEqual("Exod.1.1")
 		`
-		true
+		return
 describe "Localized book Bel (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Bel (nl)", ->
 		`
 		expect(p.parse("Bel en de draak 1:1").osis()).toEqual("Bel.1.1")
 		expect(p.parse("Bel 1:1").osis()).toEqual("Bel.1.1")
 		`
-		true
+		return
 describe "Localized book Lev (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Lev (nl)", ->
 		`
 		expect(p.parse("Derde Mozes 1:1").osis()).toEqual("Lev.1.1")
@@ -156,13 +164,14 @@ describe "Localized book Lev (nl)", ->
 		expect(p.parse("LEV 1:1").osis()).toEqual("Lev.1.1")
 		expect(p.parse("LV 1:1").osis()).toEqual("Lev.1.1")
 		`
-		true
+		return
 describe "Localized book Num (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Num (nl)", ->
 		`
 		expect(p.parse("Vierde Mozes 1:1").osis()).toEqual("Num.1.1")
@@ -189,13 +198,14 @@ describe "Localized book Num (nl)", ->
 		expect(p.parse("NUM 1:1").osis()).toEqual("Num.1.1")
 		expect(p.parse("NU 1:1").osis()).toEqual("Num.1.1")
 		`
-		true
+		return
 describe "Localized book Sir (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Sir (nl)", ->
 		`
 		expect(p.parse("Wijsheid van Jozua Ben Sirach 1:1").osis()).toEqual("Sir.1.1")
@@ -206,13 +216,14 @@ describe "Localized book Sir (nl)", ->
 		expect(p.parse("Sirach 1:1").osis()).toEqual("Sir.1.1")
 		expect(p.parse("Sir 1:1").osis()).toEqual("Sir.1.1")
 		`
-		true
+		return
 describe "Localized book Wis (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Wis (nl)", ->
 		`
 		expect(p.parse("De wijsheid van Salomo 1:1").osis()).toEqual("Wis.1.1")
@@ -221,13 +232,14 @@ describe "Localized book Wis (nl)", ->
 		expect(p.parse("Wijsheid 1:1").osis()).toEqual("Wis.1.1")
 		expect(p.parse("Wis 1:1").osis()).toEqual("Wis.1.1")
 		`
-		true
+		return
 describe "Localized book Lam (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Lam (nl)", ->
 		`
 		expect(p.parse("Klaagliederen 1:1").osis()).toEqual("Lam.1.1")
@@ -240,25 +252,27 @@ describe "Localized book Lam (nl)", ->
 		expect(p.parse("LAM 1:1").osis()).toEqual("Lam.1.1")
 		expect(p.parse("KL 1:1").osis()).toEqual("Lam.1.1")
 		`
-		true
+		return
 describe "Localized book EpJer (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: EpJer (nl)", ->
 		`
 		expect(p.parse("Brief van Jeremia 1:1").osis()).toEqual("EpJer.1.1")
 		expect(p.parse("EpJer 1:1").osis()).toEqual("EpJer.1.1")
 		`
-		true
+		return
 describe "Localized book Rev (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Rev (nl)", ->
 		`
 		expect(p.parse("Openbaring van Johannes 1:1").osis()).toEqual("Rev.1.1")
@@ -281,26 +295,28 @@ describe "Localized book Rev (nl)", ->
 		expect(p.parse("REV 1:1").osis()).toEqual("Rev.1.1")
 		expect(p.parse("OP 1:1").osis()).toEqual("Rev.1.1")
 		`
-		true
+		return
 describe "Localized book PrMan (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: PrMan (nl)", ->
 		`
 		expect(p.parse("Manasse 1:1").osis()).toEqual("PrMan.1.1")
 		expect(p.parse("PrMan 1:1").osis()).toEqual("PrMan.1.1")
 		expect(p.parse("Man 1:1").osis()).toEqual("PrMan.1.1")
 		`
-		true
+		return
 describe "Localized book Deut (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Deut (nl)", ->
 		`
 		expect(p.parse("Deuteronomium 1:1").osis()).toEqual("Deut.1.1")
@@ -323,13 +339,14 @@ describe "Localized book Deut (nl)", ->
 		expect(p.parse("DEUT 1:1").osis()).toEqual("Deut.1.1")
 		expect(p.parse("DT 1:1").osis()).toEqual("Deut.1.1")
 		`
-		true
+		return
 describe "Localized book Josh (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Josh (nl)", ->
 		`
 		expect(p.parse("Jozua 1:1").osis()).toEqual("Josh.1.1")
@@ -340,13 +357,14 @@ describe "Localized book Josh (nl)", ->
 		expect(p.parse("JOSH 1:1").osis()).toEqual("Josh.1.1")
 		expect(p.parse("JOZ 1:1").osis()).toEqual("Josh.1.1")
 		`
-		true
+		return
 describe "Localized book Judg (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Judg (nl)", ->
 		`
 		expect(p.parse("Richteren 1:1").osis()).toEqual("Judg.1.1")
@@ -367,13 +385,14 @@ describe "Localized book Judg (nl)", ->
 		expect(p.parse("RE 1:1").osis()).toEqual("Judg.1.1")
 		expect(p.parse("RI 1:1").osis()).toEqual("Judg.1.1")
 		`
-		true
+		return
 describe "Localized book Ruth (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Ruth (nl)", ->
 		`
 		expect(p.parse("Ruth 1:1").osis()).toEqual("Ruth.1.1")
@@ -382,13 +401,14 @@ describe "Localized book Ruth (nl)", ->
 		expect(p.parse("RUTH 1:1").osis()).toEqual("Ruth.1.1")
 		expect(p.parse("RT 1:1").osis()).toEqual("Ruth.1.1")
 		`
-		true
+		return
 describe "Localized book 1Esd (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Esd (nl)", ->
 		`
 		expect(p.parse("Eerste Esdras 1:1").osis()).toEqual("1Esd.1.1")
@@ -421,13 +441,14 @@ describe "Localized book 1Esd (nl)", ->
 		expect(p.parse("I Ezra 1:1").osis()).toEqual("1Esd.1.1")
 		expect(p.parse("1Esd 1:1").osis()).toEqual("1Esd.1.1")
 		`
-		true
+		return
 describe "Localized book 2Esd (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Esd (nl)", ->
 		`
 		expect(p.parse("Tweede Esdras 1:1").osis()).toEqual("2Esd.1.1")
@@ -456,13 +477,14 @@ describe "Localized book 2Esd (nl)", ->
 		expect(p.parse("4 Ezra 1:1").osis()).toEqual("2Esd.1.1")
 		expect(p.parse("2Esd 1:1").osis()).toEqual("2Esd.1.1")
 		`
-		true
+		return
 describe "Localized book Isa (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Isa (nl)", ->
 		`
 		expect(p.parse("Jesaja 1:1").osis()).toEqual("Isa.1.1")
@@ -475,13 +497,14 @@ describe "Localized book Isa (nl)", ->
 		expect(p.parse("JES 1:1").osis()).toEqual("Isa.1.1")
 		expect(p.parse("JS 1:1").osis()).toEqual("Isa.1.1")
 		`
-		true
+		return
 describe "Localized book 2Sam (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Sam (nl)", ->
 		`
 		expect(p.parse("Tweede Samuel 1:1").osis()).toEqual("2Sam.1.1")
@@ -534,13 +557,14 @@ describe "Localized book 2Sam (nl)", ->
 		expect(p.parse("2SAM 1:1").osis()).toEqual("2Sam.1.1")
 		expect(p.parse("2 S 1:1").osis()).toEqual("2Sam.1.1")
 		`
-		true
+		return
 describe "Localized book 1Sam (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Sam (nl)", ->
 		`
 		expect(p.parse("Eerste Samuel 1:1").osis()).toEqual("1Sam.1.1")
@@ -593,13 +617,14 @@ describe "Localized book 1Sam (nl)", ->
 		expect(p.parse("1SAM 1:1").osis()).toEqual("1Sam.1.1")
 		expect(p.parse("1 S 1:1").osis()).toEqual("1Sam.1.1")
 		`
-		true
+		return
 describe "Localized book 2Kgs (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Kgs (nl)", ->
 		`
 		expect(p.parse("Tweede Koningen 1:1").osis()).toEqual("2Kgs.1.1")
@@ -648,13 +673,14 @@ describe "Localized book 2Kgs (nl)", ->
 		expect(p.parse("2 KO 1:1").osis()).toEqual("2Kgs.1.1")
 		expect(p.parse("2KGS 1:1").osis()).toEqual("2Kgs.1.1")
 		`
-		true
+		return
 describe "Localized book 1Kgs (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Kgs (nl)", ->
 		`
 		expect(p.parse("Eerste Koningen 1:1").osis()).toEqual("1Kgs.1.1")
@@ -703,13 +729,14 @@ describe "Localized book 1Kgs (nl)", ->
 		expect(p.parse("1KGS 1:1").osis()).toEqual("1Kgs.1.1")
 		expect(p.parse("I KO 1:1").osis()).toEqual("1Kgs.1.1")
 		`
-		true
+		return
 describe "Localized book 2Chr (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Chr (nl)", ->
 		`
 		expect(p.parse("Tweede Kronieken 1:1").osis()).toEqual("2Chr.1.1")
@@ -746,13 +773,14 @@ describe "Localized book 2Chr (nl)", ->
 		expect(p.parse("2 KR 1:1").osis()).toEqual("2Chr.1.1")
 		expect(p.parse("2CHR 1:1").osis()).toEqual("2Chr.1.1")
 		`
-		true
+		return
 describe "Localized book 1Chr (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Chr (nl)", ->
 		`
 		expect(p.parse("Eerste Kronieken 1:1").osis()).toEqual("1Chr.1.1")
@@ -789,13 +817,14 @@ describe "Localized book 1Chr (nl)", ->
 		expect(p.parse("1 KR 1:1").osis()).toEqual("1Chr.1.1")
 		expect(p.parse("1CHR 1:1").osis()).toEqual("1Chr.1.1")
 		`
-		true
+		return
 describe "Localized book Ezra (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Ezra (nl)", ->
 		`
 		expect(p.parse("Ezra 1:1").osis()).toEqual("Ezra.1.1")
@@ -804,13 +833,14 @@ describe "Localized book Ezra (nl)", ->
 		expect(p.parse("EZRA 1:1").osis()).toEqual("Ezra.1.1")
 		expect(p.parse("EZR 1:1").osis()).toEqual("Ezra.1.1")
 		`
-		true
+		return
 describe "Localized book Neh (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Neh (nl)", ->
 		`
 		expect(p.parse("Nehemia 1:1").osis()).toEqual("Neh.1.1")
@@ -819,13 +849,14 @@ describe "Localized book Neh (nl)", ->
 		expect(p.parse("NEHEMIA 1:1").osis()).toEqual("Neh.1.1")
 		expect(p.parse("NEH 1:1").osis()).toEqual("Neh.1.1")
 		`
-		true
+		return
 describe "Localized book GkEsth (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: GkEsth (nl)", ->
 		`
 		expect(p.parse("Ester \(Grieks\) 1:1").osis()).toEqual("GkEsth.1.1")
@@ -835,13 +866,14 @@ describe "Localized book GkEsth (nl)", ->
 		expect(p.parse("Est gr 1:1").osis()).toEqual("GkEsth.1.1")
 		expect(p.parse("GkEsth 1:1").osis()).toEqual("GkEsth.1.1")
 		`
-		true
+		return
 describe "Localized book Esth (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Esth (nl)", ->
 		`
 		expect(p.parse("Esther 1:1").osis()).toEqual("Esth.1.1")
@@ -854,26 +886,28 @@ describe "Localized book Esth (nl)", ->
 		expect(p.parse("ESTH 1:1").osis()).toEqual("Esth.1.1")
 		expect(p.parse("EST 1:1").osis()).toEqual("Esth.1.1")
 		`
-		true
+		return
 describe "Localized book Job (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Job (nl)", ->
 		`
 		expect(p.parse("Job 1:1").osis()).toEqual("Job.1.1")
 		p.include_apocrypha(false)
 		expect(p.parse("JOB 1:1").osis()).toEqual("Job.1.1")
 		`
-		true
+		return
 describe "Localized book Ps (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Ps (nl)", ->
 		`
 		expect(p.parse("Psalmen 1:1").osis()).toEqual("Ps.1.1")
@@ -884,25 +918,27 @@ describe "Localized book Ps (nl)", ->
 		expect(p.parse("PSALM 1:1").osis()).toEqual("Ps.1.1")
 		expect(p.parse("PS 1:1").osis()).toEqual("Ps.1.1")
 		`
-		true
+		return
 describe "Localized book PrAzar (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: PrAzar (nl)", ->
 		`
 		expect(p.parse("Gebed van Azarja 1:1").osis()).toEqual("PrAzar.1.1")
 		expect(p.parse("PrAzar 1:1").osis()).toEqual("PrAzar.1.1")
 		`
-		true
+		return
 describe "Localized book Prov (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Prov (nl)", ->
 		`
 		expect(p.parse("Spreuken 1:1").osis()).toEqual("Prov.1.1")
@@ -913,13 +949,14 @@ describe "Localized book Prov (nl)", ->
 		expect(p.parse("PROV 1:1").osis()).toEqual("Prov.1.1")
 		expect(p.parse("SPR 1:1").osis()).toEqual("Prov.1.1")
 		`
-		true
+		return
 describe "Localized book Eccl (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Eccl (nl)", ->
 		`
 		expect(p.parse("Koheleth 1:1").osis()).toEqual("Eccl.1.1")
@@ -940,26 +977,28 @@ describe "Localized book Eccl (nl)", ->
 		expect(p.parse("PRED 1:1").osis()).toEqual("Eccl.1.1")
 		expect(p.parse("PR 1:1").osis()).toEqual("Eccl.1.1")
 		`
-		true
+		return
 describe "Localized book SgThree (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: SgThree (nl)", ->
 		`
 		expect(p.parse("Gezang der drie mannen in het vuur 1:1").osis()).toEqual("SgThree.1.1")
 		expect(p.parse("Lied van de drie jongemannen 1:1").osis()).toEqual("SgThree.1.1")
 		expect(p.parse("SgThree 1:1").osis()).toEqual("SgThree.1.1")
 		`
-		true
+		return
 describe "Localized book Song (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Song (nl)", ->
 		`
 		expect(p.parse("Canticum canticorum 1:1").osis()).toEqual("Song.1.1")
@@ -974,13 +1013,14 @@ describe "Localized book Song (nl)", ->
 		expect(p.parse("SONG 1:1").osis()).toEqual("Song.1.1")
 		expect(p.parse("HL 1:1").osis()).toEqual("Song.1.1")
 		`
-		true
+		return
 describe "Localized book Jer (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Jer (nl)", ->
 		`
 		expect(p.parse("Jeremia 1:1").osis()).toEqual("Jer.1.1")
@@ -991,13 +1031,14 @@ describe "Localized book Jer (nl)", ->
 		expect(p.parse("JER 1:1").osis()).toEqual("Jer.1.1")
 		expect(p.parse("JR 1:1").osis()).toEqual("Jer.1.1")
 		`
-		true
+		return
 describe "Localized book Ezek (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Ezek (nl)", ->
 		`
 		expect(p.parse("Ezechiel 1:1").osis()).toEqual("Ezek.1.1")
@@ -1010,13 +1051,14 @@ describe "Localized book Ezek (nl)", ->
 		expect(p.parse("EZECH 1:1").osis()).toEqual("Ezek.1.1")
 		expect(p.parse("EZEK 1:1").osis()).toEqual("Ezek.1.1")
 		`
-		true
+		return
 describe "Localized book Dan (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Dan (nl)", ->
 		`
 		expect(p.parse("Daniel 1:1").osis()).toEqual("Dan.1.1")
@@ -1029,13 +1071,14 @@ describe "Localized book Dan (nl)", ->
 		expect(p.parse("DAN 1:1").osis()).toEqual("Dan.1.1")
 		expect(p.parse("DA 1:1").osis()).toEqual("Dan.1.1")
 		`
-		true
+		return
 describe "Localized book Hos (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Hos (nl)", ->
 		`
 		expect(p.parse("Hosea 1:1").osis()).toEqual("Hos.1.1")
@@ -1044,13 +1087,14 @@ describe "Localized book Hos (nl)", ->
 		expect(p.parse("HOSEA 1:1").osis()).toEqual("Hos.1.1")
 		expect(p.parse("HOS 1:1").osis()).toEqual("Hos.1.1")
 		`
-		true
+		return
 describe "Localized book Joel (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Joel (nl)", ->
 		`
 		expect(p.parse("Joel 1:1").osis()).toEqual("Joel.1.1")
@@ -1061,13 +1105,14 @@ describe "Localized book Joel (nl)", ->
 		expect(p.parse("JOËL 1:1").osis()).toEqual("Joel.1.1")
 		expect(p.parse("JL 1:1").osis()).toEqual("Joel.1.1")
 		`
-		true
+		return
 describe "Localized book Amos (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Amos (nl)", ->
 		`
 		expect(p.parse("Amos 1:1").osis()).toEqual("Amos.1.1")
@@ -1076,13 +1121,14 @@ describe "Localized book Amos (nl)", ->
 		expect(p.parse("AMOS 1:1").osis()).toEqual("Amos.1.1")
 		expect(p.parse("AM 1:1").osis()).toEqual("Amos.1.1")
 		`
-		true
+		return
 describe "Localized book Obad (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Obad (nl)", ->
 		`
 		expect(p.parse("Obadja 1:1").osis()).toEqual("Obad.1.1")
@@ -1093,13 +1139,14 @@ describe "Localized book Obad (nl)", ->
 		expect(p.parse("OBAD 1:1").osis()).toEqual("Obad.1.1")
 		expect(p.parse("OB 1:1").osis()).toEqual("Obad.1.1")
 		`
-		true
+		return
 describe "Localized book Jonah (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Jonah (nl)", ->
 		`
 		expect(p.parse("Jonah 1:1").osis()).toEqual("Jonah.1.1")
@@ -1110,13 +1157,14 @@ describe "Localized book Jonah (nl)", ->
 		expect(p.parse("JONA 1:1").osis()).toEqual("Jonah.1.1")
 		expect(p.parse("JON 1:1").osis()).toEqual("Jonah.1.1")
 		`
-		true
+		return
 describe "Localized book Mic (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Mic (nl)", ->
 		`
 		expect(p.parse("Micha 1:1").osis()).toEqual("Mic.1.1")
@@ -1129,13 +1177,14 @@ describe "Localized book Mic (nl)", ->
 		expect(p.parse("MIC 1:1").osis()).toEqual("Mic.1.1")
 		expect(p.parse("MI 1:1").osis()).toEqual("Mic.1.1")
 		`
-		true
+		return
 describe "Localized book Nah (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Nah (nl)", ->
 		`
 		expect(p.parse("Nahum 1:1").osis()).toEqual("Nah.1.1")
@@ -1144,13 +1193,14 @@ describe "Localized book Nah (nl)", ->
 		expect(p.parse("NAHUM 1:1").osis()).toEqual("Nah.1.1")
 		expect(p.parse("NAH 1:1").osis()).toEqual("Nah.1.1")
 		`
-		true
+		return
 describe "Localized book Hab (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Hab (nl)", ->
 		`
 		expect(p.parse("Habakuk 1:1").osis()).toEqual("Hab.1.1")
@@ -1159,13 +1209,14 @@ describe "Localized book Hab (nl)", ->
 		expect(p.parse("HABAKUK 1:1").osis()).toEqual("Hab.1.1")
 		expect(p.parse("HAB 1:1").osis()).toEqual("Hab.1.1")
 		`
-		true
+		return
 describe "Localized book Zeph (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Zeph (nl)", ->
 		`
 		expect(p.parse("Sefanja 1:1").osis()).toEqual("Zeph.1.1")
@@ -1180,13 +1231,14 @@ describe "Localized book Zeph (nl)", ->
 		expect(p.parse("SEF 1:1").osis()).toEqual("Zeph.1.1")
 		expect(p.parse("ZEF 1:1").osis()).toEqual("Zeph.1.1")
 		`
-		true
+		return
 describe "Localized book Hag (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Hag (nl)", ->
 		`
 		expect(p.parse("Haggai 1:1").osis()).toEqual("Hag.1.1")
@@ -1199,13 +1251,14 @@ describe "Localized book Hag (nl)", ->
 		expect(p.parse("HAGG 1:1").osis()).toEqual("Hag.1.1")
 		expect(p.parse("HAG 1:1").osis()).toEqual("Hag.1.1")
 		`
-		true
+		return
 describe "Localized book Zech (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Zech (nl)", ->
 		`
 		expect(p.parse("Zacharia 1:1").osis()).toEqual("Zech.1.1")
@@ -1216,13 +1269,14 @@ describe "Localized book Zech (nl)", ->
 		expect(p.parse("ZACH 1:1").osis()).toEqual("Zech.1.1")
 		expect(p.parse("ZECH 1:1").osis()).toEqual("Zech.1.1")
 		`
-		true
+		return
 describe "Localized book Mal (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Mal (nl)", ->
 		`
 		expect(p.parse("Maleachi 1:1").osis()).toEqual("Mal.1.1")
@@ -1231,13 +1285,14 @@ describe "Localized book Mal (nl)", ->
 		expect(p.parse("MALEACHI 1:1").osis()).toEqual("Mal.1.1")
 		expect(p.parse("MAL 1:1").osis()).toEqual("Mal.1.1")
 		`
-		true
+		return
 describe "Localized book Matt (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Matt (nl)", ->
 		`
 		expect(p.parse("Evangelie volgens Matteus 1:1").osis()).toEqual("Matt.1.1")
@@ -1266,13 +1321,14 @@ describe "Localized book Matt (nl)", ->
 		expect(p.parse("MAT 1:1").osis()).toEqual("Matt.1.1")
 		expect(p.parse("MT 1:1").osis()).toEqual("Matt.1.1")
 		`
-		true
+		return
 describe "Localized book Mark (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Mark (nl)", ->
 		`
 		expect(p.parse("Evangelie volgens Marcus 1:1").osis()).toEqual("Mark.1.1")
@@ -1295,13 +1351,14 @@ describe "Localized book Mark (nl)", ->
 		expect(p.parse("MK 1:1").osis()).toEqual("Mark.1.1")
 		expect(p.parse("MR 1:1").osis()).toEqual("Mark.1.1")
 		`
-		true
+		return
 describe "Localized book Luke (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Luke (nl)", ->
 		`
 		expect(p.parse("Evangelie volgens Lucas 1:1").osis()).toEqual("Luke.1.1")
@@ -1324,13 +1381,14 @@ describe "Localized book Luke (nl)", ->
 		expect(p.parse("LC 1:1").osis()).toEqual("Luke.1.1")
 		expect(p.parse("LK 1:1").osis()).toEqual("Luke.1.1")
 		`
-		true
+		return
 describe "Localized book 1John (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1John (nl)", ->
 		`
 		expect(p.parse("Eerste Johannes 1:1").osis()).toEqual("1John.1.1")
@@ -1365,13 +1423,14 @@ describe "Localized book 1John (nl)", ->
 		expect(p.parse("1JOHN 1:1").osis()).toEqual("1John.1.1")
 		expect(p.parse("I JOH 1:1").osis()).toEqual("1John.1.1")
 		`
-		true
+		return
 describe "Localized book 2John (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2John (nl)", ->
 		`
 		expect(p.parse("Tweede Johannes 1:1").osis()).toEqual("2John.1.1")
@@ -1406,13 +1465,14 @@ describe "Localized book 2John (nl)", ->
 		expect(p.parse("2 JOH 1:1").osis()).toEqual("2John.1.1")
 		expect(p.parse("2JOHN 1:1").osis()).toEqual("2John.1.1")
 		`
-		true
+		return
 describe "Localized book 3John (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 3John (nl)", ->
 		`
 		expect(p.parse("Derde Johannes 1:1").osis()).toEqual("3John.1.1")
@@ -1447,13 +1507,14 @@ describe "Localized book 3John (nl)", ->
 		expect(p.parse("3 JOH 1:1").osis()).toEqual("3John.1.1")
 		expect(p.parse("3JOHN 1:1").osis()).toEqual("3John.1.1")
 		`
-		true
+		return
 describe "Localized book John (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: John (nl)", ->
 		`
 		expect(p.parse("Evangelie volgens Johannes 1:1").osis()).toEqual("John.1.1")
@@ -1466,13 +1527,14 @@ describe "Localized book John (nl)", ->
 		expect(p.parse("JOHN 1:1").osis()).toEqual("John.1.1")
 		expect(p.parse("JOH 1:1").osis()).toEqual("John.1.1")
 		`
-		true
+		return
 describe "Localized book Acts (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Acts (nl)", ->
 		`
 		expect(p.parse("Handelingen van de apostelen 1:1").osis()).toEqual("Acts.1.1")
@@ -1489,13 +1551,14 @@ describe "Localized book Acts (nl)", ->
 		expect(p.parse("HAND 1:1").osis()).toEqual("Acts.1.1")
 		expect(p.parse("HND 1:1").osis()).toEqual("Acts.1.1")
 		`
-		true
+		return
 describe "Localized book Rom (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Rom (nl)", ->
 		`
 		expect(p.parse("Romeinenbrief 1:1").osis()).toEqual("Rom.1.1")
@@ -1506,13 +1569,14 @@ describe "Localized book Rom (nl)", ->
 		expect(p.parse("ROMEINEN 1:1").osis()).toEqual("Rom.1.1")
 		expect(p.parse("ROM 1:1").osis()).toEqual("Rom.1.1")
 		`
-		true
+		return
 describe "Localized book 2Cor (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Cor (nl)", ->
 		`
 		expect(p.parse("Tweede Corinthiers 1:1").osis()).toEqual("2Cor.1.1")
@@ -1785,13 +1849,14 @@ describe "Localized book 2Cor (nl)", ->
 		expect(p.parse("2 KOR 1:1").osis()).toEqual("2Cor.1.1")
 		expect(p.parse("2COR 1:1").osis()).toEqual("2Cor.1.1")
 		`
-		true
+		return
 describe "Localized book 1Cor (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Cor (nl)", ->
 		`
 		expect(p.parse("Eerste Corinthiers 1:1").osis()).toEqual("1Cor.1.1")
@@ -2064,13 +2129,14 @@ describe "Localized book 1Cor (nl)", ->
 		expect(p.parse("I KOR 1:1").osis()).toEqual("1Cor.1.1")
 		expect(p.parse("1COR 1:1").osis()).toEqual("1Cor.1.1")
 		`
-		true
+		return
 describe "Localized book Gal (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Gal (nl)", ->
 		`
 		expect(p.parse("Galatenbrief 1:1").osis()).toEqual("Gal.1.1")
@@ -2081,13 +2147,14 @@ describe "Localized book Gal (nl)", ->
 		expect(p.parse("GALATEN 1:1").osis()).toEqual("Gal.1.1")
 		expect(p.parse("GAL 1:1").osis()).toEqual("Gal.1.1")
 		`
-		true
+		return
 describe "Localized book Eph (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Eph (nl)", ->
 		`
 		expect(p.parse("Efeziers 1:1").osis()).toEqual("Eph.1.1")
@@ -2102,13 +2169,14 @@ describe "Localized book Eph (nl)", ->
 		expect(p.parse("EPH 1:1").osis()).toEqual("Eph.1.1")
 		expect(p.parse("EF 1:1").osis()).toEqual("Eph.1.1")
 		`
-		true
+		return
 describe "Localized book Phil (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Phil (nl)", ->
 		`
 		expect(p.parse("Filippenzen 1:1").osis()).toEqual("Phil.1.1")
@@ -2121,13 +2189,14 @@ describe "Localized book Phil (nl)", ->
 		expect(p.parse("PHIL 1:1").osis()).toEqual("Phil.1.1")
 		expect(p.parse("FIL 1:1").osis()).toEqual("Phil.1.1")
 		`
-		true
+		return
 describe "Localized book Col (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Col (nl)", ->
 		`
 		expect(p.parse("Colossenzen 1:1").osis()).toEqual("Col.1.1")
@@ -2140,13 +2209,14 @@ describe "Localized book Col (nl)", ->
 		expect(p.parse("COL 1:1").osis()).toEqual("Col.1.1")
 		expect(p.parse("KOL 1:1").osis()).toEqual("Col.1.1")
 		`
-		true
+		return
 describe "Localized book 2Thess (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Thess (nl)", ->
 		`
 		expect(p.parse("Tweede Thessalonicenzen 1:1").osis()).toEqual("2Thess.1.1")
@@ -2225,13 +2295,14 @@ describe "Localized book 2Thess (nl)", ->
 		expect(p.parse("II TES 1:1").osis()).toEqual("2Thess.1.1")
 		expect(p.parse("2 TES 1:1").osis()).toEqual("2Thess.1.1")
 		`
-		true
+		return
 describe "Localized book 1Thess (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Thess (nl)", ->
 		`
 		expect(p.parse("Eerste Thessalonicenzen 1:1").osis()).toEqual("1Thess.1.1")
@@ -2310,13 +2381,14 @@ describe "Localized book 1Thess (nl)", ->
 		expect(p.parse("1 TES 1:1").osis()).toEqual("1Thess.1.1")
 		expect(p.parse("I TES 1:1").osis()).toEqual("1Thess.1.1")
 		`
-		true
+		return
 describe "Localized book 2Tim (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Tim (nl)", ->
 		`
 		expect(p.parse("Tweede Timotheus 1:1").osis()).toEqual("2Tim.1.1")
@@ -2393,13 +2465,14 @@ describe "Localized book 2Tim (nl)", ->
 		expect(p.parse("2 TIM 1:1").osis()).toEqual("2Tim.1.1")
 		expect(p.parse("2TIM 1:1").osis()).toEqual("2Tim.1.1")
 		`
-		true
+		return
 describe "Localized book 1Tim (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Tim (nl)", ->
 		`
 		expect(p.parse("Eerste Timotheus 1:1").osis()).toEqual("1Tim.1.1")
@@ -2476,13 +2549,14 @@ describe "Localized book 1Tim (nl)", ->
 		expect(p.parse("I TIM 1:1").osis()).toEqual("1Tim.1.1")
 		expect(p.parse("1TIM 1:1").osis()).toEqual("1Tim.1.1")
 		`
-		true
+		return
 describe "Localized book Titus (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Titus (nl)", ->
 		`
 		expect(p.parse("Titus 1:1").osis()).toEqual("Titus.1.1")
@@ -2491,13 +2565,14 @@ describe "Localized book Titus (nl)", ->
 		expect(p.parse("TITUS 1:1").osis()).toEqual("Titus.1.1")
 		expect(p.parse("TIT 1:1").osis()).toEqual("Titus.1.1")
 		`
-		true
+		return
 describe "Localized book Phlm (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Phlm (nl)", ->
 		`
 		expect(p.parse("Filemon 1:1").osis()).toEqual("Phlm.1.1")
@@ -2512,13 +2587,14 @@ describe "Localized book Phlm (nl)", ->
 		expect(p.parse("FILM 1:1").osis()).toEqual("Phlm.1.1")
 		expect(p.parse("PHLM 1:1").osis()).toEqual("Phlm.1.1")
 		`
-		true
+		return
 describe "Localized book Heb (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Heb (nl)", ->
 		`
 		expect(p.parse("Hebreeen 1:1").osis()).toEqual("Heb.1.1")
@@ -2531,13 +2607,14 @@ describe "Localized book Heb (nl)", ->
 		expect(p.parse("HEBR 1:1").osis()).toEqual("Heb.1.1")
 		expect(p.parse("HEB 1:1").osis()).toEqual("Heb.1.1")
 		`
-		true
+		return
 describe "Localized book Jas (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Jas (nl)", ->
 		`
 		expect(p.parse("Jakobus 1:1").osis()).toEqual("Jas.1.1")
@@ -2548,13 +2625,14 @@ describe "Localized book Jas (nl)", ->
 		expect(p.parse("JAK 1:1").osis()).toEqual("Jas.1.1")
 		expect(p.parse("JAS 1:1").osis()).toEqual("Jas.1.1")
 		`
-		true
+		return
 describe "Localized book 2Pet (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Pet (nl)", ->
 		`
 		expect(p.parse("Tweede Petrus 1:1").osis()).toEqual("2Pet.1.1")
@@ -2605,13 +2683,14 @@ describe "Localized book 2Pet (nl)", ->
 		expect(p.parse("2 PE 1:1").osis()).toEqual("2Pet.1.1")
 		expect(p.parse("2PET 1:1").osis()).toEqual("2Pet.1.1")
 		`
-		true
+		return
 describe "Localized book 1Pet (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Pet (nl)", ->
 		`
 		expect(p.parse("Eerste Petrus 1:1").osis()).toEqual("1Pet.1.1")
@@ -2662,13 +2741,14 @@ describe "Localized book 1Pet (nl)", ->
 		expect(p.parse("1 PE 1:1").osis()).toEqual("1Pet.1.1")
 		expect(p.parse("1PET 1:1").osis()).toEqual("1Pet.1.1")
 		`
-		true
+		return
 describe "Localized book Jude (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Jude (nl)", ->
 		`
 		expect(p.parse("Judas 1:1").osis()).toEqual("Jude.1.1")
@@ -2679,13 +2759,14 @@ describe "Localized book Jude (nl)", ->
 		expect(p.parse("JUDE 1:1").osis()).toEqual("Jude.1.1")
 		expect(p.parse("JUD 1:1").osis()).toEqual("Jude.1.1")
 		`
-		true
+		return
 describe "Localized book Tob (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Tob (nl)", ->
 		`
 		expect(p.parse("Tobias 1:1").osis()).toEqual("Tob.1.1")
@@ -2695,50 +2776,54 @@ describe "Localized book Tob (nl)", ->
 		expect(p.parse("Tobía 1:1").osis()).toEqual("Tob.1.1")
 		expect(p.parse("Tob 1:1").osis()).toEqual("Tob.1.1")
 		`
-		true
+		return
 describe "Localized book Jdt (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Jdt (nl)", ->
 		`
 		expect(p.parse("Judith 1:1").osis()).toEqual("Jdt.1.1")
 		expect(p.parse("Judit 1:1").osis()).toEqual("Jdt.1.1")
 		expect(p.parse("Jdt 1:1").osis()).toEqual("Jdt.1.1")
 		`
-		true
+		return
 describe "Localized book Bar (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Bar (nl)", ->
 		`
 		expect(p.parse("Baruch 1:1").osis()).toEqual("Bar.1.1")
 		expect(p.parse("Bar 1:1").osis()).toEqual("Bar.1.1")
 		`
-		true
+		return
 describe "Localized book Sus (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Sus (nl)", ->
 		`
 		expect(p.parse("Susanna 1:1").osis()).toEqual("Sus.1.1")
 		expect(p.parse("Sus 1:1").osis()).toEqual("Sus.1.1")
 		`
-		true
+		return
 describe "Localized book 2Macc (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 2Macc (nl)", ->
 		`
 		expect(p.parse("Tweede Makkabeeen 1:1").osis()).toEqual("2Macc.1.1")
@@ -2764,13 +2849,14 @@ describe "Localized book 2Macc (nl)", ->
 		expect(p.parse("2 Mak 1:1").osis()).toEqual("2Macc.1.1")
 		expect(p.parse("2Macc 1:1").osis()).toEqual("2Macc.1.1")
 		`
-		true
+		return
 describe "Localized book 3Macc (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 3Macc (nl)", ->
 		`
 		expect(p.parse("Derde Makkabeeen 1:1").osis()).toEqual("3Macc.1.1")
@@ -2796,13 +2882,14 @@ describe "Localized book 3Macc (nl)", ->
 		expect(p.parse("3 Mak 1:1").osis()).toEqual("3Macc.1.1")
 		expect(p.parse("3Macc 1:1").osis()).toEqual("3Macc.1.1")
 		`
-		true
+		return
 describe "Localized book 4Macc (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 4Macc (nl)", ->
 		`
 		expect(p.parse("Vierde Makkabeeen 1:1").osis()).toEqual("4Macc.1.1")
@@ -2822,13 +2909,14 @@ describe "Localized book 4Macc (nl)", ->
 		expect(p.parse("4 Mak 1:1").osis()).toEqual("4Macc.1.1")
 		expect(p.parse("4Macc 1:1").osis()).toEqual("4Macc.1.1")
 		`
-		true
+		return
 describe "Localized book 1Macc (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: 1Macc (nl)", ->
 		`
 		expect(p.parse("Eerste Makkabeeen 1:1").osis()).toEqual("1Macc.1.1")
@@ -2854,20 +2942,21 @@ describe "Localized book 1Macc (nl)", ->
 		expect(p.parse("1Macc 1:1").osis()).toEqual("1Macc.1.1")
 		expect(p.parse("I Mak 1:1").osis()).toEqual("1Macc.1.1")
 		`
-		true
+		return
 describe "Localized book Ezek,Ezra (nl)", ->
 	p = {}
 	beforeEach ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 	it "should handle book: Ezek,Ezra (nl)", ->
 		`
 		expect(p.parse("Ez 1:1").osis()).toEqual("Ezek.1.1")
 		p.include_apocrypha(false)
 		expect(p.parse("EZ 1:1").osis()).toEqual("Ezek.1.1")
 		`
-		true
+		return
 
 describe "Miscellaneous tests", ->
 	p = {}
@@ -2875,19 +2964,23 @@ describe "Miscellaneous tests", ->
 		p = new bcv_parser
 		p.set_options book_alone_strategy: "ignore", book_sequence_strategy: "ignore", osis_compaction_strategy: "bc", captive_end_digits_strategy: "delete"
 		p.include_apocrypha true
+		return
 
 	it "should return the expected language", ->
 		expect(p.languages).toEqual ["nl"]
+		return
 
 	it "should handle ranges (nl)", ->
 		expect(p.parse("Titus 1:1 - 2").osis()).toEqual "Titus.1.1-Titus.1.2"
 		expect(p.parse("Matt 1-2").osis()).toEqual "Matt.1-Matt.2"
 		expect(p.parse("Phlm 2 - 3").osis()).toEqual "Phlm.1.2-Phlm.1.3"
+		return
 	it "should handle chapters (nl)", ->
 		expect(p.parse("Titus 1:1, hoofdstukken 2").osis()).toEqual "Titus.1.1,Titus.2"
 		expect(p.parse("Matt 3:4 HOOFDSTUKKEN 6").osis()).toEqual "Matt.3.4,Matt.6"
 		expect(p.parse("Titus 1:1, hoofdstuk 2").osis()).toEqual "Titus.1.1,Titus.2"
 		expect(p.parse("Matt 3:4 HOOFDSTUK 6").osis()).toEqual "Matt.3.4,Matt.6"
+		return
 	it "should handle verses (nl)", ->
 		expect(p.parse("Exod 1:1 verzen 3").osis()).toEqual "Exod.1.1,Exod.1.3"
 		expect(p.parse("Phlm VERZEN 6").osis()).toEqual "Phlm.1.6"
@@ -2901,6 +2994,7 @@ describe "Miscellaneous tests", ->
 		expect(p.parse("Phlm V. 6").osis()).toEqual "Phlm.1.6"
 		expect(p.parse("Exod 1:1 v 3").osis()).toEqual "Exod.1.1,Exod.1.3"
 		expect(p.parse("Phlm V 6").osis()).toEqual "Phlm.1.6"
+		return
 	it "should handle 'and' (nl)", ->
 		expect(p.parse("Exod 1:1 en 3").osis()).toEqual "Exod.1.1,Exod.1.3"
 		expect(p.parse("Phlm 2 EN 6").osis()).toEqual "Phlm.1.2,Phlm.1.6"
@@ -2908,12 +3002,15 @@ describe "Miscellaneous tests", ->
 		expect(p.parse("Phlm 2 VGL 6").osis()).toEqual "Phlm.1.2,Phlm.1.6"
 		expect(p.parse("Exod 1:1 zie ook 3").osis()).toEqual "Exod.1.1,Exod.1.3"
 		expect(p.parse("Phlm 2 ZIE OOK 6").osis()).toEqual "Phlm.1.2,Phlm.1.6"
+		return
 	it "should handle titles (nl)", ->
 		expect(p.parse("Ps 3 opschrift, 4:2, 5:opschrift").osis()).toEqual "Ps.3.1,Ps.4.2,Ps.5.1"
 		expect(p.parse("PS 3 OPSCHRIFT, 4:2, 5:OPSCHRIFT").osis()).toEqual "Ps.3.1,Ps.4.2,Ps.5.1"
+		return
 	it "should handle 'ff' (nl)", ->
 		expect(p.parse("Rev 3en volgende verzen, 4:2en volgende verzen").osis()).toEqual "Rev.3-Rev.22,Rev.4.2-Rev.4.11"
 		expect(p.parse("REV 3 EN VOLGENDE VERZEN, 4:2 EN VOLGENDE VERZEN").osis()).toEqual "Rev.3-Rev.22,Rev.4.2-Rev.4.11"
+		return
 	it "should handle translations (nl)", ->
 		expect(p.parse("Lev 1 (GNB96)").osis_and_translations()).toEqual [["Lev.1", "GNB96"]]
 		expect(p.parse("lev 1 gnb96").osis_and_translations()).toEqual [["Lev.1", "GNB96"]]
@@ -2929,10 +3026,13 @@ describe "Miscellaneous tests", ->
 		expect(p.parse("lev 1 sv77").osis_and_translations()).toEqual [["Lev.1", "SV77"]]
 		expect(p.parse("Lev 1 (WV95)").osis_and_translations()).toEqual [["Lev.1", "WV95"]]
 		expect(p.parse("lev 1 wv95").osis_and_translations()).toEqual [["Lev.1", "WV95"]]
+		return
 	it "should handle book ranges (nl)", ->
 		p.set_options {book_alone_strategy: "full", book_range_strategy: "include"}
 		expect(p.parse("Eerste - Derde  Joh").osis()).toEqual "1John.1-3John.1"
+		return
 	it "should handle boundaries (nl)", ->
 		p.set_options {book_alone_strategy: "full"}
 		expect(p.parse("\u2014Matt\u2014").osis()).toEqual "Matt.1-Matt.28"
 		expect(p.parse("\u201cMatt 1:1\u201d").osis()).toEqual "Matt.1.1"
+		return

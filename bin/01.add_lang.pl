@@ -630,6 +630,7 @@ sub make_tests
 		push @out, "\t\tp = new bcv_parser";
 		push @out, "\t\tp.set_options book_alone_strategy: \"ignore\",book_sequence_strategy: \"ignore\",osis_compaction_strategy: \"bc\",captive_end_digits_strategy: \"delete\"";
 		push @out, "\t\tp.include_apocrypha true";
+		push @out, "\t\treturn";
 		push @out, "\tit \"should handle book: $osis ($lang)\", ->";
 		# Drop into js rather than coffeescript to minimize compile times on the coffee side.
 		push @out, "\t\t`";
@@ -651,7 +652,7 @@ sub make_tests
 		}
 		push @out, "\t\t`";
 		# In keeping with coffeescript, always return something (which, since we just exited a js block, won't otherwise happen).
-		push @out, "\t\ttrue";
+		push @out, "\t\treturn";
 	}
 	open OUT, '>:utf8', "$dir/$lang/book_names.txt";
 	foreach my $osis (sort keys %all_abbrevs)
@@ -751,7 +752,7 @@ sub add_non_latin_digit_tests
 	my $temp = join "\n", @_;
 	return @out unless ($temp =~ /[\x{0660}-\x{0669}\x{06f0}-\x{06f9}\x{07c0}-\x{07c9}\x{0966}-\x{096f}\x{09e6}-\x{09ef}\x{0a66}-\x{0a6f}\x{0ae6}-\x{0aef}\x{0b66}-\x{0b6f}\x{0be6}-\x{0bef}\x{0c66}-\x{0c6f}\x{0ce6}-\x{0cef}\x{0d66}-\x{0d6f}\x{0e50}-\x{0e59}\x{0ed0}-\x{0ed9}\x{0f20}-\x{0f29}\x{1040}-\x{1049}\x{1090}-\x{1099}\x{17e0}-\x{17e9}\x{1810}-\x{1819}\x{1946}-\x{194f}\x{19d0}-\x{19d9}\x{1a80}-\x{1a89}\x{1a90}-\x{1a99}\x{1b50}-\x{1b59}\x{1bb0}-\x{1bb9}\x{1c40}-\x{1c49}\x{1c50}-\x{1c59}\x{a620}-\x{a629}\x{a8d0}-\x{a8d9}\x{a900}-\x{a909}\x{a9d0}-\x{a9d9}\x{aa50}-\x{aa59}\x{abf0}-\x{abf9}\x{ff10}-\x{ff19}]/);
 	push @out, "\t\t`";
-	push @out, "\t\ttrue";
+	push @out, "\t\treturn";
 	push @out, "	it \"should handle non-Latin digits in book: $osis ($lang)\", ->";
 	push @out, "		p.set_options non_latin_digits_strategy: \"replace\"";
 	push @out, "\t\t`";
@@ -771,6 +772,7 @@ sub add_range_tests
 			push @out, "		expect(p.parse(\"Phlm 2 " . uc_normalize($to) . " 3\").osis()).toEqual \"Phlm.1.2-Phlm.1.3\"";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -786,6 +788,7 @@ sub add_chapter_tests
 			push @out, "		expect(p.parse(\"Matt 3:4 " . uc_normalize($chapter) . " 6\").osis()).toEqual \"Matt.3.4,Matt.6\"";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -801,6 +804,7 @@ sub add_verse_tests
 			push @out, "		expect(p.parse(\"Phlm " . uc_normalize($verse) . " 6\").osis()).toEqual \"Phlm.1.6\"";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -816,6 +820,7 @@ sub add_sequence_tests
 			push @out, "		expect(p.parse(\"Phlm 2 " . uc_normalize($and) . " 6\").osis()).toEqual \"Phlm.1.2,Phlm.1.6\"";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -831,6 +836,7 @@ sub add_title_tests
 			push @out, "		expect(p.parse(\"" . uc_normalize("Ps 3 $title, 4:2, 5:$title") . "\").osis()).toEqual \"Ps.3.1,Ps.4.2,Ps.5.1\"";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -848,6 +854,7 @@ sub add_ff_tests
 		}
 	}
 	push @out, "\t\tp.set_options {case_sensitive: \"none\"}" if ($lang eq 'it');
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -872,6 +879,7 @@ sub add_next_tests
 		}
 	}
 	push @out, "\t\tp.set_options {case_sensitive: \"none\"}" if ($lang eq 'it');
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -889,6 +897,7 @@ sub add_trans_tests
 			push @out, "		expect(p.parse(\"" . lc("Lev 1 $trans") . "\").osis_and_translations()).toEqual [[\"Lev.1\", \"$osis\"]]";
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -928,6 +937,7 @@ sub add_book_range_tests
 			}
 		}
 	}
+	push @out, "\t\treturn";
 	return @out;
 }
 
@@ -938,6 +948,7 @@ sub add_boundary_tests
 	push @out, "		p.set_options {book_alone_strategy: \"full\"}";
 	push @out, "		expect(p.parse(\"\\u2014Matt\\u2014\").osis()).toEqual \"Matt.1-Matt.28\"";
 	push @out, "		expect(p.parse(\"\\u201cMatt 1:1\\u201d\").osis()).toEqual \"Matt.1.1\"";
+	push @out, "\t\treturn";
 	return @out;
 }
 
