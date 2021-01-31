@@ -7,6 +7,7 @@
 !.editorconfig
 !.eslintrc.js
 !.gitignore
+!.npmrc
 !.prettierrc.json
 
 # Node.js
