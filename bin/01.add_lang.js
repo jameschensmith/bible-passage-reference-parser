@@ -1072,7 +1072,7 @@ function get_abbrevs() {
     }
     const is_literal = /^\*/.test(line) ? 1 : 0;
     if (is_literal) {
-      line = line.replace(/([\u0080-\uffff])/g, "$1");
+      line = line.replace(/([\u0080-\uffff])/g, "$1`");
     }
     const [almost_osis, ...abbrevs] = line.split("\t");
     const osis = almost_osis.replace(/^\*/, "");
