@@ -1344,7 +1344,7 @@ function expand_abbrev(abbrev) {
         } else if (next === "\\") {
           continue;
         } else {
-          let accents = handle_accents(next);
+          let accents = handle_accent(next);
           accents = accents.replace(/^\[|\]$/g, "");
           accents.split("").forEach((accent) => {
             nexts.push(accent);
