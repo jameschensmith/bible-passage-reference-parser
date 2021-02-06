@@ -1572,5 +1572,5 @@ function get_file_contents(filename) {
 }
 
 function quote_meta(str) {
-  return str.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+  return str.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&");
 }
