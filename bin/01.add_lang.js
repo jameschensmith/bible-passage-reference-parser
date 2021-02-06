@@ -1051,7 +1051,7 @@ function get_abbrevs() {
     if (/\t\s/.test(line) && /^[^*]/.test(line)) {
       console.log(`Tab followed by space: ${line}`);
     }
-    if (/\s[\t\n]/.test(line)) {
+    if (/ [\t\n]/.test(line)) {
       console.log(`Space followed by tab/newline: ${line}`);
     }
     if (!/^[\w*]/.test(line)) {
