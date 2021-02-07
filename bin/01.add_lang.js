@@ -782,7 +782,7 @@ function add_non_latin_digit_tests(osis, tests) {
   );
   out.push('\t\tp.set_options non_latin_digits_strategy: "replace"');
   out.push("\t\t`");
-  return out;
+  return out.concat(tests);
 }
 
 function add_range_tests() {
@@ -971,7 +971,7 @@ function add_next_tests() {
 function add_trans_tests() {
   const out = [];
   out.push(`\tit "should handle translations (${lang})", ->`);
-  vars.$TRANS.forEach((abbrev) => {
+  vars.$TRANS.sort().forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
       (translation) => {
         const [trans, maybe_osis] = translation.split(",");
