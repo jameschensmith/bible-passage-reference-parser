@@ -972,7 +972,7 @@ function add_next_tests() {
 function add_trans_tests() {
   const out = [];
   out.push(`\tit "should handle translations (${lang})", ->`);
-  vars.$TRANS.sort().forEach((abbrev) => {
+  [...vars.$TRANS].sort().forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
       (translation) => {
         const [trans, maybe_osis] = translation.split(",");
