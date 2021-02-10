@@ -741,7 +741,8 @@ function sort_abbrevs_by_length(abbrevs) {
 
 function add_abbrev_to_all_abbrevs(osis, abbrev, all_abbrevs) {
   if (/\./.test(abbrev) && abbrev !== "\u0418.\u041d") {
-    const news = abbrev.split(".");
+    // split by '.', while removing any empty fields
+    const news = abbrev.match(/[^.]+/g) ?? [];
     let olds = [news.shift()];
     news.forEach((n) => {
       const temp = [];
