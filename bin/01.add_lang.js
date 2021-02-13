@@ -420,7 +420,7 @@ function format_node_regexp_pattern(pattern) {
           out_chars.push("\\-");
         } else if (char === "]") {
           out_chars.push(char);
-          if (has_space && (!chars.length || /^[*+]/.test(chars[0]))) {
+          if (has_space && (!chars.length || !/^[*+]/.test(chars[0]))) {
             out_chars.push("*");
           }
           out_chars = out_chars.concat(chars);
