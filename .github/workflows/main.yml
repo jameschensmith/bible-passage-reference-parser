@@ -1,0 +1,26 @@
+name: Main workflow
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [10.x, 12.x, 14.x, 15.x]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup | Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build | Install
+        run: npm ci
+
+      - name: Build | Test
+        run: npm test
