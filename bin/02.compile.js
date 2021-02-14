@@ -3,6 +3,11 @@ const fs = require("fs");
 
 const arg_lang = process.argv[2];
 
+const dir = "js";
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir);
+}
+
 if (arg_lang) {
   compile(arg_lang);
 } else {
@@ -19,7 +24,7 @@ function compile(lang) {
   add_pegjs_global(`temp_${lang}_grammar.js`);
   console.log("Joining...");
   execSync(
-    `cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/${lang}/translations.coffee" "src/${lang}/regexps.coffee" | coffee --no-header --compile --stdio > "js/${lang}_bcv_parser.js"`
+    `cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/${lang}/translations.coffee" "src/${lang}/regexps.coffee" | coffee --no-header --compile --stdio > "${dir}/${lang}_bcv_parser.js"`
   );
   add_peg(lang, "");
   // compile_closure();
@@ -101,7 +106,7 @@ function add_peg(lang, prefix) {
     throw new Error("Unreplaced options");
   }
 
-  merge_file(`js/#PREFIX${lang}_bcv_parser.js`, peg, prefix);
+  merge_file(`${dir}/#PREFIX${lang}_bcv_parser.js`, peg, prefix);
 }
 
 function merge_file(file, peg, prefix) {
