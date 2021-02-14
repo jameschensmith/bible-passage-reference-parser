@@ -1,4 +1,3 @@
 module.exports = {
-  preset: "@danielbayley/jest-preset-coffeescript",
-  testMatch: ["<rootDir>/src/**/spec.coffee"],
+  testMatch: ["<rootDir>/src/**/spec.js"],
 };
