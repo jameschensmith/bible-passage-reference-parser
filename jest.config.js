@@ -1,3 +1,3 @@
 module.exports = {
-  testMatch: ["<rootDir>/src/**/spec.js"],
+  testPathIgnorePatterns: ["<rootDir>/tools/", "<rootDir>/node_modules/"],
 };
