@@ -1,11 +1,11 @@
-const { execSync } = require("child_process");
-const fs = require("fs");
+import { execSync } from "child_process";
+import fs from "fs";
 
 const arg_lang = process.argv[2];
 
-const dir = "js";
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir);
+const out_dir = "js";
+if (!fs.existsSync(out_dir)) {
+  fs.mkdirSync(out_dir);
 }
 
 if (arg_lang) {
@@ -16,7 +16,7 @@ if (arg_lang) {
     .forEach(compile);
 }
 
-function compile(lang) {
+function compile(lang: string) {
   console.log(`Compiling lang '${lang}'...`);
   execSync(
     `pegjs --format globals --export-var grammar -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
@@ -24,14 +24,14 @@ function compile(lang) {
   add_pegjs_global(`temp_${lang}_grammar.js`);
   console.log("Joining...");
   execSync(
-    `cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/${lang}/translations.coffee" "src/${lang}/regexps.coffee" | coffee --no-header --compile --stdio > "${dir}/${lang}_bcv_parser.js"`
+    `cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/${lang}/translations.coffee" "src/${lang}/regexps.coffee" | coffee --no-header --compile --stdio > "${out_dir}/${lang}_bcv_parser.js"`
   );
   add_peg(lang, "");
   // compile_closure();
   fs.rmSync(`temp_${lang}_grammar.js`);
 }
 
-function add_peg(lang, prefix) {
+function add_peg(lang: string, prefix: string) {
   let peg = fs.readFileSync(`temp_${prefix}${lang}_grammar.js`).toString();
 
   // Ideally, it would `return res[0].split("");`, but this is faster, and PEG.js doesn't care.
@@ -63,9 +63,9 @@ function add_peg(lang, prefix) {
   //       return peg$FAILED;
   //     }
   //   }`;
-  const sequence_regex_var = peg.match(
-    /function peg\$parsesequence_sep\(\) \{\s+var s.+;\s+s0 =.+\s+s1 =.+\s+if \((peg\$c\d+)\.test/
-  )[1];
+  const sequence_regex_var = /function peg\$parsesequence_sep\(\) \{\s+var s.+;\s+s0 =.+\s+s1 =.+\s+if \((peg\$c\d+)\.test/.exec(
+    peg
+  )?.[1];
   if (!sequence_regex_var) {
     throw new Error("No sequence var");
   }
@@ -74,7 +74,7 @@ function add_peg(lang, prefix) {
     "\\$1"
   );
   const re = new RegExp(`${escaped_regex} = \\/\\^\\[,([^\\]]+?\\]\\/)`);
-  let sequence_regex_value = peg.match(re)[1];
+  let sequence_regex_value = re.exec(peg)?.[1];
   if (!sequence_regex_value) {
     throw new Error("No sequence value");
   }
@@ -102,14 +102,14 @@ function add_peg(lang, prefix) {
   // if (/parse(?:space|integer|any_integer)\(\) \{\s+var s/i.test(peg)) {
   //   throw new Error(`Unreplaced PEG space: ${peg}`);
   // }
-  if (!/"punctuation_strategy"/.test(peg)) {
+  if (!peg.includes('"punctuation_strategy"')) {
     throw new Error("Unreplaced options");
   }
 
-  merge_file(`${dir}/#PREFIX${lang}_bcv_parser.js`, peg, prefix);
+  merge_file(`${out_dir}/#PREFIX${lang}_bcv_parser.js`, peg, prefix);
 }
 
-function merge_file(file, peg, prefix) {
+function merge_file(file: string, peg: string, prefix: string) {
   if (prefix && prefix !== "") {
     prefix += "/";
   }
@@ -129,7 +129,7 @@ function merge_file(file, peg, prefix) {
 //   // print `node template_closure.js $lang`;
 // }
 
-function add_pegjs_global(filename) {
+function add_pegjs_global(filename: string) {
   let data = fs.readFileSync(filename).toString();
   data = `var grammar;\n${data}`;
   data = data.replace(/\broot\.grammar/, "grammar");
