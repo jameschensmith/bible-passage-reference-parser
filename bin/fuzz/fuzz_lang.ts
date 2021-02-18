@@ -1,19 +1,19 @@
-/* eslint-disable no-continue,no-shadow,babel/new-cap */
-const fs = require("fs");
+/* eslint-disable */
+import fs from "fs";
 
 const lang = "en";
 const max_length = 100;
 
-const bcv_parser = require(`../../js/${lang}_bcv_parser`).bcv_parser;
+const { bcv_parser } = require(`../../js/${lang}_bcv_parser`);
 const bcv = new bcv_parser();
 
 // prettier-ignore
-const possibles = {
+const possibles: Record<string, any> = {
   book: get_abbrevs(lang),
   translation: get_translations(),
-  number: [...Array(1100).keys()],
-  chapter: [...Array(152).keys()],
-  verse: [...Array(177).keys()],
+  number: Array.from({ length: 1100 }, (_, i) => i),
+  chapter: Array.from({ length: 152 }, (_, i) => i),
+  verse: Array.from({ length: 177 }, (_, i) => i),
   cv_sep: [":", ".", '"', "'", " "],
   range_sep: ["-", "\u2013", "\u2014", "through", "thru", "to"],
   sequence_sep: [",", ";", "/", ":", "&", "-", "\u2013", "\u2014", "~", "and", "compare", "cf", "cf.", "see also", "also", "see", " "],
@@ -28,7 +28,7 @@ const possibles = {
   punctuation: [",", ".", "!", "?", "-", "'", '"', "\u2019"],
   parentheses: ["(", ")", "[", "]", "{", "}"],
   letter: ["f", "g", "h", "n"],
-  char_ascii: [...Array(127).keys()],
+  char_ascii: Array.from({ length: 127 }, (_, i) => i),
   char_unicode: Array.from({ length: 65535 - 128 }, (_, i) => 128 + i),
   bcv: "$book$chapter$cv_sep$verse",
   b_range: "$book$range_sep$book",
@@ -44,7 +44,7 @@ const options = get_options();
 const possible_keys = Object.keys(possibles);
 const option_keys = Object.keys(options);
 let total_length = 0;
-const start_time = new Date();
+const start_time = Date.now();
 
 for (let i = 1, o = 1; o <= 10000000; i = ++o) {
   const my_options = create_options(option_keys);
@@ -52,7 +52,7 @@ for (let i = 1, o = 1; o <= 10000000; i = ++o) {
   const text = build_text(possible_keys);
   total_length += text.length;
   if (i % 1000 === 0) {
-    const elapsed_time = Math.round((new Date() - start_time) / 1000);
+    const elapsed_time = Math.round((Date.now() - start_time) / 1000);
     const bytes_per_second = Math.round(total_length / elapsed_time);
     console.log(
       `${i} ${elapsed_time} sec ${Math.round(
@@ -68,7 +68,7 @@ for (let i = 1, o = 1; o <= 10000000; i = ++o) {
         throw result;
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     const e = error;
     console.log(e);
     console.log(my_options);
@@ -77,9 +77,9 @@ for (let i = 1, o = 1; o <= 10000000; i = ++o) {
   }
 }
 
-function get_abbrevs(lang) {
+function get_abbrevs(language: string) {
   const lines = fs
-    .readFileSync(`src/${lang}/book_names.txt`)
+    .readFileSync(`src/${language}/book_names.txt`)
     .toString()
     .split("\n");
   const out = [];
@@ -100,22 +100,22 @@ function get_translations() {
 
 function get_options() {
   const lines = fs.readFileSync("README.adoc").toString().split("\n");
-  const out = {};
+  const out: Record<string, any> = {};
   let option = "";
   let go = false;
   let result;
   for (let j = 0; j < lines.length; j++) {
     const line = lines[j];
-    if (go && line.match(/^=== /)) {
+    if (go && /^=== /.exec(line)) {
       break;
     }
-    if (line.match(/^=== Options/)) {
+    if (/^=== Options/.exec(line)) {
       go = true;
     }
     if (!go) {
       continue;
     }
-    if ((result = line.match(/^\* `(\w+):/))) {
+    if ((result = /^\* `(\w+):/.exec(line))) {
       option = result[1];
       out[option] = [];
     } else if ((result = line.match(/^\*\* `(\w+)`/))) {
@@ -128,8 +128,8 @@ function get_options() {
   return out;
 }
 
-function create_options(keys) {
-  const out = {};
+function create_options(keys: string[]) {
+  const out: Record<string, any> = {};
   for (let j = 0; j < keys.length; j++) {
     const option = keys[j];
     out[option] = get_random_item_from_array(options[option]);
@@ -137,11 +137,11 @@ function create_options(keys) {
   return out;
 }
 
-function get_random_item_from_array(items) {
+function get_random_item_from_array(items: any[]) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function build_text(keys) {
+function build_text(keys: string[]) {
   const out = [];
   let rand = Math.random();
   const length = Math.ceil(rand * max_length);
@@ -156,7 +156,7 @@ function build_text(keys) {
   return out.join("");
 }
 
-function make_token(type) {
+function make_token(type: string) {
   const rand = Math.random();
   const possible = possibles[type];
   let token;
@@ -167,13 +167,13 @@ function make_token(type) {
   } else {
     token = get_random_item_from_array(possible);
   }
-  if (rand >= 0.5 && type.match(/^translation/)) {
+  if (rand >= 0.5 && /^translation/.exec(type)) {
     token = `(${token})`;
   }
   return token;
 }
 
-function build_nested_string(text) {
+function build_nested_string(text: string) {
   text = text.replace(/\$(\w+)/g, (_, type) => {
     let match = make_token(type);
     const rand = Math.random();
