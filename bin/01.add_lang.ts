@@ -1,7 +1,7 @@
-/* eslint-disable complexity,max-depth,max-statements,no-continue,no-shadow */
-const fs = require("fs");
+/* eslint-disable */
+import fs from "fs";
 
-const regexgen = require("regexgen");
+import regexgen from "regexgen";
 
 const lang = process.argv[2];
 if (!lang || !/^\w+$/.test(lang)) {
@@ -19,7 +19,7 @@ let letters = "";
 // prettier-ignore
 const valid_osises = make_valid_osises(["Gen","Exod","Lev","Num","Deut","Josh","Judg","Ruth","1Sam","2Sam","1Kgs","2Kgs","1Chr","2Chr","Ezra","Neh","Esth","Job","Ps","Prov","Eccl","Song","Isa","Jer","Lam","Ezek","Dan","Hos","Joel","Amos","Obad","Jonah","Mic","Nah","Hab","Zeph","Hag","Zech","Mal","Matt","Mark","Luke","John","Acts","Rom","1Cor","2Cor","Gal","Eph","Phil","Col","1Thess","2Thess","1Tim","2Tim","Titus","Phlm","Heb","Jas","1Pet","2Pet","1John","2John","3John","Jude","Rev","Tob","Jdt","GkEsth","Wis","Sir","Bar","PrAzar","Sus","Bel","SgThree","EpJer","1Macc","2Macc","3Macc","4Macc","1Esd","2Esd","PrMan","AddEsth","AddDan"]);
 
-const raw_abbrevs = {};
+const raw_abbrevs: Record<string, Record<string, number>> = {};
 const vars = get_vars();
 const abbrevs = get_abbrevs();
 const order = get_order();
@@ -31,8 +31,8 @@ make_translations();
 
 function make_translations() {
   let out = get_file_contents(`${tools_dir}/template/translations.coffee`);
-  const regexps = [];
-  const aliases = [];
+  const regexps: string[] = [];
+  const aliases: string[] = [];
   vars.$TRANS.forEach((translation) => {
     const group = translation.split(",");
     const [trans, osis] = group;
@@ -136,7 +136,7 @@ function make_regexps() {
     .map((c) => format_value("quote", c))
     .join("|");
   out = out.replace(/\$PRE_BOOK_ALLOWED_CHARACTERS/, pre);
-  let passage_components = [];
+  let passage_components: string[] = [];
   const variables = ["$CHAPTER", "$NEXT", "$FF", "$TO", "$AND", "$VERSE"];
   variables.forEach((variable) => {
     if (vars[variable]) {
@@ -161,8 +161,8 @@ function make_regexps() {
   }
 }
 
-function make_regexp_set(osises) {
-  const out = [];
+function make_regexp_set(osises: { osis: string; apocrypha: number }[]) {
+  const out: string[] = [];
   let has_psalm_cb = 0;
   osises.forEach((ref) => {
     const { osis, apocrypha } = ref;
@@ -174,7 +174,7 @@ function make_regexp_set(osises) {
       out.push(get_file_contents(`${dir}/${lang}/psalm_cb.coffee`));
       has_psalm_cb = 1;
     }
-    const safes = {};
+    const safes: Record<string, number> = {};
     Object.keys(raw_abbrevs[osis]).forEach((abbrev) => {
       const safe = abbrev.replace(/[[\]?]/g, "");
       safes[safe] = safe.length;
@@ -183,16 +183,16 @@ function make_regexp_set(osises) {
       make_regexp(
         osis,
         apocrypha,
-        Object.keys(safes).sort((a, b) => safes[b] > safes[a])
+        Object.keys(safes).sort((a, b) => safes[b] - safes[a])
       )
     );
   });
   return out.join("\x0a\t,\x0a");
 }
 
-function make_regexp(osis, apocrypha, safes) {
-  const out = [];
-  const abbrevs = [];
+function make_regexp(osis: string, apocrypha: number, safes: string[]) {
+  const out: string[] = [];
+  const abbrevs: string[] = [];
   safes.forEach((abbrev) => {
     abbrev = abbrev.replace(/ /g, `${regexp_space}*`);
     abbrev = abbrev.replace(/[\u200b]/g, () => {
@@ -232,23 +232,29 @@ function make_regexp(osis, apocrypha, safes) {
   return out.join("");
 }
 
-function make_book_regexp(osis, abbrevs, recurse_level) {
+function make_book_regexp(
+  osis: string,
+  abbrevs: string[],
+  recurse_level: number
+) {
   abbrevs = abbrevs.map((abbrev) => {
     return abbrev.replace(/\\/g, "");
   });
   const subsets = get_book_subsets(abbrevs);
-  const out = [];
+  const out: string[] = [];
   subsets.forEach((subset) => {
     const json = JSON.stringify(subset);
     const base64 = Buffer.from(json).toString("base64");
     console.log(`${osis} ${base64.length}`);
 
-    const regexp = JSON.parse(make_subset_regexp(base64));
+    const regexp: { patterns: string[] } = JSON.parse(
+      make_subset_regexp(base64)
+    );
     if (!regexp.patterns) {
       throw new Error("No regexp json object");
     }
 
-    const patterns = [];
+    const patterns: string[] = [];
     regexp.patterns.forEach((pattern) => {
       pattern = format_node_regexp_pattern(pattern);
       patterns.push(pattern);
@@ -261,7 +267,7 @@ function make_book_regexp(osis, abbrevs, recurse_level) {
   return out.join("|");
 }
 
-function make_subset_regexp(base64) {
+function make_subset_regexp(base64: string) {
   const subset = Buffer.from(base64, "base64").toString("utf8");
   let strings = JSON.parse(subset);
   const out = [];
@@ -297,7 +303,11 @@ function make_subset_regexp(base64) {
   return JSON.stringify({ patterns: out }).replace(/\\\\u/g, "\\u");
 }
 
-function validate_full_node_regexp(osis, pattern, abbrevs) {
+function validate_full_node_regexp(
+  osis: string,
+  pattern: string,
+  abbrevs: string[]
+) {
   const matcher = new RegExp(`^(?:${pattern})`);
   abbrevs.forEach((abbrev) => {
     if (!matcher.test(abbrev)) {
@@ -306,15 +316,15 @@ function validate_full_node_regexp(osis, pattern, abbrevs) {
   });
 }
 
-function get_book_subsets(abbrevs) {
+function get_book_subsets(abbrevs: string[]) {
   if (abbrevs.length <= 20) {
     return [abbrevs];
   }
-  const groups = [[]];
-  const subs = {};
+  const groups: string[][] = [[]];
+  const subs: Record<string, number> = {};
   abbrevs.sort((a, b) => b.length - a.length);
   while (abbrevs.length !== 0) {
-    const long = abbrevs.shift();
+    const long = abbrevs.shift()!;
     if (subs[long]) {
       continue;
     }
@@ -340,7 +350,13 @@ function get_book_subsets(abbrevs) {
   return groups;
 }
 
-function validate_node_regexp(osis, pattern, abbrevs, recurse_level, note) {
+function validate_node_regexp(
+  osis: string,
+  pattern: string,
+  abbrevs: string[],
+  recurse_level: number,
+  note?: string
+): string {
   const [oks, not_oks] = check_regexp_pattern(osis, pattern, abbrevs);
   if (!not_oks.length) {
     return pattern;
@@ -351,8 +367,8 @@ function validate_node_regexp(osis, pattern, abbrevs, recurse_level, note) {
       throw new Error(`'Lengths' didn't work: ${osis}`);
     }
     const lengths = split_by_length(abbrevs);
-    const patterns = [];
-    lengths
+    const patterns: string[] = [];
+    Object.keys(lengths)
       .sort()
       .reverse()
       .forEach((length) => {
@@ -385,8 +401,8 @@ function validate_node_regexp(osis, pattern, abbrevs, recurse_level, note) {
   return new_pattern;
 }
 
-function split_by_length(abbrevs) {
-  const lengths = {};
+function split_by_length(abbrevs: string[]) {
+  const lengths: Record<string, string[]> = {};
   abbrevs.forEach((abbrev) => {
     const length = Math.floor(abbrev.length / 2);
     if (!lengths[length]) {
@@ -397,9 +413,13 @@ function split_by_length(abbrevs) {
   return lengths;
 }
 
-function check_regexp_pattern(osis, pattern, abbrevs) {
-  const oks = [];
-  const not_oks = [];
+function check_regexp_pattern(
+  osis: string,
+  pattern: string,
+  abbrevs: string[]
+): [string[], string[]] {
+  const oks: string[] = [];
+  const not_oks: string[] = [];
   const matcher = new RegExp(`^(?:${pattern})`, "i");
   abbrevs.forEach((abbrev) => {
     let compare = `${abbrev} 1`;
@@ -413,7 +433,7 @@ function check_regexp_pattern(osis, pattern, abbrevs) {
   return [oks, not_oks];
 }
 
-function format_node_regexp_pattern(pattern) {
+function format_node_regexp_pattern(pattern: string) {
   if (!/^\/\^/.test(pattern) || !/\$\/$/.test(pattern)) {
     throw new Error(`Unexpected regexp pattern: ${pattern}`);
   }
@@ -421,9 +441,9 @@ function format_node_regexp_pattern(pattern) {
   pattern = pattern.replace(/\$\/$/, "");
   if (/\[/.test(pattern)) {
     const parts = pattern.split("[");
-    const out = [parts.shift()];
+    const out = [parts.shift()!];
     while (parts.length !== 0) {
-      let part = parts.shift();
+      let part = parts.shift()!;
       if (/\\$/.test(out[out.length - 1])) {
         out.push(part);
         continue;
@@ -468,12 +488,12 @@ function format_node_regexp_pattern(pattern) {
   return pattern;
 }
 
-function format_value(type, value) {
+function format_value(type: string, value: string) {
   vars.$TEMP_VALUE = [value];
   return format_var(type, "$TEMP_VALUE");
 }
 
-function format_var(type, var_name) {
+function format_var(type: string, var_name: string) {
   let values = vars[var_name];
   if (type === "regexp" || type === "quote") {
     values = values.map((value) => {
@@ -503,11 +523,11 @@ function format_var(type, var_name) {
       value = value.replace(/"{2,}/g, "");
       value = value.replace(/^\s+|\s+$/g, "");
       value += " ";
-      const out = [];
+      const out: string[] = [];
       const parts = value.split('"');
       let is_outside_quote = 1;
       while (parts.length !== 0) {
-        let part = parts.shift();
+        let part = parts.shift()!;
         if (is_outside_quote === 0) {
           part = part.replace(/^ /, () => {
             out[out.length - 1] += "space ";
@@ -565,9 +585,9 @@ function format_var(type, var_name) {
   }
 }
 
-function handle_pegjs_prepends(out, values) {
+function handle_pegjs_prepends(out: string, values: string[]) {
   const count = values.length;
-  const lcs = {};
+  const lcs: Record<string, string[]> = {};
   values.forEach((c) => {
     if (!/^"/.test(c)) {
       return;
@@ -614,9 +634,9 @@ function handle_pegjs_prepends(out, values) {
 }
 
 function make_tests() {
-  let out_array = [];
-  const osises = [...order];
-  const all_abbrevs = {};
+  let out_array: string[] = [];
+  const osises = [...order] as any[];
+  const all_abbrevs: Record<string, any> = {};
   Object.keys(abbrevs)
     .sort()
     .forEach((osis) => {
@@ -628,7 +648,7 @@ function make_tests() {
 
   osises.forEach((ref) => {
     const { osis } = ref;
-    const tests = [];
+    const tests: string[] = [];
     const [first] = osis.split(",");
     const match = `${first}.1.1`;
     sort_abbrevs_by_length(Object.keys(abbrevs[osis])).forEach((abbrev) => {
@@ -711,7 +731,7 @@ function make_tests() {
       all_abbrevs[osis] = osis_abbrevs;
     });
 
-  let misc_tests = [];
+  let misc_tests: string[] = [];
   misc_tests = misc_tests.concat(add_range_tests());
   misc_tests = misc_tests.concat(add_chapter_tests());
   misc_tests = misc_tests.concat(add_verse_tests());
@@ -741,9 +761,9 @@ function make_tests() {
   return all_abbrevs;
 }
 
-function sort_abbrevs_by_length(abbrevs) {
-  const lengths = {};
-  let out = [];
+function sort_abbrevs_by_length(abbrevs: string[]) {
+  const lengths: Record<string, string[]> = {};
+  let out: string[] = [];
   abbrevs.forEach((abbrev) => {
     const length = abbrev.length;
     if (!lengths[length]) {
@@ -761,13 +781,17 @@ function sort_abbrevs_by_length(abbrevs) {
   return out;
 }
 
-function add_abbrev_to_all_abbrevs(osis, abbrev, all_abbrevs) {
+function add_abbrev_to_all_abbrevs(
+  osis: string,
+  abbrev: string,
+  all_abbrevs: Record<string, Record<string, number>>
+) {
   if (/\./.test(abbrev) && abbrev !== "\u0418.\u041d") {
     // split by '.', while removing any empty fields
     const news = abbrev.match(/[^.]+/g) ?? [];
-    let olds = [news.shift()];
+    let olds = [news.shift()!];
     news.forEach((n) => {
-      const temp = [];
+      const temp: string[] = [];
       olds.forEach((old) => {
         temp.push(`${old}.${n}`);
         temp.push(`${old}${n}`);
@@ -788,9 +812,9 @@ function add_abbrev_to_all_abbrevs(osis, abbrev, all_abbrevs) {
   }
 }
 
-function add_non_latin_digit_tests(osis, tests) {
+function add_non_latin_digit_tests(osis: string, tests: string[]) {
   const temp = tests.join("\n");
-  const out = [];
+  const out: string[] = [];
   if (
     !/[\u0660-\u0669\u06f0-\u06f9\u07c0-\u07c9\u0966-\u096f\u09e6-\u09ef\u0a66-\u0a6f\u0ae6-\u0aef\u0b66-\u0b6f\u0be6-\u0bef\u0c66-\u0c6f\u0ce6-\u0cef\u0d66-\u0d6f\u0e50-\u0e59\u0ed0-\u0ed9\u0f20-\u0f29\u1040-\u1049\u1090-\u1099\u17e0-\u17e9\u1810-\u1819\u1946-\u194f\u19d0-\u19d9\u1a80-\u1a89\u1a90-\u1a99\u1b50-\u1b59\u1bb0-\u1bb9\u1c40-\u1c49\u1c50-\u1c59\ua620-\ua629\ua8d0-\ua8d9\ua900-\ua909\ua9d0-\ua9d9\uaa50-\uaa59\uabf0-\uabf9\uff10-\uff19]/.test(
       temp
@@ -807,7 +831,7 @@ function add_non_latin_digit_tests(osis, tests) {
 }
 
 function add_range_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle ranges (${lang})", () => {`);
   vars.$TO.forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach((to) => {
@@ -829,7 +853,7 @@ function add_range_tests() {
 }
 
 function add_chapter_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle chapters (${lang})", () => {`);
   vars.$CHAPTER.forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
@@ -850,7 +874,7 @@ function add_chapter_tests() {
 }
 
 function add_verse_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle verses (${lang})", () => {`);
   vars.$VERSE.forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
@@ -871,7 +895,7 @@ function add_verse_tests() {
 }
 
 function add_sequence_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle 'and' (${lang})", () => {`);
   vars.$AND.forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
@@ -892,7 +916,7 @@ function add_sequence_tests() {
 }
 
 function add_title_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle titles (${lang})", () => {`);
   vars.$TITLE.forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
@@ -913,7 +937,7 @@ function add_title_tests() {
 }
 
 function add_ff_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle 'ff' (${lang})", () => {`);
   if (lang === "it") {
     out.push('\t\tp.set_options({case_sensitive: "books"});');
@@ -943,7 +967,7 @@ function add_next_tests() {
   if (!vars.$NEXT) {
     return [];
   }
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle 'next' (${lang})", () => {`);
   if (lang === "it") {
     out.push('\t\tp.set_options({case_sensitive: "books"});');
@@ -990,7 +1014,7 @@ function add_next_tests() {
 }
 
 function add_trans_tests() {
-  const out = [];
+  const out: string[] = [];
   out.push(`\tit("should handle translations (${lang})", () => {`);
   [...vars.$TRANS].sort().forEach((abbrev) => {
     expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
@@ -1028,13 +1052,13 @@ function add_book_range_tests() {
     );
     return [];
   }
-  const out = [];
+  const out: string[] = [];
   const johns = expand_abbrev(handle_accents(john));
   out.push(`\tit("should handle book ranges (${lang})", () => {`);
   out.push(
     '\t\tp.set_options({book_alone_strategy: "full", book_range_strategy: "include"});'
   );
-  const alreadys = {};
+  const alreadys: Record<string, number> = {};
   johns.sort().forEach((abbrev) => {
     vars.$TO.forEach((to_regex) => {
       expand_abbrev(remove_exclamations(handle_accents(to_regex))).forEach(
@@ -1066,7 +1090,7 @@ function add_boundary_tests() {
 function get_abbrevs() {
   const fd = fs.openSync(`temp.corrections.txt`, "w");
   let has_corrections = 0;
-  const out = {};
+  const out: Record<string, Record<string, number>> = {};
   const data = get_file_contents(`${dir}/${lang}/data.txt`);
   data.split("\n").forEach((line) => {
     if (/\t\s/.test(line) && /^[^*]/.test(line)) {
@@ -1125,7 +1149,7 @@ function get_abbrevs() {
       }
       abbrev = handle_accents(abbrev);
       const alts = expand_abbrev_vars(abbrev);
-      if (/.\$/.test(alts)) {
+      if (/.\$/.test(alts.join(""))) {
         throw new Error(`Alts:${alts}`);
       }
       alts.forEach((alt) => {
@@ -1151,13 +1175,13 @@ function get_abbrevs() {
   return out;
 }
 
-function expand_abbrev_vars(abbrev) {
+function expand_abbrev_vars(abbrev: string) {
   abbrev = abbrev.replace(/\\(?![()[\]|s])/g, "");
   if (!/\$[A-Z]+/.test(abbrev)) {
     return [abbrev];
   }
-  const variable = abbrev.match(/(\$[A-Z]+)(?!\w)/)[1];
-  let out = [];
+  const variable = abbrev.match(/(\$[A-Z]+)(?!\w)/)![1];
+  let out: string[] = [];
   let recurse = 0;
   vars[variable].forEach((value) => {
     expand_abbrev(value).forEach((val) => {
@@ -1180,7 +1204,7 @@ function expand_abbrev_vars(abbrev) {
     });
   });
   if (recurse) {
-    let temps = [];
+    let temps: string[] = [];
     out.forEach((abbrev) => {
       const adds = expand_abbrev_vars(abbrev);
       temps = temps.concat(adds);
@@ -1191,7 +1215,7 @@ function expand_abbrev_vars(abbrev) {
 }
 
 function get_order() {
-  const out = [];
+  const out: { osis: string; apocrypha: number }[] = [];
   const data = get_file_contents(`${dir}/${lang}/data.txt`);
   data.split("\n").forEach((line) => {
     if (!/^=/.test(line)) {
@@ -1215,7 +1239,7 @@ function get_order() {
 }
 
 function get_vars() {
-  const out = {};
+  const out: Record<string, string[]> = {};
   const data = get_file_contents(`${dir}/${lang}/data.txt`);
   data.split("\n").forEach((line) => {
     if (!/^\$/.test(line)) {
@@ -1234,7 +1258,7 @@ function get_vars() {
       valid_characters = valid_characters.replace(/\]$/, char);
     }
   });
-  letters = get_pre_book_characters(out.$UNICODE_BLOCK, "");
+  letters = get_pre_book_characters(out.$UNICODE_BLOCK);
   if (!out.$PRE_BOOK_ALLOWED_CHARACTERS) {
     out.$PRE_BOOK_ALLOWED_CHARACTERS = [letters];
   }
@@ -1253,7 +1277,7 @@ function get_vars() {
   return out;
 }
 
-function get_pre_passage_characters(allowed_chars) {
+function get_pre_passage_characters(allowed_chars: string[]) {
   let pattern = allowed_chars.join("|");
   if (/^\[\^[^\]]+?\]$/.test(pattern)) {
     pattern = pattern.replace(/`/g, "");
@@ -1267,13 +1291,13 @@ function get_pre_passage_characters(allowed_chars) {
   return pattern;
 }
 
-function get_pre_book_characters(unicodes_ref) {
+function get_pre_book_characters(unicodes_ref: string[]) {
   if (!unicodes_ref.length) {
     throw new Error("No $UNICODE_BLOCK is set");
   }
   const blocks = get_unicode_blocks(unicodes_ref);
   const letters_array = get_letters(blocks);
-  const out_array = [];
+  const out_array: string[] = [];
   letters_array.forEach((ref) => {
     const [start, end] = ref;
     out_array.push(end === start ? start : `${start}-${end}`);
@@ -1283,8 +1307,8 @@ function get_pre_book_characters(unicodes_ref) {
   return `[^${out}]`;
 }
 
-function get_letters(blocks) {
-  const out = {};
+function get_letters(blocks: [number, number][]) {
+  const out: Record<string, number> = {};
   const data = get_file_contents(`bin/letters/letters.txt`);
   data.split("\n").forEach((line) => {
     if (!/^\\u/.test(line)) {
@@ -1293,12 +1317,12 @@ function get_letters(blocks) {
     line = line.replace(/\\u/g, "");
     line = line.replace(/\s*#.+$/, "");
     line = line.replace(/\s+/g, "");
-    let [start, end = start] = line.split("-");
-    [start, end] = [parseInt(start, 16), parseInt(end, 16)];
+    const [start, end = start] = line.split("-");
+    const [start_num, end_num] = [parseInt(start, 16), parseInt(end, 16)];
     blocks.forEach((ref) => {
       const [start_range, end_range] = ref;
-      if (end >= start_range && start <= end_range) {
-        for (let i = start; i <= end; i++) {
+      if (end_num >= start_range && start_num <= end_range) {
+        for (let i = start_num; i <= end_num; i++) {
           if (i < start_range || i > end_range) {
             continue;
           }
@@ -1308,7 +1332,7 @@ function get_letters(blocks) {
     });
   });
   let prev = -2;
-  const out_array = [];
+  const out_array: [string, string][] = [];
   Object.keys(out)
     .map((key) => parseInt(key, 10))
     .forEach((pos) => {
@@ -1324,12 +1348,12 @@ function get_letters(blocks) {
   return out_array;
 }
 
-function get_unicode_blocks(unicodes_ref) {
+function get_unicode_blocks(unicodes_ref: string[]) {
   let unicode = unicodes_ref.join("|");
   if (!/Basic_Latin/.test(unicode)) {
     unicode += "|Basic_Latin";
   }
-  const out = [];
+  const out: [number, number][] = [];
   const data = get_file_contents(`bin/letters/blocks.txt`);
   data.split("\n").forEach((line) => {
     if (!/^\w/.test(line)) {
@@ -1346,7 +1370,7 @@ function get_unicode_blocks(unicodes_ref) {
   return out;
 }
 
-function expand_abbrev(abbrev) {
+function expand_abbrev(abbrev: string) {
   if (!/[[(?|\\]/.test(abbrev)) {
     return [abbrev];
   }
@@ -1357,9 +1381,9 @@ function expand_abbrev(abbrev) {
     let char = chars.shift();
     let is_optional = 0;
     if (char === "[") {
-      const nexts = [];
+      const nexts: string[] = [];
       while (chars.length !== 0) {
-        const next = chars.shift();
+        const next = chars.shift()!;
         if (next === "]") {
           break;
         } else if (next === "\\") {
@@ -1377,9 +1401,9 @@ function expand_abbrev(abbrev) {
       if (is_optional) {
         nexts.push("");
       }
-      const temps = [];
+      const temps: string[] = [];
       outs.forEach((out) => {
-        const alreadys = {};
+        const alreadys: Record<string, number> = {};
         nexts.forEach((next) => {
           if (alreadys[next]) {
             return;
@@ -1390,9 +1414,9 @@ function expand_abbrev(abbrev) {
       });
       outs = temps;
     } else if (char === "(") {
-      let nexts = [];
+      let nexts: string[] = [];
       while (chars.length !== 0) {
-        const next = chars.shift();
+        const next = chars.shift()!;
         if (!nexts.length && next === "?" && chars[0] === ":") {
           throw new Error("'(?:' in parentheses; replace with just '('");
           // chars.shift();
@@ -1402,7 +1426,7 @@ function expand_abbrev(abbrev) {
           break;
         } else if (next === "\\") {
           nexts.push(next);
-          nexts.push(chars.shift());
+          nexts.push(chars.shift()!);
         } else {
           nexts.push(next);
         }
@@ -1412,7 +1436,7 @@ function expand_abbrev(abbrev) {
       if (is_optional) {
         nexts.push("");
       }
-      const temps = [];
+      const temps: string[] = [];
       outs.forEach((out) => {
         nexts.forEach((next) => {
           temps.push(`${out}${next}`);
@@ -1420,10 +1444,10 @@ function expand_abbrev(abbrev) {
       });
       outs = temps;
     } else if (char === "|") {
-      outs.push(expand_abbrev(chars.join("")));
+      outs.push(...expand_abbrev(chars.join("")));
       return outs;
     } else {
-      const temps = [];
+      const temps: string[] = [];
       if (char === "\\") {
         // Just use the next character
         char = chars.shift();
@@ -1445,7 +1469,7 @@ function expand_abbrev(abbrev) {
   return outs;
 }
 
-function is_next_char_optional(chars) {
+function is_next_char_optional(chars: string[]): [number, string[]] {
   if (!chars) {
     return [0, chars];
   }
@@ -1457,12 +1481,12 @@ function is_next_char_optional(chars) {
   return [is_optional, chars];
 }
 
-function handle_accents(text) {
+function handle_accents(text: string) {
   const chars = text.split("");
   const texts = [];
   let context = "";
   while (chars.length !== 0) {
-    let char = chars.shift();
+    let char = chars.shift()!;
     if (/^[\u0080-\uffff]$/.test(char)) {
       if (chars && chars[0] === "`") {
         texts.push(char);
@@ -1505,11 +1529,11 @@ function handle_accents(text) {
   return text;
 }
 
-function remove_exclamations(text) {
+function remove_exclamations(text: string) {
   return text.includes("!") ? text.split("!")[0] : text;
 }
 
-function handle_accent(char) {
+function handle_accent(char: string) {
   let alt = char.normalize("NFD");
   if (
     !vars.$COLLAPSE_COMBINING_CHARACTERS ||
@@ -1565,7 +1589,7 @@ function handle_accent(char) {
   return char;
 }
 
-function is_valid_osis(osis) {
+function is_valid_osis(osis: string) {
   osis.split(",").forEach((part) => {
     if (!valid_osises[part]) {
       throw new Error(`Invalid OSIS: ${osis} (${part})`);
@@ -1573,9 +1597,9 @@ function is_valid_osis(osis) {
   });
 }
 
-function make_valid_osises(osises) {
+function make_valid_osises(osises: string[]) {
   let type = "ot_nt";
-  return osises.reduce((out, osis) => {
+  return osises.reduce<Record<string, unknown>>((out, osis) => {
     if (osis === "Tob") {
       type = "apocrypha";
     }
@@ -1584,14 +1608,14 @@ function make_valid_osises(osises) {
   }, {});
 }
 
-function uc_normalize(text) {
+function uc_normalize(text: string) {
   return text.normalize("NFD").toUpperCase().normalize("NFC");
 }
 
-function get_file_contents(filename) {
+function get_file_contents(filename: string) {
   return fs.readFileSync(filename).toString();
 }
 
-function quote_meta(str) {
+function quote_meta(str: string) {
   return str.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&");
 }

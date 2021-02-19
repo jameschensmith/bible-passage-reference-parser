@@ -29,13 +29,14 @@
     "build": "ts-node bin/02.compile.ts",
     "format": "prettier --write --ignore-path=.gitignore .",
     "format:check": "prettier --check --ignore-path=.gitignore .",
-    "gen:lang": "node bin/01.add_lang.js",
+    "gen:lang": "ts-node bin/01.add_lang.ts",
     "lint": "eslint . --ignore-path .gitignore",
     "lint:fix": "eslint . --ignore-path .gitignore --fix",
     "test": "jest",
     "test:lang": "bash -c 'jest src/$0/spec.js'"
   },
   "devDependencies": {
+    "@types/regexgen": "^1.3.0",
     "coffeescript": "^1.12.7",
     "eslint": "^7.18.0",
     "eslint-config-kentcdodds": "^17.3.2",
