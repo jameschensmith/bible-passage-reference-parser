@@ -1,6 +1,7 @@
 /* eslint-disable complexity,max-depth,max-statements,no-continue,no-shadow */
-const { execSync } = require("child_process");
 const fs = require("fs");
+
+const regexgen = require("regexgen");
 
 const lang = process.argv[2];
 if (!lang || !/^\w+$/.test(lang)) {
@@ -239,22 +240,10 @@ function make_book_regexp(osis, abbrevs, recurse_level) {
   const out = [];
   subsets.forEach((subset) => {
     const json = JSON.stringify(subset);
-    let base64 = Buffer.from(json).toString("base64");
+    const base64 = Buffer.from(json).toString("base64");
     console.log(`${osis} ${base64.length}`);
 
-    let use_file = 0;
-    if (base64.length > 128_000) {
-      // Ubuntu limitation
-      use_file = 1;
-      fs.writeFileSync("./temp.txt", json);
-      base64 = "<";
-    }
-
-    let regexp = execSync(`node ./bin/make_regexps.js "${base64}"`);
-    if (use_file) {
-      fs.rmSync("./temp.txt");
-    }
-    regexp = JSON.parse(regexp.toString());
+    const regexp = JSON.parse(make_subset_regexp(base64));
     if (!regexp.patterns) {
       throw new Error("No regexp json object");
     }
@@ -270,6 +259,42 @@ function make_book_regexp(osis, abbrevs, recurse_level) {
   });
   validate_full_node_regexp(osis, out.join("|"), abbrevs);
   return out.join("|");
+}
+
+function make_subset_regexp(base64) {
+  const subset = Buffer.from(base64, "base64").toString("utf8");
+  let strings = JSON.parse(subset);
+  const out = [];
+  while (strings.length > 0) {
+    const pattern = regexgen(strings);
+    let pattern_string = pattern.toString();
+    pattern_string = `/^(?:${pattern_string.substr(1)}`;
+    pattern_string = `${pattern_string.substr(
+      0,
+      pattern_string.length - 1
+    )})$/`;
+    pattern_string = pattern_string.replace(
+      /([\x80-\uffff])/g,
+      (_, $1) => `\\u${`0000${$1.charCodeAt(0).toString(16)}`.substr(-4)}`
+    );
+    out.push(pattern_string);
+
+    const re = new RegExp(pattern);
+    const redos = [];
+    let max_length = 0;
+    for (let i = 0, max = strings.length; i < max; i++) {
+      if (re.test(strings[i])) {
+        if (strings[i].length > max_length) {
+          max_length = strings[i].length;
+        }
+      } else {
+        redos.push(strings[i]);
+      }
+    }
+    strings = redos;
+  }
+
+  return JSON.stringify({ patterns: out }).replace(/\\\\u/g, "\\u");
 }
 
 function validate_full_node_regexp(osis, pattern, abbrevs) {
