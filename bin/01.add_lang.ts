@@ -69,11 +69,12 @@ function make_translations() {
       `${dir}/${lang}/translation_alternates.coffee`
     );
   }
-  out = out.replace(/\$TRANS_REGEXP/g, regexp);
-  out = out.replace(/\$TRANS_ALIAS/g, alias);
-  out = out.replace(/\s*\$TRANS_ALTERNATE/g, `\n${alternate}`);
   const lang_isos = JSON.stringify(vars.$LANG_ISOS);
-  out = out.replace(/\$LANG_ISOS/g, lang_isos);
+  out = out
+    .replace(/\$TRANS_REGEXP/g, regexp)
+    .replace(/\$TRANS_ALIAS/g, alias)
+    .replace(/\s*\$TRANS_ALTERNATE/g, `\n${alternate}`)
+    .replace(/\$LANG_ISOS/g, lang_isos);
   fs.writeFileSync(`${dir}/${lang}/translations.coffee`, out);
   const found = out.match(/(\$[A-Z_]+)/);
   if (found) {
@@ -84,9 +85,10 @@ function make_translations() {
 function make_grammar() {
   let out = get_file_contents(`${tools_dir}/template/grammar.pegjs`);
   if (!vars.$NEXT) {
-    out = out.replace(/\nnext_v\s+=.+\s+\{ return[^}]+\}\s+\}\s+/, "\n");
-    out = out.replace(/\bnext_v \/ /g, "");
-    out = out.replace(/\$NEXT \/ /g, "");
+    out = out
+      .replace(/\nnext_v\s+=.+\s+\{ return[^}]+\}\s+\}\s+/, "\n")
+      .replace(/\bnext_v \/ /g, "")
+      .replace(/\$NEXT \/ /g, "");
     if (/\bnext_v\b|\$NEXT/.test(out)) {
       throw new Error("Grammar: next_v");
     }
@@ -126,12 +128,13 @@ function make_regexps() {
       osises.push({ osis, apocrypha });
     });
   const book_regexps = make_regexp_set(osises);
-  out = out.replace(/\$BOOK_REGEXPS/, book_regexps);
-  out = out.replace(/\$VALID_CHARACTERS/, valid_characters);
-  out = out.replace(
-    /\$PRE_PASSAGE_ALLOWED_CHARACTERS/,
-    vars.$PRE_PASSAGE_ALLOWED_CHARACTERS.join("|")
-  );
+  out = out
+    .replace(/\$BOOK_REGEXPS/, book_regexps)
+    .replace(/\$VALID_CHARACTERS/, valid_characters)
+    .replace(
+      /\$PRE_PASSAGE_ALLOWED_CHARACTERS/,
+      vars.$PRE_PASSAGE_ALLOWED_CHARACTERS.join("|")
+    );
   const pre = vars.$PRE_BOOK_ALLOWED_CHARACTERS
     .map((c) => format_value("quote", c))
     .join("|");
@@ -194,10 +197,11 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
   const out: string[] = [];
   const abbrevs: string[] = [];
   safes.forEach((abbrev) => {
-    abbrev = abbrev.replace(/ /g, `${regexp_space}*`);
-    abbrev = abbrev.replace(/[\u200b]/g, () => {
-      return `${regexp_space.replace(/\]$/, "\u200b]")}*`;
-    });
+    abbrev = abbrev
+      .replace(/ /g, `${regexp_space}*`)
+      .replace(/[\u200b]/g, () => {
+        return `${regexp_space.replace(/\]$/, "\u200b]")}*`;
+      });
     abbrev = handle_accent(abbrev);
     abbrev = abbrev.replace(/(\$[A-Z]+)(?!\w)/g, (_match, p1) => {
       return `${format_var("regexp", p1)}\\.?`;
@@ -205,8 +209,7 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
     abbrevs.push(abbrev);
   });
   const book_regexp = make_book_regexp(osis, all_abbrevs[osis], 1);
-  osis = osis.replace(/,+$/, "");
-  osis = osis.replace(/,/g, '", "');
+  osis = osis.replace(/,+$/, "").replace(/,/g, '", "');
   out.push(`\t\tosis: ["${osis}"]\x0a\t\t`);
   if (apocrypha) {
     out.push(`apocrypha: true\x0a\t\t`);
@@ -219,10 +222,11 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
     if (pre === "\\\\d|\\\\b") {
       pre = "\b";
     }
-    pre = pre.replace(/\\+d\|?/, "");
-    pre = pre.replace(/^\|+/, "");
-    pre = pre.replace(/^\||\|\||\|$/, ""); // remove leftover |
-    pre = pre.replace(/^\[\^/, "[^0-9"); // if it's a negated class, add \d
+    pre = pre
+      .replace(/\\+d\|?/, "")
+      .replace(/^\|+/, "")
+      .replace(/^\||\|\||\|$/, "") // remove leftover |
+      .replace(/^\[\^/, "[^0-9"); // if it's a negated class, add \d
   }
   const post = vars.$POST_BOOK_ALLOWED_CHARACTERS.join("|");
   out.push(`regexp: ///(^|${pre})(\x0a\t\t`);
@@ -437,8 +441,7 @@ function format_node_regexp_pattern(pattern: string) {
   if (!/^\/\^/.test(pattern) || !/\$\/$/.test(pattern)) {
     throw new Error(`Unexpected regexp pattern: ${pattern}`);
   }
-  pattern = pattern.replace(/^\/\^/, "");
-  pattern = pattern.replace(/\$\/$/, "");
+  pattern = pattern.replace(/^\/\^/, "").replace(/\$\/$/, "");
   if (/\[/.test(pattern)) {
     const parts = pattern.split("[");
     const out = [parts.shift()!];
@@ -482,9 +485,10 @@ function format_node_regexp_pattern(pattern: string) {
     }
     pattern = out.join("[");
   }
-  pattern = pattern.replace(/ /g, "[\\s\\xa0]*");
-  pattern = pattern.replace(/::OPTIONAL_SPACE::/g, "\\s\\xa0");
-  pattern = pattern.replace(/\u2009/g, "[\\s\\xa0]");
+  pattern = pattern
+    .replace(/ /g, "[\\s\\xa0]*")
+    .replace(/::OPTIONAL_SPACE::/g, "\\s\\xa0")
+    .replace(/\u2009/g, "[\\s\\xa0]");
   return pattern;
 }
 
@@ -497,11 +501,9 @@ function format_var(type: string, var_name: string) {
   let values = vars[var_name];
   if (type === "regexp" || type === "quote") {
     values = values.map((value) => {
-      value = value.replace(/\.$/, "");
-      value = value.replace(/!(.+)$/, "(?!$1)");
+      value = value.replace(/\.$/, "").replace(/!(.+)$/, "(?!$1)");
       if (type === "quote") {
-        value = value.replace(/\\/g, "\\\\");
-        value = value.replace(/"/g, '\\"');
+        value = value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       }
       return value;
     });
@@ -511,17 +513,18 @@ function format_var(type: string, var_name: string) {
     return values.length > 1 ? `(?:${out})` : out;
   } else if (type === "pegjs") {
     values = values.map((value) => {
-      value = value.replace(/\.(?!`)/, '" abbrev? "');
-      value = value.replace(/\.`/, '" abbrev "');
-      value = value.replace(/([A-Z])/g, (_match, p1) => p1.toLowerCase());
+      value = value
+        .replace(/\.(?!`)/, '" abbrev? "')
+        .replace(/\.`/, '" abbrev "')
+        .replace(/([A-Z])/g, (_match, p1) => p1.toLowerCase());
       value = handle_accents(value);
-      value = value.replace(/\[/g, '" [');
-      value = value.replace(/\]/g, '] "');
+      value = value.replace(/\[/g, '" [').replace(/\]/g, '] "');
       value = `"${value}"`;
-      value = value.replace(/\s*!\[/, '" ![');
-      value = value.replace(/\s*!([^[])/, '" !"$1');
-      value = value.replace(/"{2,}/g, "");
-      value = value.replace(/^\s+|\s+$/g, "");
+      value = value
+        .replace(/\s*!\[/, '" ![')
+        .replace(/\s*!([^[])/, '" !"$1')
+        .replace(/"{2,}/g, "")
+        .replace(/^\s+|\s+$/g, "");
       value += " ";
       const out: string[] = [];
       const parts = value.split('"');
@@ -529,22 +532,20 @@ function format_var(type: string, var_name: string) {
       while (parts.length !== 0) {
         let part = parts.shift()!;
         if (is_outside_quote === 0) {
-          part = part.replace(/^ /, () => {
-            out[out.length - 1] += "space ";
-            return "";
-          });
-          part = part.replace(/ /g, '" space "');
-          part = part.replace(
-            /((?:^|")[^"]+?")( space )/g,
-            (_match, p1, p2) => {
+          part = part
+            .replace(/^ /, () => {
+              out[out.length - 1] += "space ";
+              return "";
+            })
+            .replace(/ /g, '" space "')
+            .replace(/((?:^|")[^"]+?")( space )/g, (_match, p1, p2) => {
               let quote = p1;
               const space = p2;
               if (/[\u0080-\uffff]/.test(quote)) {
                 quote += "i";
               }
               return `${quote}${space}`;
-            }
-          );
+            });
           out.push(part);
           if (/[\u0080-\uffff]/.test(part)) {
             parts[0] = `i${parts[0]}`;
@@ -556,9 +557,10 @@ function format_var(type: string, var_name: string) {
         }
       }
       value = out.join('"');
-      value = value.replace(/\[([^\]]*?[\u0080-\uffff][^\]]*?)\]/g, "[$1]i");
-      value = value.replace(/!(space ".+)/, "!($1)");
-      value = value.replace(/\s+$/, "");
+      value = value
+        .replace(/\[([^\]]*?[\u0080-\uffff][^\]]*?)\]/g, "[$1]i")
+        .replace(/!(space ".+)/, "!($1)")
+        .replace(/\s+$/, "");
       if (var_name === "$TO") {
         value += " sp";
       }
@@ -744,10 +746,11 @@ function make_tests() {
   misc_tests = misc_tests.concat(add_boundary_tests());
   let out = get_file_contents(`${tools_dir}/template/spec.js`);
   const lang_isos = JSON.stringify(vars.$LANG_ISOS);
-  out = out.replace(/\$LANG_ISOS/g, lang_isos);
-  out = out.replace(/\$LANG/g, lang);
-  out = out.replace(/\$BOOK_TESTS/, out_array.join("\x0a"));
-  out = out.replace(/\$MISC_TESTS/, misc_tests.join("\x0a"));
+  out = out
+    .replace(/\$LANG_ISOS/g, lang_isos)
+    .replace(/\$LANG/g, lang)
+    .replace(/\$BOOK_TESTS/, out_array.join("\x0a"))
+    .replace(/\$MISC_TESTS/, misc_tests.join("\x0a"));
 
   fs.writeFileSync(`${dir}/${lang}/spec.js`, out);
   let found = out.match(/(\$[A-Z]+)/);
@@ -1280,9 +1283,10 @@ function get_vars() {
 function get_pre_passage_characters(allowed_chars: string[]) {
   let pattern = allowed_chars.join("|");
   if (/^\[\^[^\]]+?\]$/.test(pattern)) {
-    pattern = pattern.replace(/`/g, "");
-    pattern = pattern.replace(/\\x1[ef]|0-9|\\d|A-Z|a-z/g, "");
-    pattern = pattern.replace(/\[\^/, "[^\\x1f\\x1e\\dA-Za-z");
+    pattern = pattern
+      .replace(/`/g, "")
+      .replace(/\\x1[ef]|0-9|\\d|A-Z|a-z/g, "")
+      .replace(/\[\^/, "[^\\x1f\\x1e\\dA-Za-z");
   } else if (pattern === "\\d|\\b") {
     pattern = "[^w\x1f\x1e]";
   } else {
@@ -1314,9 +1318,10 @@ function get_letters(blocks: [number, number][]) {
     if (!/^\\u/.test(line)) {
       return;
     }
-    line = line.replace(/\\u/g, "");
-    line = line.replace(/\s*#.+$/, "");
-    line = line.replace(/\s+/g, "");
+    line = line
+      .replace(/\\u/g, "")
+      .replace(/\s*#.+$/, "")
+      .replace(/\s+/g, "");
     const [start, end = start] = line.split("-");
     const [start_num, end_num] = [parseInt(start, 16), parseInt(end, 16)];
     blocks.forEach((ref) => {
@@ -1517,15 +1522,16 @@ function handle_accents(text: string) {
   ) {
     text = text.replace(/\u02c8(?!`)/g, "[\u02c8']");
   }
-  text = text.replace(/([\u0080-\uffff])`/g, "$1");
-  text = text.replace(/[\u02b9\u0374]/g, "['\u2019\u0384\u0374\u02b9]");
-  text = text.replace(
-    /([\u0300\u0370]-)\['\u2019\u0384\u0374\u02b9\](\u0376)/,
-    "$1\u0374$2"
-  );
-  text = text.replace(/\.(?!`)/g, "\\.?");
-  text = text.replace(/\.`/g, "\\.");
-  text = text.replace(/ `/g, "\u2009");
+  text = text
+    .replace(/([\u0080-\uffff])`/g, "$1")
+    .replace(/[\u02b9\u0374]/g, "['\u2019\u0384\u0374\u02b9]")
+    .replace(
+      /([\u0300\u0370]-)\['\u2019\u0384\u0374\u02b9\](\u0376)/,
+      "$1\u0374$2"
+    )
+    .replace(/\.(?!`)/g, "\\.?")
+    .replace(/\.`/g, "\\.")
+    .replace(/ `/g, "\u2009");
   return text;
 }
 
@@ -1546,46 +1552,47 @@ function handle_accent(char: string) {
   if (char !== alt && alt.length > 0 && /[^\s\d]/.test(alt)) {
     return `[${char}${alt}]`;
   }
-  char = char.replace(
-    /[\u{0660}\u{06f0}\u{07c0}\u{0966}\u{09e6}\u{0a66}\u{0ae6}\u{0b66}\u{0be6}\u{0c66}\u{0ce6}\u{0d66}\u{0e50}\u{0ed0}\u{0f20}\u{1040}\u{1090}\u{17e0}\u{1810}\u{1946}\u{19d0}\u{1a80}\u{1a90}\u{1b50}\u{1bb0}\u{1c40}\u{1c50}\u{a620}\u{a8d0}\u{a900}\u{a9d0}\u{aa50}\u{abf0}\u{ff10}]/gu,
-    `[${char}0]`
-  );
-  char = char.replace(
-    /[\u{0661}\u{06f1}\u{07c1}\u{0967}\u{09e7}\u{0a67}\u{0ae7}\u{0b67}\u{0be7}\u{0c67}\u{0ce7}\u{0d67}\u{0e51}\u{0ed1}\u{0f21}\u{1041}\u{1091}\u{17e1}\u{1811}\u{1947}\u{19d1}\u{1a81}\u{1a91}\u{1b51}\u{1bb1}\u{1c41}\u{1c51}\u{a621}\u{a8d1}\u{a901}\u{a9d1}\u{aa51}\u{abf1}\u{ff11}]/gu,
-    `[${char}1]`
-  );
-  char = char.replace(
-    /[\u{0662}\u{06f2}\u{07c2}\u{0968}\u{09e8}\u{0a68}\u{0ae8}\u{0b68}\u{0be8}\u{0c68}\u{0ce8}\u{0d68}\u{0e52}\u{0ed2}\u{0f22}\u{1042}\u{1092}\u{17e2}\u{1812}\u{1948}\u{19d2}\u{1a82}\u{1a92}\u{1b52}\u{1bb2}\u{1c42}\u{1c52}\u{a622}\u{a8d2}\u{a902}\u{a9d2}\u{aa52}\u{abf2}\u{ff12}]/gu,
-    `[${char}2]`
-  );
-  char = char.replace(
-    /[\u{0663}\u{06f3}\u{07c3}\u{0969}\u{09e9}\u{0a69}\u{0ae9}\u{0b69}\u{0be9}\u{0c69}\u{0ce9}\u{0d69}\u{0e53}\u{0ed3}\u{0f23}\u{1043}\u{1093}\u{17e3}\u{1813}\u{1949}\u{19d3}\u{1a83}\u{1a93}\u{1b53}\u{1bb3}\u{1c43}\u{1c53}\u{a623}\u{a8d3}\u{a903}\u{a9d3}\u{aa53}\u{abf3}\u{ff13}]/gu,
-    `[${char}3]`
-  );
-  char = char.replace(
-    /[\u{0664}\u{06f4}\u{07c4}\u{096a}\u{09ea}\u{0a6a}\u{0aea}\u{0b6a}\u{0bea}\u{0c6a}\u{0cea}\u{0d6a}\u{0e54}\u{0ed4}\u{0f24}\u{1044}\u{1094}\u{17e4}\u{1814}\u{194a}\u{19d4}\u{1a84}\u{1a94}\u{1b54}\u{1bb4}\u{1c44}\u{1c54}\u{a624}\u{a8d4}\u{a904}\u{a9d4}\u{aa54}\u{abf4}\u{ff14}]/gu,
-    `[${char}4]`
-  );
-  char = char.replace(
-    /[\u{0665}\u{06f5}\u{07c5}\u{096b}\u{09eb}\u{0a6b}\u{0aeb}\u{0b6b}\u{0beb}\u{0c6b}\u{0ceb}\u{0d6b}\u{0e55}\u{0ed5}\u{0f25}\u{1045}\u{1095}\u{17e5}\u{1815}\u{194b}\u{19d5}\u{1a85}\u{1a95}\u{1b55}\u{1bb5}\u{1c45}\u{1c55}\u{a625}\u{a8d5}\u{a905}\u{a9d5}\u{aa55}\u{abf5}\u{ff15}]/gu,
-    `[${char}5]`
-  );
-  char = char.replace(
-    /[\u{0666}\u{06f6}\u{07c6}\u{096c}\u{09ec}\u{0a6c}\u{0aec}\u{0b6c}\u{0bec}\u{0c6c}\u{0cec}\u{0d6c}\u{0e56}\u{0ed6}\u{0f26}\u{1046}\u{1096}\u{17e6}\u{1816}\u{194c}\u{19d6}\u{1a86}\u{1a96}\u{1b56}\u{1bb6}\u{1c46}\u{1c56}\u{a626}\u{a8d6}\u{a906}\u{a9d6}\u{aa56}\u{abf6}\u{ff16}]/gu,
-    `[${char}6]`
-  );
-  char = char.replace(
-    /[\u{0667}\u{06f7}\u{07c7}\u{096d}\u{09ed}\u{0a6d}\u{0aed}\u{0b6d}\u{0bed}\u{0c6d}\u{0ced}\u{0d6d}\u{0e57}\u{0ed7}\u{0f27}\u{1047}\u{1097}\u{17e7}\u{1817}\u{194d}\u{19d7}\u{1a87}\u{1a97}\u{1b57}\u{1bb7}\u{1c47}\u{1c57}\u{a627}\u{a8d7}\u{a907}\u{a9d7}\u{aa57}\u{abf7}\u{ff17}]/gu,
-    `[${char}7]`
-  );
-  char = char.replace(
-    /[\u{0668}\u{06f8}\u{07c8}\u{096e}\u{09ee}\u{0a6e}\u{0aee}\u{0b6e}\u{0bee}\u{0c6e}\u{0cee}\u{0d6e}\u{0e58}\u{0ed8}\u{0f28}\u{1048}\u{1098}\u{17e8}\u{1818}\u{194e}\u{19d8}\u{1a88}\u{1a98}\u{1b58}\u{1bb8}\u{1c48}\u{1c58}\u{a628}\u{a8d8}\u{a908}\u{a9d8}\u{aa58}\u{abf8}\u{ff18}]/gu,
-    `[${char}8]`
-  );
-  char = char.replace(
-    /[\u{0669}\u{06f9}\u{07c9}\u{096f}\u{09ef}\u{0a6f}\u{0aef}\u{0b6f}\u{0bef}\u{0c6f}\u{0cef}\u{0d6f}\u{0e59}\u{0ed9}\u{0f29}\u{1049}\u{1099}\u{17e9}\u{1819}\u{194f}\u{19d9}\u{1a89}\u{1a99}\u{1b59}\u{1bb9}\u{1c49}\u{1c59}\u{a629}\u{a8d9}\u{a909}\u{a9d9}\u{aa59}\u{abf9}\u{ff19}]/gu,
-    `[${char}9]`
-  );
+  char = char
+    .replace(
+      /[\u{0660}\u{06f0}\u{07c0}\u{0966}\u{09e6}\u{0a66}\u{0ae6}\u{0b66}\u{0be6}\u{0c66}\u{0ce6}\u{0d66}\u{0e50}\u{0ed0}\u{0f20}\u{1040}\u{1090}\u{17e0}\u{1810}\u{1946}\u{19d0}\u{1a80}\u{1a90}\u{1b50}\u{1bb0}\u{1c40}\u{1c50}\u{a620}\u{a8d0}\u{a900}\u{a9d0}\u{aa50}\u{abf0}\u{ff10}]/gu,
+      `[${char}0]`
+    )
+    .replace(
+      /[\u{0661}\u{06f1}\u{07c1}\u{0967}\u{09e7}\u{0a67}\u{0ae7}\u{0b67}\u{0be7}\u{0c67}\u{0ce7}\u{0d67}\u{0e51}\u{0ed1}\u{0f21}\u{1041}\u{1091}\u{17e1}\u{1811}\u{1947}\u{19d1}\u{1a81}\u{1a91}\u{1b51}\u{1bb1}\u{1c41}\u{1c51}\u{a621}\u{a8d1}\u{a901}\u{a9d1}\u{aa51}\u{abf1}\u{ff11}]/gu,
+      `[${char}1]`
+    )
+    .replace(
+      /[\u{0662}\u{06f2}\u{07c2}\u{0968}\u{09e8}\u{0a68}\u{0ae8}\u{0b68}\u{0be8}\u{0c68}\u{0ce8}\u{0d68}\u{0e52}\u{0ed2}\u{0f22}\u{1042}\u{1092}\u{17e2}\u{1812}\u{1948}\u{19d2}\u{1a82}\u{1a92}\u{1b52}\u{1bb2}\u{1c42}\u{1c52}\u{a622}\u{a8d2}\u{a902}\u{a9d2}\u{aa52}\u{abf2}\u{ff12}]/gu,
+      `[${char}2]`
+    )
+    .replace(
+      /[\u{0663}\u{06f3}\u{07c3}\u{0969}\u{09e9}\u{0a69}\u{0ae9}\u{0b69}\u{0be9}\u{0c69}\u{0ce9}\u{0d69}\u{0e53}\u{0ed3}\u{0f23}\u{1043}\u{1093}\u{17e3}\u{1813}\u{1949}\u{19d3}\u{1a83}\u{1a93}\u{1b53}\u{1bb3}\u{1c43}\u{1c53}\u{a623}\u{a8d3}\u{a903}\u{a9d3}\u{aa53}\u{abf3}\u{ff13}]/gu,
+      `[${char}3]`
+    )
+    .replace(
+      /[\u{0664}\u{06f4}\u{07c4}\u{096a}\u{09ea}\u{0a6a}\u{0aea}\u{0b6a}\u{0bea}\u{0c6a}\u{0cea}\u{0d6a}\u{0e54}\u{0ed4}\u{0f24}\u{1044}\u{1094}\u{17e4}\u{1814}\u{194a}\u{19d4}\u{1a84}\u{1a94}\u{1b54}\u{1bb4}\u{1c44}\u{1c54}\u{a624}\u{a8d4}\u{a904}\u{a9d4}\u{aa54}\u{abf4}\u{ff14}]/gu,
+      `[${char}4]`
+    )
+    .replace(
+      /[\u{0665}\u{06f5}\u{07c5}\u{096b}\u{09eb}\u{0a6b}\u{0aeb}\u{0b6b}\u{0beb}\u{0c6b}\u{0ceb}\u{0d6b}\u{0e55}\u{0ed5}\u{0f25}\u{1045}\u{1095}\u{17e5}\u{1815}\u{194b}\u{19d5}\u{1a85}\u{1a95}\u{1b55}\u{1bb5}\u{1c45}\u{1c55}\u{a625}\u{a8d5}\u{a905}\u{a9d5}\u{aa55}\u{abf5}\u{ff15}]/gu,
+      `[${char}5]`
+    )
+    .replace(
+      /[\u{0666}\u{06f6}\u{07c6}\u{096c}\u{09ec}\u{0a6c}\u{0aec}\u{0b6c}\u{0bec}\u{0c6c}\u{0cec}\u{0d6c}\u{0e56}\u{0ed6}\u{0f26}\u{1046}\u{1096}\u{17e6}\u{1816}\u{194c}\u{19d6}\u{1a86}\u{1a96}\u{1b56}\u{1bb6}\u{1c46}\u{1c56}\u{a626}\u{a8d6}\u{a906}\u{a9d6}\u{aa56}\u{abf6}\u{ff16}]/gu,
+      `[${char}6]`
+    )
+    .replace(
+      /[\u{0667}\u{06f7}\u{07c7}\u{096d}\u{09ed}\u{0a6d}\u{0aed}\u{0b6d}\u{0bed}\u{0c6d}\u{0ced}\u{0d6d}\u{0e57}\u{0ed7}\u{0f27}\u{1047}\u{1097}\u{17e7}\u{1817}\u{194d}\u{19d7}\u{1a87}\u{1a97}\u{1b57}\u{1bb7}\u{1c47}\u{1c57}\u{a627}\u{a8d7}\u{a907}\u{a9d7}\u{aa57}\u{abf7}\u{ff17}]/gu,
+      `[${char}7]`
+    )
+    .replace(
+      /[\u{0668}\u{06f8}\u{07c8}\u{096e}\u{09ee}\u{0a6e}\u{0aee}\u{0b6e}\u{0bee}\u{0c6e}\u{0cee}\u{0d6e}\u{0e58}\u{0ed8}\u{0f28}\u{1048}\u{1098}\u{17e8}\u{1818}\u{194e}\u{19d8}\u{1a88}\u{1a98}\u{1b58}\u{1bb8}\u{1c48}\u{1c58}\u{a628}\u{a8d8}\u{a908}\u{a9d8}\u{aa58}\u{abf8}\u{ff18}]/gu,
+      `[${char}8]`
+    )
+    .replace(
+      /[\u{0669}\u{06f9}\u{07c9}\u{096f}\u{09ef}\u{0a6f}\u{0aef}\u{0b6f}\u{0bef}\u{0c6f}\u{0cef}\u{0d6f}\u{0e59}\u{0ed9}\u{0f29}\u{1049}\u{1099}\u{17e9}\u{1819}\u{194f}\u{19d9}\u{1a89}\u{1a99}\u{1b59}\u{1bb9}\u{1c49}\u{1c59}\u{a629}\u{a8d9}\u{a909}\u{a9d9}\u{aa59}\u{abf9}\u{ff19}]/gu,
+      `[${char}9]`
+    );
   return char;
 }
 
