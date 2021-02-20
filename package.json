@@ -33,7 +33,7 @@
     "lint": "eslint . --ignore-path .gitignore",
     "lint:fix": "eslint . --ignore-path .gitignore --fix",
     "test": "jest",
-    "test:lang": "bash -c 'jest src/$0/spec.js'"
+    "test:lang": "bash -c 'jest src/$0/spec.ts'"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
