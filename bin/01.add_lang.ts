@@ -690,7 +690,7 @@ function make_tests() {
       });
     });
     out_array.push(`describe("Localized book ${osis} (${lang})", () => {`);
-    out_array.push("\tlet p = {};");
+    out_array.push("\tlet p: any = {};");
     out_array.push("\tbeforeEach(() => {");
     out_array.push("\t\tp = new bcv_parser();");
     out_array.push(
@@ -744,7 +744,7 @@ function make_tests() {
   misc_tests = misc_tests.concat(add_trans_tests());
   misc_tests = misc_tests.concat(add_book_range_tests());
   misc_tests = misc_tests.concat(add_boundary_tests());
-  let out = get_file_contents(`${tools_dir}/template/spec.js`);
+  let out = get_file_contents(`${tools_dir}/template/spec.ts`);
   const lang_isos = JSON.stringify(vars.$LANG_ISOS);
   out = out
     .replace(/\$LANG_ISOS/g, lang_isos)
@@ -752,7 +752,7 @@ function make_tests() {
     .replace(/\$BOOK_TESTS/, out_array.join("\x0a"))
     .replace(/\$MISC_TESTS/, misc_tests.join("\x0a"));
 
-  fs.writeFileSync(`${dir}/${lang}/spec.js`, out);
+  fs.writeFileSync(`${dir}/${lang}/spec.ts`, out);
   let found = out.match(/(\$[A-Z]+)/);
   if (found) {
     throw new Error(`${found}\nTests: Capital variable`);
