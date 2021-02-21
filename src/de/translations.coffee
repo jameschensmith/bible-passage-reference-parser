@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:LUTH(?:1545|ER)|SCH(?:200|195)0|HFA|ELB)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		
 		default:

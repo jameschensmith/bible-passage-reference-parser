@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:NEG1979|LSG(?:21)?|BDS)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		
 		default:

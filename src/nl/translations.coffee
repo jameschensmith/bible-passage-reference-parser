@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:NB(?:G51|V)|GNB96|WV95|SV77|SV|NB)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		
 		default:

@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:BPT|JFA|NVI)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		
 		default:

@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:N(?:A(?:B(?:RE)?|SB?)|(?:RS|KJ)V|IR?V|LT)|HCSB|(?:TNI|E[RS]|AS|RS|KJ)V|MSG|LXX|CE[BV]|AMP)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		ceb:
 			alias: "ceb"

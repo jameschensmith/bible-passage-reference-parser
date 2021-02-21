@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  (?:YC(?:200[189]|1998)?|HADI|C(?:AN|OS)|T(?:SV|C)|KM)
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		yc1998:
 			osis: "YC"

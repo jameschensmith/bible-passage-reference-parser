@@ -2,7 +2,7 @@
 bcv_parser::regexps.translations = ///(?:
 	  $TRANS_REGEXP
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		$TRANS_ALIAS
 		default:
