@@ -1,3 +1,4 @@
+/* eslint-disable max-depth,no-continue,no-shadow,prefer-const */
 const fs = require("fs");
 
 const src_dir = "src";
