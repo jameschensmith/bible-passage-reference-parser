@@ -28,6 +28,12 @@ make_regexps();
 make_grammar();
 const default_alternates_file = `${dir}/en/translation_alternates.coffee`;
 make_translations();
+make_index();
+
+function make_index() {
+  const out = get_file_contents(`${tools_dir}/template/index.coffee`);
+  fs.writeFileSync(`${dir}/${lang}/index.coffee`, out);
+}
 
 function make_translations() {
   let out = get_file_contents(`${tools_dir}/template/translations.coffee`);

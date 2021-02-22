@@ -1,5 +1,7 @@
 # This class takes the output from the grammar and turns it into simpler objects for additional processing or for output.
 
+{ bcv_utils } = require("./bcv_utils")
+
 class bcv_passage
 	books: []
 	indices: {}
@@ -877,3 +879,6 @@ class bcv_passage
 		# If the translation specifically overrides the default, use that. Otherwise stick with the default.
 		unless @translations[translation].chapters[book]?
 			@translations[translation].chapters[book] = bcv_utils.shallow_clone_array @translations.default.chapters[book]
+
+module.exports =
+	bcv_passage: bcv_passage

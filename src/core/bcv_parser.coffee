@@ -1,14 +1,15 @@
 # This class takes a string and identifies Bible passage references in that string. It's designed to handle how people actually type Bible passages and tries fairly hard to make sense of dubious possibilities.
-# 
+#
 # The aggressiveness is tunable, to a certain extent, using the below `options`. It's probably too aggressive for general text parsing (the "is 2" in "There is 2 much" becomes "Isa.2", for example).
 
-# Export to whatever the current context is.
-root = this
+{ bcv_passage } = require("./bcv_passage")
+{ bcv_utils } = require("./bcv_utils")
 
 class bcv_parser
 	s: ""
 	entities: []
 	passage: null
+	grammar: null
 	regexps: {}
 	# ## Main Options
 	options:
@@ -99,7 +100,8 @@ class bcv_parser
 		case_sensitive: "none"
 
 	# Remember default options for later use.
-	constructor: ->
+	constructor: (grammar) ->
+		@grammar = grammar
 		@options = {}
 		for own key, val of bcv_parser::options
 			@options[key] = val
@@ -337,7 +339,7 @@ class bcv_parser
 			start_index_adjust = if part.substr(0, 1) is "\x1f" then 0 else part.split("\x1f")[0].length
 			# * `match` is important for the length and whether it contains control characters, neither of which we've changed inconsistently with the original string. The `part` may be shorter than originally matched, but that's only to remove unneeded characters at the end.
 			# * `grammar` is the external PEG parser. The `@options.punctuation_strategy` determines which punctuation is used for sequences and `cv` separators.
-			passage = value: grammar.parse(part, {punctuation_strategy: @options.punctuation_strategy}), type: "base", start_index: @passage.books[book_id].start_index - start_index_adjust, match: part
+			passage = value: @grammar.parse(part, {punctuation_strategy: @options.punctuation_strategy}), type: "base", start_index: @passage.books[book_id].start_index - start_index_adjust, match: part
 			# Are we looking at a single book on its own that could be part of a range like "1-2 Sam"?
 			if @options.book_alone_strategy is "full" and
 			@options.book_range_strategy is "include" and
@@ -345,7 +347,7 @@ class bcv_parser
 			# Either it's on its own or a translation sequence follows it, making it effectively on its own.
 			(passage.value.length == 1 or (passage.value.length > 1 and passage.value[1].type is "translation_sequence")) and
 			start_index_adjust == 0 and
-			(@passage.books[book_id].parsed.length == 1 or (@passage.books[book_id].parsed.length > 1 and 
+			(@passage.books[book_id].parsed.length == 1 or (@passage.books[book_id].parsed.length > 1 and
 			@passage.books[book_id].parsed[1].type is "translation")) and
 			/^[234]/.test @passage.books[book_id].parsed[0]
 				@create_book_range s, passage, book_id
@@ -717,4 +719,5 @@ class bcv_parser
 				break
 		true
 
-root.bcv_parser = bcv_parser
+module.exports =
+	bcv_parser: bcv_parser

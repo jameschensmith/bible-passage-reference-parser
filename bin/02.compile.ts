@@ -19,15 +19,13 @@ if (arg_lang) {
 function compile(lang: string) {
   console.log(`Compiling lang '${lang}'...`);
   execSync(
-    `pegjs --format globals --export-var grammar -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
+    `pegjs --format commonjs -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
   );
-  add_pegjs_global(`temp_${lang}_grammar.js`);
-  console.log("Joining...");
+  execSync("coffee -bc --no-header -o js/core src/core/*.coffee");
   execSync(
-    `cat "src/core/bcv_parser.coffee" "src/core/bcv_passage.coffee" "src/core/bcv_utils.coffee" "src/${lang}/translations.coffee" "src/${lang}/regexps.coffee" | coffee --no-header --compile --stdio > "${out_dir}/${lang}_bcv_parser.js"`
+    `coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee src/${lang}/regexps.coffee src/${lang}/translations.coffee`
   );
   add_peg(lang, "");
-  // compile_closure();
   fs.rmSync(`temp_${lang}_grammar.js`);
 }
 
@@ -106,32 +104,5 @@ function add_peg(lang: string, prefix: string) {
     throw new Error("Unreplaced options");
   }
 
-  merge_file(`${out_dir}/#PREFIX${lang}_bcv_parser.js`, peg, prefix);
-}
-
-function merge_file(file: string, peg: string, prefix: string) {
-  if (prefix && prefix !== "") {
-    prefix += "/";
-  }
-  const src_file = file.replace(/#PREFIX/, "");
-  let joined = fs.readFileSync(src_file).toString();
-  const prev = joined;
-  joined = joined.replace(/(\s*\}\)\.call\(this\);\s*)$/, `\n${peg}$1`);
-  if (prev === joined) {
-    throw new Error("PEG not successfully added");
-  }
-  const dest_file = file.replace(/#PREFIX/, prefix);
-  fs.writeFileSync(dest_file, joined);
-}
-
-// function compile_closure() {
-//   console.log("Minifying...");
-//   // print `node template_closure.js $lang`;
-// }
-
-function add_pegjs_global(filename: string) {
-  let data = fs.readFileSync(filename).toString();
-  data = `var grammar;\n${data}`;
-  data = data.replace(/\broot\.grammar/, "grammar");
-  fs.writeFileSync(filename, data);
+  fs.writeFileSync(`js/${lang}/grammar.js`, peg);
 }

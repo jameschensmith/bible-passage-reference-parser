@@ -14,3 +14,6 @@ bcv_utils =
 		for i in [0 .. arr.length]
 			out[i] = arr[i] if typeof(arr[i]) isnt "undefined"
 		out
+
+module.exports =
+	bcv_utils: bcv_utils

@@ -1,3 +1,5 @@
+{ bcv_parser } = require("../core")
+
 # When adding a new translation, add it both here and bcv_parser::translations.aliases
 bcv_parser::regexps.translations = ///(?:
 	  (?:YC(?:200[189]|1998)?|HADI|C(?:AN|OS)|T(?:SV|C)|KM)

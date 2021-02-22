@@ -1,5 +1,5 @@
 /* eslint-disable */
-const { bcv_parser } = require("../../js/es_bcv_parser.js");
+const { bcv_parser } = require("../../js/es");
 export {};
 
 describe("Parsing", () => {

@@ -1,3 +1,5 @@
+{ bcv_parser } = require("../core")
+
 bcv_parser::regexps.space = "[\\s\\xa0]"
 bcv_parser::regexps.escaped_passage = ///
 	(?:^ | [^\x1f\x1e\dA-Za-zଁଅ-ଌଏ-ଐଓ-ନପ-ରଲ-ଳଵ-ହ଼-ଽିୁ-ୄ୍ୖଡ଼-ଢ଼ୟ-ୣୱ] )	# Beginning of string or not in the middle of a word or immediately following another book. Only count a book if it's part of a sequence: `Matt5John3` is OK, but not `1Matt5John3`

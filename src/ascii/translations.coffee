@@ -1,8 +1,10 @@
+{ bcv_parser } = require("../core")
+
 # When adding a new translation, add it both here and bcv_parser::translations.aliases
 bcv_parser::regexps.translations = ///(?:
 	  (?:(?:E[RS]|AS|TNI|RS|KJ)V|LXX|MSG|CE[BV]|AMP|HCSB|N(?:(?:KJ|RS)V|LT|IR?V|A(?:B(?:RE)?|SB?)))
 	)\b///gi
-bcv_parser::translations = 
+bcv_parser::translations =
 	aliases:
 		ceb:
 			alias: "ceb"
