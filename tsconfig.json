@@ -3,6 +3,8 @@
     /* Basic Options */
     "target": "es5",
     "module": "commonjs",
+    "outDir": "./js",
+    "rootDir": "./src",
 
     /* Strict Type-Checking Options */
     "strict": true,
@@ -13,5 +15,7 @@
     /* Advanced Options */
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["./src"],
+  "exclude": ["**/spec.ts"]
 }
