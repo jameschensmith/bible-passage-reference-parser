@@ -8,20 +8,26 @@ if (!fs.existsSync(out_dir)) {
   fs.mkdirSync(out_dir);
 }
 
+compile_core();
+
 if (arg_lang) {
-  compile(arg_lang);
+  compile_lang(arg_lang);
 } else {
   fs.readdirSync("src")
     .filter((dir) => dir !== "core")
-    .forEach(compile);
+    .forEach(compile_lang);
 }
 
-function compile(lang: string) {
+function compile_core() {
+  console.log("Compiling core...");
+  execSync("coffee -bc --no-header -o js/core src/core/*.coffee");
+}
+
+function compile_lang(lang: string) {
   console.log(`Compiling lang '${lang}'...`);
   execSync(
     `pegjs --format commonjs -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
   );
-  execSync("coffee -bc --no-header -o js/core src/core/*.coffee");
   execSync(
     `coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee src/${lang}/regexps.coffee src/${lang}/translations.coffee`
   );
