@@ -8,13 +8,15 @@
 
     /* Strict Type-Checking Options */
     "strict": true,
+    "alwaysStrict": false,
 
     /* Module Resolution Options */
     "esModuleInterop": true,
 
     /* Advanced Options */
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitUseStrict": true
   },
   "include": ["./src"],
   "exclude": ["**/spec.ts"]
