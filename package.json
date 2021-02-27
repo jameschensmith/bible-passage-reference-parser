@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/faithfulsource/bible-passage-reference-parser",
   "scripts": {
-    "build": "ts-node bin/02.compile.ts",
+    "build": "tsc && ts-node bin/02.compile.ts",
     "format": "prettier --write --ignore-path=.gitignore .",
     "format:check": "prettier --check --ignore-path=.gitignore .",
     "gen:lang": "ts-node bin/01.add_lang.ts",

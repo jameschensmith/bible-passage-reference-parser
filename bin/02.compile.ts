@@ -8,19 +8,12 @@ if (!fs.existsSync(out_dir)) {
   fs.mkdirSync(out_dir);
 }
 
-compile_core();
-
 if (arg_lang) {
   compile_lang(arg_lang);
 } else {
   fs.readdirSync("src")
     .filter((dir) => dir !== "core")
     .forEach(compile_lang);
-}
-
-function compile_core() {
-  console.log("Compiling core...");
-  execSync("tsc");
 }
 
 function compile_lang(lang: string) {
