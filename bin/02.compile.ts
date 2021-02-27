@@ -20,7 +20,6 @@ if (arg_lang) {
 
 function compile_core() {
   console.log("Compiling core...");
-  execSync("coffee -bc --no-header -o js/core src/core/*.coffee");
   execSync("tsc");
 }
 
