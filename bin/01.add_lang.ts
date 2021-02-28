@@ -378,8 +378,8 @@ function validate_node_regexp(
     }
     const lengths = split_by_length(abbrevs);
     const patterns: string[] = [];
+    // Since keys are numbers, they will be sorted.
     Object.keys(lengths)
-      .sort()
       .reverse()
       .forEach((length) => {
         patterns.push(make_book_regexp(osis, lengths[length], 1));
@@ -1603,7 +1603,8 @@ function handle_accent(char: string) {
 }
 
 function is_valid_osis(osis: string) {
-  osis.split(",").forEach((part) => {
+  // split by ',', while removing any empty fields
+  osis.match(/[^,]+/g)?.forEach((part) => {
     if (!valid_osises[part]) {
       throw new Error(`Invalid OSIS: ${osis} (${part})`);
     }
@@ -1630,5 +1631,5 @@ function get_file_contents(filename: string) {
 }
 
 function quote_meta(str: string) {
-  return str.replace(/[[\]{}()*+?.,\\^$|#]/g, "\\$&");
+  return str.replace(/[[\]{}()*+?.\\^$|]/g, "\\$&");
 }
