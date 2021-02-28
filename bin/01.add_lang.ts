@@ -26,7 +26,7 @@ const order = get_order();
 const all_abbrevs = make_tests();
 make_regexps();
 make_grammar();
-const default_alternates_file = `${dir}/en/translation_alternates.coffee`;
+const default_alternates_file = `${dir}/en/translation_alternates.ts`;
 make_translations();
 make_index();
 
@@ -36,7 +36,7 @@ function make_index() {
 }
 
 function make_translations() {
-  let out = get_file_contents(`${tools_dir}/template/translations.coffee`);
+  let out = get_file_contents(`${tools_dir}/template/translations.ts`);
   const regexps: string[] = [];
   const aliases: string[] = [];
   vars.$TRANS.forEach((translation) => {
@@ -54,25 +54,26 @@ function make_translations() {
     if (/\W/.test(lc)) {
       lc = `"${lc}"`;
     }
-    let string = `${lc}:`;
+    let string = `${lc}: {`;
     if (osis) {
-      string += `\x0a\t\t\tosis: "${osis}"`;
+      string += `\x0a\t\t\tosis: "${osis}",`;
     }
     if (alias) {
       string += `\x0a\t\t\talias: "${alias}"`;
     }
+    string += "\x0a\t\t},"
     aliases.push(string);
   });
   const regexp = make_book_regexp("translations", regexps, 1);
   let alias = aliases.join("\x0a\t\t");
-  if (fs.existsSync(`${dir}/${lang}/translation_aliases.coffee`)) {
-    alias = get_file_contents(`${dir}/${lang}/translation_aliases.coffee`);
+  if (fs.existsSync(`${dir}/${lang}/translation_aliases.ts`)) {
+    alias = get_file_contents(`${dir}/${lang}/translation_aliases.ts`);
     out = out.replace(/\t+(\$TRANS_ALIAS)/g, "$1");
   }
   let alternate = get_file_contents(default_alternates_file);
-  if (fs.existsSync(`${dir}/${lang}/translation_alternates.coffee`)) {
+  if (fs.existsSync(`${dir}/${lang}/translation_alternates.ts`)) {
     alternate = get_file_contents(
-      `${dir}/${lang}/translation_alternates.coffee`
+      `${dir}/${lang}/translation_alternates.ts`
     );
   }
   const lang_isos = JSON.stringify(vars.$LANG_ISOS);
@@ -81,7 +82,7 @@ function make_translations() {
     .replace(/\$TRANS_ALIAS/g, alias)
     .replace(/\s*\$TRANS_ALTERNATE/g, `\n${alternate}`)
     .replace(/\$LANG_ISOS/g, lang_isos);
-  fs.writeFileSync(`${dir}/${lang}/translations.coffee`, out);
+  fs.writeFileSync(`${dir}/${lang}/translations.ts`, out);
   const found = out.match(/(\$[A-Z_]+)/);
   if (found) {
     throw new Error(`${found}\nTranslations: Capital variable`);

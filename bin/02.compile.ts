@@ -22,7 +22,7 @@ function compile_lang(lang: string) {
     `pegjs --format commonjs -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
   );
   execSync(
-    `coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee src/${lang}/regexps.coffee src/${lang}/translations.coffee`
+    `coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee src/${lang}/regexps.coffee`
   );
   add_peg(lang, "");
   fs.rmSync(`temp_${lang}_grammar.js`);

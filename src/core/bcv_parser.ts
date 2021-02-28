@@ -12,6 +12,7 @@ export class bcv_parser {
 	passage: any;
 	grammar: any;
 	translations: any;
+	languages: any;
 	regexps: any;
 	// ## Main Options
 	options: any;
