@@ -21,9 +21,7 @@ function compile_lang(lang: string) {
   execSync(
     `pegjs --format commonjs -o "temp_${lang}_grammar.js" "src/${lang}/grammar.pegjs"`
   );
-  execSync(
-    `coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee src/${lang}/regexps.coffee`
-  );
+  execSync(`coffee -bc --no-header -o js/${lang} src/${lang}/index.coffee`);
   add_peg(lang, "");
   fs.rmSync(`temp_${lang}_grammar.js`);
 }

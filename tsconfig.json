@@ -19,5 +19,5 @@
     "noImplicitUseStrict": true
   },
   "include": ["./src"],
-  "exclude": ["**/spec.ts", "**/translation_alternates.ts"]
+  "exclude": ["**/spec.ts", "**/translation_alternates.ts", "**/psalm_cb.ts"]
 }

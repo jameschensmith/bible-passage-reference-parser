@@ -14,7 +14,7 @@ const dir = "src";
 const tools_dir = "tools";
 const regexp_space = "[\\s\xa0]";
 let valid_characters =
-  "[\\d\\s\\xa0.:,;\\x1e\\x1f&\\(\\)\\uff08\\uff09\\[\\]/\"'\\*=~\\-\\u2013\\u2014]";
+  "[\\\\d\\\\s\\\\xa0.:,;\\\\x1e\\\\x1f&\\\\(\\\\)\\\\uff08\\\\uff09\\\\[\\\\]/\"'\\\\*=~\\\\-\\\\u2013\\\\u2014]";
 let letters = "";
 // prettier-ignore
 const valid_osises = make_valid_osises(["Gen","Exod","Lev","Num","Deut","Josh","Judg","Ruth","1Sam","2Sam","1Kgs","2Kgs","1Chr","2Chr","Ezra","Neh","Esth","Job","Ps","Prov","Eccl","Song","Isa","Jer","Lam","Ezek","Dan","Hos","Joel","Amos","Obad","Jonah","Mic","Nah","Hab","Zeph","Hag","Zech","Mal","Matt","Mark","Luke","John","Acts","Rom","1Cor","2Cor","Gal","Eph","Phil","Col","1Thess","2Thess","1Tim","2Tim","Titus","Phlm","Heb","Jas","1Pet","2Pet","1John","2John","3John","Jude","Rev","Tob","Jdt","GkEsth","Wis","Sir","Bar","PrAzar","Sus","Bel","SgThree","EpJer","1Macc","2Macc","3Macc","4Macc","1Esd","2Esd","PrMan","AddEsth","AddDan"]);
@@ -61,7 +61,7 @@ function make_translations() {
     if (alias) {
       string += `\x0a\t\t\talias: "${alias}"`;
     }
-    string += "\x0a\t\t},"
+    string += "\x0a\t\t},";
     aliases.push(string);
   });
   const regexp = make_book_regexp("translations", regexps, 1);
@@ -72,9 +72,7 @@ function make_translations() {
   }
   let alternate = get_file_contents(default_alternates_file);
   if (fs.existsSync(`${dir}/${lang}/translation_alternates.ts`)) {
-    alternate = get_file_contents(
-      `${dir}/${lang}/translation_alternates.ts`
-    );
+    alternate = get_file_contents(`${dir}/${lang}/translation_alternates.ts`);
   }
   const lang_isos = JSON.stringify(vars.$LANG_ISOS);
   out = out
@@ -115,7 +113,7 @@ function make_grammar() {
 }
 
 function make_regexps() {
-  let out = get_file_contents(`${tools_dir}/template/regexps.coffee`);
+  let out = get_file_contents(`${tools_dir}/template/regexps.ts`);
   if (!vars.$NEXT) {
     out = out.replace(/\n.+\$NEXT.+\n/, "\n");
     if (/\$NEXT\b/.test(out)) {
@@ -140,7 +138,7 @@ function make_regexps() {
     .replace(/\$VALID_CHARACTERS/, valid_characters)
     .replace(
       /\$PRE_PASSAGE_ALLOWED_CHARACTERS/,
-      vars.$PRE_PASSAGE_ALLOWED_CHARACTERS.join("|")
+      vars.$PRE_PASSAGE_ALLOWED_CHARACTERS.join("|").replace(/\\/g, "\\\\")
     );
   const pre = vars.$PRE_BOOK_ALLOWED_CHARACTERS
     .map((c) => format_value("quote", c))
@@ -156,7 +154,7 @@ function make_regexps() {
     }
   });
   passage_components.sort((a, b) => b.length - a.length);
-  out = out.replace(/\$PASSAGE_COMPONENTS/, passage_components.join(" | "));
+  out = out.replace(/\$PASSAGE_COMPONENTS/, passage_components.join("|"));
   Object.keys(vars)
     .sort()
     .forEach((key) => {
@@ -164,7 +162,7 @@ function make_regexps() {
       const re = new RegExp(`${safe_key}(?!\\w)`, "g");
       out = out.replace(re, () => format_var("regexp", key));
     });
-  fs.writeFileSync(`${dir}/${lang}/regexps.coffee`, out);
+  fs.writeFileSync(`${dir}/${lang}/regexps.ts`, out);
   const found = out.match(/(\$[A-Z_]+)/);
   if (found) {
     throw new Error(`${found}\nRegexps: Capital variable`);
@@ -179,9 +177,9 @@ function make_regexp_set(osises: { osis: string; apocrypha: number }[]) {
     if (
       osis === "Ps" &&
       !has_psalm_cb &&
-      fs.existsSync(`${dir}/${lang}/psalm_cb.coffee`)
+      fs.existsSync(`${dir}/${lang}/psalm_cb.ts`)
     ) {
-      out.push(get_file_contents(`${dir}/${lang}/psalm_cb.coffee`));
+      out.push(get_file_contents(`${dir}/${lang}/psalm_cb.ts`));
       has_psalm_cb = 1;
     }
     const safes: Record<string, number> = {};
@@ -197,7 +195,7 @@ function make_regexp_set(osises: { osis: string; apocrypha: number }[]) {
       )
     );
   });
-  return out.join("\x0a\t,\x0a");
+  return out.join("\x0a");
 }
 
 function make_regexp(osis: string, apocrypha: number, safes: string[]) {
@@ -217,11 +215,12 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
   });
   const book_regexp = make_book_regexp(osis, all_abbrevs[osis], 1);
   osis = osis.replace(/,+$/, "").replace(/,/g, '", "');
-  out.push(`\t\tosis: ["${osis}"]\x0a\t\t`);
+  out.push(`\t\t{\x0a`);
+  out.push(`\t\t\tosis: ["${osis}"],\x0a\t\t\t`);
   if (apocrypha) {
-    out.push(`apocrypha: true\x0a\t\t`);
+    out.push(`apocrypha: true,\x0a\t\t\t`);
   }
-  let pre = "#{bcv_parser::regexps.pre_book}";
+  let pre = "${bcv_parser.prototype.regexps.pre_book}";
   if (/^[0-9]/.test(osis) || /[0-9]/.test(abbrevs.join("|"))) {
     pre = vars.$PRE_BOOK_ALLOWED_CHARACTERS
       .map((v) => format_value("quote", v))
@@ -236,10 +235,11 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
       .replace(/^\[\^/, "[^0-9"); // if it's a negated class, add \d
   }
   const post = vars.$POST_BOOK_ALLOWED_CHARACTERS.join("|");
-  out.push(`regexp: ///(^|${pre})(\x0a\t\t`);
-  out.push(book_regexp);
+  out.push(`regexp: new RegExp(\`(^|${pre})(`);
+  out.push(book_regexp.replace(/\\/g, "\\\\"));
   out[out.length - 1] = out[out.length - 1].replace(/-(?!\?)/g, "-?");
-  out.push(`\x0a\t\t\t)(?:(?=${post})|$)///gi`);
+  out.push(`)(?:(?=${post})|$)\`, "gi")`);
+  out.push(`\x0a\t\t},`);
   return out.join("");
 }
 
@@ -516,7 +516,7 @@ function format_var(type: string, var_name: string) {
     });
     let out = values.join("|");
     out = handle_accents(out);
-    out = out.replace(/ +/g, "#{bcv_parser::regexps.space}+");
+    out = out.replace(/ +/g, "${bcv_parser.prototype.regexps.space}+");
     return values.length > 1 ? `(?:${out})` : out;
   } else if (type === "pegjs") {
     values = values.map((value) => {
