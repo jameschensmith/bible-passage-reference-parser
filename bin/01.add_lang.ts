@@ -31,8 +31,8 @@ make_translations();
 make_index();
 
 function make_index() {
-  const out = get_file_contents(`${tools_dir}/template/index.coffee`);
-  fs.writeFileSync(`${dir}/${lang}/index.coffee`, out);
+  const out = get_file_contents(`${tools_dir}/template/index.ts`);
+  fs.writeFileSync(`${dir}/${lang}/index.ts`, out);
 }
 
 function make_translations() {
