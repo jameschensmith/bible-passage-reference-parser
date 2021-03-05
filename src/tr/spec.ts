@@ -1,6 +1,5 @@
 /* eslint-disable */
-const { bcv_parser } = require("../../js/tr");
-export {};
+import { bcv_parser } from "../../js/tr";
 
 describe("Parsing", () => {
 	let p: any = {};
