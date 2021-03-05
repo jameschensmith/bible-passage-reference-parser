@@ -108,7 +108,7 @@ export class bcv_parser {
 			// Don't use this value directly; use the `set_options` function. Changing this option repeatedly will slow down execution.
 			// * `none`: All matches are case-insensitive.
 			// * `books`: Book names are case-sensitive. Everything else is still case-insensitive.
-			case_sensitive: "none"
+			case_sensitive: "none",
 		};
 	}
 
@@ -142,7 +142,9 @@ export class bcv_parser {
 	// Parse a string and prepare the object for further interrogation, depending on what's needed. The second argument is a string that serves as the context for the first argument. If there's a valid partial match at the beginning of the first argument, then it will parse it using the supplied `context`. For example, `parse_string_with_context("verse 2", "Genesis 3").osis()` = `Gen.3.2`. You'd use this when you have some text that looks like it's a partial reference, and you already know the context.
 	parse_with_context(s: string, context: any) {
 		this.reset();
-		[context, this.passage.books] = this.match_books(this.replace_control_characters(context));
+		[context, this.passage.books] = this.match_books(
+			this.replace_control_characters(context)
+		);
 		let entities;
 		[entities, context] = this.match_passages(context);
 		this.reset();
@@ -156,7 +158,7 @@ export class bcv_parser {
 			parsed: [],
 			start_index: 0,
 			type: "context",
-			context
+			context,
 		});
 		// Reconstruct the string, adding in the context. Because we've already called `match_books`, the resulting offsets will reflect the original string and not the new string.
 		s = `\x1f${this.passage.books.length - 1}/9\x1f${s}`;
@@ -186,7 +188,11 @@ export class bcv_parser {
 		for (const key of Object.keys(options)) {
 			// The drawback with this approach is that calling `include_apocrypha`, `versification_system`, and `case_sensitive` could regenerate `@regexps.books` three times.
 			const val = options[key];
-			if ((key === "include_apocrypha") || (key === "versification_system") || (key === "case_sensitive")) {
+			if (
+				key === "include_apocrypha" ||
+				key === "versification_system" ||
+				key === "case_sensitive"
+			) {
 				this[key](val);
 			} else {
 				this.options[key] = val;
@@ -197,14 +203,29 @@ export class bcv_parser {
 
 	// Whether to use books and abbreviations from the Apocrypha. Takes a boolean argument: `true` to include the Apocrypha and `false` to not. Defaults to `false`. Returns the `bcv_parser` object.
 	include_apocrypha(arg: any) {
-		if ((arg == null) || ((arg !== true) && (arg !== false))) { return this; }
+		if (arg == null || (arg !== true && arg !== false)) {
+			return this;
+		}
 		this.options.include_apocrypha = arg;
-		this.regexps.books = this.regexps.get_books(arg, this.options.case_sensitive);
+		this.regexps.books = this.regexps.get_books(
+			arg,
+			this.options.case_sensitive
+		);
 		for (const translation of Object.keys(this.translations)) {
-			if ((translation === "aliases") || (translation === "alternates")) { continue; }
+			if (translation === "aliases" || translation === "alternates") {
+				continue;
+			}
 			// If the `Ps` array in the `chapters` object doesn't exist, create it so that we can add Ps 151 to the end of it.
-			if (this.translations[translation].chapters == null) { this.translations[translation].chapters = {}; }
-			if (this.translations[translation].chapters["Ps"] == null) { this.translations[translation].chapters["Ps"] = bcv_utils.shallow_clone_array(this.translations["default"].chapters["Ps"]); }
+			if (this.translations[translation].chapters == null) {
+				this.translations[translation].chapters = {};
+			}
+			if (this.translations[translation].chapters["Ps"] == null) {
+				this.translations[translation].chapters[
+					"Ps"
+				] = bcv_utils.shallow_clone_array(
+					this.translations["default"].chapters["Ps"]
+				);
+			}
 			// Add Ps 151 to the end of Psalms. The assumption here is that Ps151 always only is one chapter long.
 			if (arg === true) {
 				var verse_count;
@@ -214,9 +235,11 @@ export class bcv_parser {
 					verse_count = this.translations["default"].chapters["Ps151"][0];
 				}
 				this.translations[translation].chapters["Ps"][150] = verse_count;
-			// Remove Ps 151 from the end of Psalms.
+				// Remove Ps 151 from the end of Psalms.
 			} else {
-				if (this.translations[translation].chapters["Ps"].length === 151) { this.translations[translation].chapters["Ps"].pop(); }
+				if (this.translations[translation].chapters["Ps"].length === 151) {
+					this.translations[translation].chapters["Ps"].pop();
+				}
 			}
 		}
 		return this;
@@ -224,39 +247,65 @@ export class bcv_parser {
 
 	// Use an alternate versification system. Takes a string argument; the built-in options are: `default` to use KJV-style versification and `vulgate` to use the Vulgate (Greek) Psalm numbering. English offers several other versification systems; see the Readme for details.
 	versification_system(system: string) {
-		if (this.translations[system] == null) { return this; }
+		if (this.translations[system] == null) {
+			return this;
+		}
 		// If we've already changed the `versification_system` once, we need to do some cleanup before we change it to something else.
 		if (this.translations.alternates.default != null) {
 			// If we're changing to the default from something else, make sure we reset it to the correct values.
 			if (system === "default") {
 				if (this.translations.alternates.default.order != null) {
-					this.translations.default.order = bcv_utils.shallow_clone(this.translations.alternates.default.order);
+					this.translations.default.order = bcv_utils.shallow_clone(
+						this.translations.alternates.default.order
+					);
 				}
-				for (const book of Object.keys(this.translations.alternates.default.chapters)) {
-					const chapter_list = this.translations.alternates.default.chapters[book];
-					this.translations.default.chapters[book] = bcv_utils.shallow_clone_array(chapter_list);
+				for (const book of Object.keys(
+					this.translations.alternates.default.chapters
+				)) {
+					const chapter_list = this.translations.alternates.default.chapters[
+						book
+					];
+					this.translations.default.chapters[
+						book
+					] = bcv_utils.shallow_clone_array(chapter_list);
 				}
-			// Make sure the `versification_system` is reset to the default before applying any changes--alternate systems only include differences from the default.
+				// Make sure the `versification_system` is reset to the default before applying any changes--alternate systems only include differences from the default.
 			} else {
 				this.versification_system("default");
 			}
 		}
-		if (this.translations.alternates.default == null) { this.translations.alternates.default = {order: null, chapters: {}}; }
+		if (this.translations.alternates.default == null) {
+			this.translations.alternates.default = { order: null, chapters: {} };
+		}
 		// If we're updating the book order (e.g., to mix the Apocrypha into the Old Testament)...
-		if ((system !== "default") && (this.translations[system].order != null)) {
+		if (system !== "default" && this.translations[system].order != null) {
 			// Save the existing default order so we can get it back later if necessary. We want to do everything nondestructively.
-			if (this.translations.alternates.default.order == null) { this.translations.alternates.default.order = bcv_utils.shallow_clone(this.translations.default.order); }
+			if (this.translations.alternates.default.order == null) {
+				this.translations.alternates.default.order = bcv_utils.shallow_clone(
+					this.translations.default.order
+				);
+			}
 			// The `order` key should always contain the full order; too many things can go wrong if we try to merge the old order and the new one.
-			this.translations.default.order = bcv_utils.shallow_clone(this.translations[system].order);
+			this.translations.default.order = bcv_utils.shallow_clone(
+				this.translations[system].order
+			);
 		}
 		// If we're updating the number of chapters in a book or the number of verses in a chapter...
-		if ((system !== "default") && (this.translations[system].chapters != null)) {
+		if (system !== "default" && this.translations[system].chapters != null) {
 			// Loop through only the books that are changing.
 			for (const book of Object.keys(this.translations[system].chapters)) {
 				// Save the existing default order so we can get it back later. Only set it the first time.
 				const chapter_list = this.translations[system].chapters[book];
-				if (this.translations.alternates.default.chapters[book] == null) { this.translations.alternates.default.chapters[book] = bcv_utils.shallow_clone_array(this.translations.default.chapters[book]); }
-				this.translations.default.chapters[book] = bcv_utils.shallow_clone_array(chapter_list);
+				if (this.translations.alternates.default.chapters[book] == null) {
+					this.translations.alternates.default.chapters[
+						book
+					] = bcv_utils.shallow_clone_array(
+						this.translations.default.chapters[book]
+					);
+				}
+				this.translations.default.chapters[
+					book
+				] = bcv_utils.shallow_clone_array(chapter_list);
 			}
 		}
 		// Depending on the order of operations, the cloned list could be inconsistent with the current state. For example, if we called `versification_system`, we've cached 150 Psalms. If we then call `include_apocrypha(true)`, we now have 151 Psalms. If we then call `versification_system` again, we're back, incorrectly, to 150 Psalms because that's what was cached.
@@ -267,28 +316,42 @@ export class bcv_parser {
 
 	// Whether to treat books as case-sensitive. Valid values are `none` and `books`.
 	case_sensitive(arg: string) {
-		if (arg !== "none" && arg !== "books") { return this; }
+		if (arg !== "none" && arg !== "books") {
+			return this;
+		}
 		// If nothing is changing, don't bother continuing
-		if (arg === this.options.case_sensitive) { return this; }
+		if (arg === this.options.case_sensitive) {
+			return this;
+		}
 		this.options.case_sensitive = arg;
-		this.regexps.books = this.regexps.get_books(this.options.include_apocrypha, arg);
+		this.regexps.books = this.regexps.get_books(
+			this.options.include_apocrypha,
+			arg
+		);
 		return this;
 	}
 
 	// ## Administrative Functions
 	// Return translation information so that we don't have to reach into semi-private objects to grab the data we need.
 	translation_info(new_translation = "default") {
-		if ((new_translation != null) && (this.translations.aliases[new_translation]?.alias != null)) {
+		if (
+			new_translation != null &&
+			this.translations.aliases[new_translation]?.alias != null
+		) {
 			new_translation = this.translations.aliases[new_translation].alias;
 		}
-		if ((new_translation == null) || (this.translations[new_translation] == null)) { new_translation = "default"; }
+		if (new_translation == null || this.translations[new_translation] == null) {
+			new_translation = "default";
+		}
 		const old_translation = this.options.versification_system;
-		if (new_translation !== old_translation) { this.versification_system(new_translation); }
+		if (new_translation !== old_translation) {
+			this.versification_system(new_translation);
+		}
 		const out: any = {
 			alias: new_translation,
 			books: [],
 			chapters: {},
-			order: bcv_utils.shallow_clone(this.translations.default.order)
+			order: bcv_utils.shallow_clone(this.translations.default.order),
 		};
 		for (const book of Object.keys(this.translations.default.chapters)) {
 			const chapter_list = this.translations.default.chapters[book];
@@ -296,9 +359,11 @@ export class bcv_parser {
 		}
 		for (const book of Object.keys(out.order)) {
 			const id = out.order[book];
-			out.books[id-1] = book;
+			out.books[id - 1] = book;
 		}
-		if (new_translation !== old_translation) { this.versification_system(old_translation); }
+		if (new_translation !== old_translation) {
+			this.versification_system(old_translation);
+		}
 		return out;
 	}
 
@@ -331,8 +396,8 @@ export class bcv_parser {
 			s = s.replace(book.regexp, (full: any, prev: any, bk: any) => {
 				has_replacement = true;
 				// `value` contains the raw string; `book.osis` is the osis value for the book.
-				books.push({value: bk, parsed: book.osis, type: "book"});
-				const extra = (book.extra != null) ? `/${book.extra}` : "";
+				books.push({ value: bk, parsed: book.osis, type: "book" });
+				const extra = book.extra != null ? `/${book.extra}` : "";
 				return `${prev}\x1f${books.length - 1}${extra}\x1f`;
 			});
 			// If we've already replaced all possible books in the string, we don't need to check any further.
@@ -342,7 +407,11 @@ export class bcv_parser {
 		}
 		// Replace translations.
 		s = s.replace(this.regexps.translations, (match: any) => {
-			books.push({value: match, parsed: match.toLowerCase(), type: "translation"});
+			books.push({
+				value: match,
+				parsed: match.toLowerCase(),
+				type: "translation",
+			});
 			return `\x1e${books.length - 1}\x1e`;
 		});
 		return [s, this.get_book_indices(books, s)];
@@ -383,7 +452,7 @@ export class bcv_parser {
 			const original_part_length = part.length;
 			match.index += full.length - original_part_length;
 			// Remove most three+-character digits at the end; they won't match.
-			if ((/\s[2-9]\d\d\s*$|\s\d{4,}\s*$/).test(part)) {
+			if (/\s[2-9]\d\d\s*$|\s\d{4,}\s*$/.test(part)) {
 				part = part.replace(/\s+\d+\s*$/, "");
 			}
 			// Clean up the end of the match to avoid irrelevant context.
@@ -394,35 +463,57 @@ export class bcv_parser {
 			if (this.options.captive_end_digits_strategy === "delete") {
 				// If the match ends with a space+digit and is immediately followed by a word character, ignore the space+digit: `Matt 1, 2Text`.
 				const next_char = match.index + part.length;
-				if ((s.length > next_char) && /^\w/.test(s.substr(next_char, 1))) { part = part.replace(/[\s*]+\d+$/, ""); }
+				if (s.length > next_char && /^\w/.test(s.substr(next_char, 1))) {
+					part = part.replace(/[\s*]+\d+$/, "");
+				}
 				// If the match ends with a translation indicator, remove any numbers afterward. This situation generally occurs in cases like, "Ps 1:1 ESV 1 Blessed is...", where the final `1` is a verse number that's part of the text.
 				part = part.replace(/(\x1e[)\]]?)[\s*]*\d+$/, "$1");
 			}
 			// Though PEG.js doesn't have to be case-sensitive, using the case-insensitive feature involves some repeated processing. By lower-casing here, we only pay the cost once. The grammar for words like "also" is case-sensitive; we can safely lowercase ascii letters without changing indices. We don't just call .toLowerCase() because it could affect the length of the string if it contains certain characters; maintaining the indices is the most important thing.
 			part = part.replace(/[A-Z]+/g, (capitals: any) => capitals.toLowerCase());
 			// If we're in a chapter-book situation, the first character won't be a book control character, which would throw off the `start_index`.
-			const start_index_adjust = part.substr(0, 1) === "\x1f" ? 0 : part.split("\x1f")[0].length;
+			const start_index_adjust =
+				part.substr(0, 1) === "\x1f" ? 0 : part.split("\x1f")[0].length;
 			// * `match` is important for the length and whether it contains control characters, neither of which we've changed inconsistently with the original string. The `part` may be shorter than originally matched, but that's only to remove unneeded characters at the end.
 			// * `grammar` is the external PEG parser. The `@options.punctuation_strategy` determines which punctuation is used for sequences and `cv` separators.
-			const passage = {value: this.grammar.parse(part, {punctuation_strategy: this.options.punctuation_strategy}), type: "base", start_index: this.passage.books[book_id].start_index - start_index_adjust, match: part};
+			const passage = {
+				value: this.grammar.parse(part, {
+					punctuation_strategy: this.options.punctuation_strategy,
+				}),
+				type: "base",
+				start_index:
+					this.passage.books[book_id].start_index - start_index_adjust,
+				match: part,
+			};
 			// Are we looking at a single book on its own that could be part of a range like "1-2 Sam"?
-			if ((this.options.book_alone_strategy === "full") &&
-			(this.options.book_range_strategy === "include") &&
-			(passage.value[0].type === "b") &&
-			// Either it's on its own or a translation sequence follows it, making it effectively on its own.
-			((passage.value.length === 1) || ((passage.value.length > 1) && (passage.value[1].type === "translation_sequence"))) &&
-			(start_index_adjust === 0) &&
-			((this.passage.books[book_id].parsed.length === 1) || ((this.passage.books[book_id].parsed.length > 1) &&
-			(this.passage.books[book_id].parsed[1].type === "translation"))) &&
-			/^[234]/.test(this.passage.books[book_id].parsed[0])) {
+			if (
+				this.options.book_alone_strategy === "full" &&
+				this.options.book_range_strategy === "include" &&
+				passage.value[0].type === "b" &&
+				// Either it's on its own or a translation sequence follows it, making it effectively on its own.
+				(passage.value.length === 1 ||
+					(passage.value.length > 1 &&
+						passage.value[1].type === "translation_sequence")) &&
+				start_index_adjust === 0 &&
+				(this.passage.books[book_id].parsed.length === 1 ||
+					(this.passage.books[book_id].parsed.length > 1 &&
+						this.passage.books[book_id].parsed[1].type === "translation")) &&
+				/^[234]/.test(this.passage.books[book_id].parsed[0])
+			) {
 				this.create_book_range(s, passage, book_id);
 			}
 			// Handle each passage individually to prevent context leakage (e.g., translations back-propagating through unrelated entities).
 			[accum, post_context] = this.passage.handle_obj(passage);
 			entities = entities.concat(accum);
 			// Move the next RegExp iteration to start earlier if we didn't use everything we thought we were going to.
-			const regexp_index_adjust = this.adjust_regexp_end(accum, original_part_length, part.length);
-			if (regexp_index_adjust > 0) { this.regexps.escaped_passage.lastIndex -= regexp_index_adjust; }
+			const regexp_index_adjust = this.adjust_regexp_end(
+				accum,
+				original_part_length,
+				part.length
+			);
+			if (regexp_index_adjust > 0) {
+				this.regexps.escaped_passage.lastIndex -= regexp_index_adjust;
+			}
 		}
 		return [entities, post_context];
 	}
@@ -432,7 +523,7 @@ export class bcv_parser {
 		let regexp_index_adjust = 0;
 		if (accum.length > 0) {
 			// `accum` uses an off-by-one end index compared to the RegExp object. "and Psa3" means `lastIndex` = 8, `old_length` and `new_length` are both 4 (omitting "and " and leaving "Psa3"), and the `accum` end index is 3. We end up with 4 - 3 - 1 = 0, or no adjustment. Compare "and Psa3 and", where the last " and" is originally considered part of the regexp. In this case, `regexp_index_adjust` is 4: 8 ("Psa3 and") - 3 ("Psa3") - 1.
-			regexp_index_adjust = old_length - accum[accum.length-1].indices[1] - 1;
+			regexp_index_adjust = old_length - accum[accum.length - 1].indices[1] - 1;
 		} else if (old_length !== new_length) {
 			regexp_index_adjust = old_length - new_length;
 		}
@@ -455,12 +546,31 @@ export class bcv_parser {
 
 	// If a book is on its own, check whether it's preceded by something that indicates it's a book range like "1-2 Samuel".
 	create_book_range(s: string, passage: any, book_id: any) {
-		const cases = [bcv_parser.prototype.regexps.first, bcv_parser.prototype.regexps.second, bcv_parser.prototype.regexps.third];
-		const limit = parseInt(this.passage.books[book_id].parsed[0].substr(0, 1), 10);
+		const cases = [
+			bcv_parser.prototype.regexps.first,
+			bcv_parser.prototype.regexps.second,
+			bcv_parser.prototype.regexps.third,
+		];
+		const limit = parseInt(
+			this.passage.books[book_id].parsed[0].substr(0, 1),
+			10
+		);
 		for (let i = 1; i < limit; i++) {
-			const range_regexp = i === (limit - 1) ? bcv_parser.prototype.regexps.range_and : bcv_parser.prototype.regexps.range_only;
-			const prev = s.match(new RegExp(`(?:^|\\W)(${cases[i-1]}\\s*${range_regexp}\\s*)\\x1f${book_id}\\x1f`, 'i'));
-			if (prev != null) { return this.add_book_range_object(passage, prev, i); }
+			const range_regexp =
+				i === limit - 1
+					? bcv_parser.prototype.regexps.range_and
+					: bcv_parser.prototype.regexps.range_only;
+			const prev = s.match(
+				new RegExp(
+					`(?:^|\\W)(${
+						cases[i - 1]
+					}\\s*${range_regexp}\\s*)\\x1f${book_id}\\x1f`,
+					"i"
+				)
+			);
+			if (prev != null) {
+				return this.add_book_range_object(passage, prev, i);
+			}
 		}
 		return false;
 	}
@@ -470,8 +580,15 @@ export class bcv_parser {
 		const { length } = prev[1];
 		passage.value[0] = {
 			type: "b_range_pre",
-			value: [{type: "b_pre", value: start_book_number.toString(), indices: [prev.index, prev.index + length]}, passage.value[0]],
-			indices: [0, passage.value[0].indices[1] + length]
+			value: [
+				{
+					type: "b_pre",
+					value: start_book_number.toString(),
+					indices: [prev.index, prev.index + length],
+				},
+				passage.value[0],
+			],
+			indices: [0, passage.value[0].indices[1] + length],
 		};
 		// Adjust the indices of the original result so they reflect the new content.
 		passage.value[0].value[1].indices[0] += length;
@@ -479,10 +596,14 @@ export class bcv_parser {
 		// These two are the most important ones; the `absolute_indices` function uses them.
 		passage.start_index -= length;
 		passage.match = prev[1] + passage.match;
-		if (passage.value.length === 1) { return; }
+		if (passage.value.length === 1) {
+			return;
+		}
 		// If there are subsequent objects, also adjust their offsets.
 		for (let i = 1; i < passage.value.length; i++) {
-			if (passage.value[i].value == null) { continue; }
+			if (passage.value[i].value == null) {
+				continue;
+			}
 			// If it's an `integer` type, `passage.value[i].value` is a scalar rather than an object, so we only need to adjust the indices for the top-level object.
 			if (passage.value[i].value[0]?.indices != null) {
 				passage.value[i].value[0].indices[0] += length;
@@ -498,7 +619,9 @@ export class bcv_parser {
 	osis() {
 		const out = [];
 		for (const osis of this.parsed_entities()) {
-			if (osis.osis.length > 0) { out.push(osis.osis); }
+			if (osis.osis.length > 0) {
+				out.push(osis.osis);
+			}
 		}
 		return out.join(",");
 	}
@@ -507,7 +630,9 @@ export class bcv_parser {
 	osis_and_translations() {
 		const out = [];
 		for (const osis of this.parsed_entities()) {
-			if (osis.osis.length > 0) { out.push([osis.osis, osis.translations.join(",")]); }
+			if (osis.osis.length > 0) {
+				out.push([osis.osis, osis.translations.join(",")]);
+			}
 		}
 		return out;
 	}
@@ -516,7 +641,13 @@ export class bcv_parser {
 	osis_and_indices() {
 		const out = [];
 		for (const osis of this.parsed_entities()) {
-			if (osis.osis.length > 0) { out.push({osis: osis.osis, translations: osis.translations, indices: osis.indices}); }
+			if (osis.osis.length > 0) {
+				out.push({
+					osis: osis.osis,
+					translations: osis.translations,
+					indices: osis.indices,
+				});
+			}
 		}
 		return out;
 	}
@@ -527,18 +658,36 @@ export class bcv_parser {
 		for (let entity_id = 0; entity_id < this.entities.length; entity_id++) {
 			const entity = this.entities[entity_id];
 			// Be sure to include any translation identifiers in the indices we report back, but only if the translation immediately follows the previous entity.
-			if (entity.type && (entity.type === "translation_sequence") && (out.length > 0) && (entity_id === (out[out.length-1].entity_id + 1))) {
-				out[out.length-1].indices[1] = entity.absolute_indices[1];
+			if (
+				entity.type &&
+				entity.type === "translation_sequence" &&
+				out.length > 0 &&
+				entity_id === out[out.length - 1].entity_id + 1
+			) {
+				out[out.length - 1].indices[1] = entity.absolute_indices[1];
 			}
-			if (entity.passages == null) { continue; }
-			if (((entity.type === "b") && (this.options.book_alone_strategy === "ignore")) || ((entity.type === "b_range") && (this.options.book_range_strategy === "ignore")) || (entity.type === "context")) { continue; }
+			if (entity.passages == null) {
+				continue;
+			}
+			if (
+				(entity.type === "b" &&
+					this.options.book_alone_strategy === "ignore") ||
+				(entity.type === "b_range" &&
+					this.options.book_range_strategy === "ignore") ||
+				entity.type === "context"
+			) {
+				continue;
+			}
 			// A given entity, even if part of a sequence, always only has one set of translations associated with it.
 			let translations = [];
 			let translation_alias = null;
 			if (entity.passages[0].translations != null) {
 				for (const translation of entity.passages[0].translations) {
-					const translation_osis = translation.osis?.length > 0 ? translation.osis : "";
-					if (translation_alias == null) { translation_alias = translation.alias; }
+					const translation_osis =
+						translation.osis?.length > 0 ? translation.osis : "";
+					if (translation_alias == null) {
+						translation_alias = translation.alias;
+					}
 					translations.push(translation_osis);
 				}
 			} else {
@@ -550,25 +699,44 @@ export class bcv_parser {
 			for (let i = 0; i < length; i++) {
 				const passage = entity.passages[i];
 				// The `type` is usually only set in a sequence.
-				if (passage.type == null) { passage.type = entity.type; }
+				if (passage.type == null) {
+					passage.type = entity.type;
+				}
 				if (passage.valid.valid === false) {
-					if ((this.options.invalid_sequence_strategy === "ignore") && (entity.type === "sequence")) {
+					if (
+						this.options.invalid_sequence_strategy === "ignore" &&
+						entity.type === "sequence"
+					) {
 						this.snap_sequence("ignore", entity, osises, i, length);
 					}
 					// Stop here if we're ignoring invalid passages.
-					if (this.options.invalid_passage_strategy === "ignore") { continue; }
+					if (this.options.invalid_passage_strategy === "ignore") {
+						continue;
+					}
 				}
 				// If indicated in `@options`, exclude stray start/end books, resetting the parent indices as needed.
-				if (((passage.type === "b") || (passage.type === "b_range")) && (this.options.book_sequence_strategy === "ignore") && (entity.type === "sequence")) {
+				if (
+					(passage.type === "b" || passage.type === "b_range") &&
+					this.options.book_sequence_strategy === "ignore" &&
+					entity.type === "sequence"
+				) {
 					this.snap_sequence("book", entity, osises, i, length);
 					continue;
 				}
-				if (((passage.type === "b_range_start") || (passage.type === "range_end_b")) && (this.options.book_range_strategy === "ignore")) {
-						this.snap_range(entity, i);
-					}
-				if (passage.absolute_indices == null) { passage.absolute_indices = entity.absolute_indices; }
+				if (
+					(passage.type === "b_range_start" ||
+						passage.type === "range_end_b") &&
+					this.options.book_range_strategy === "ignore"
+				) {
+					this.snap_range(entity, i);
+				}
+				if (passage.absolute_indices == null) {
+					passage.absolute_indices = entity.absolute_indices;
+				}
 				osises.push({
-					osis: passage.valid.valid ? this.to_osis(passage.start, passage.end, translation_alias) : "",
+					osis: passage.valid.valid
+						? this.to_osis(passage.start, passage.end, translation_alias)
+						: "",
 					type: passage.type,
 					indices: passage.absolute_indices,
 					translations,
@@ -576,25 +744,46 @@ export class bcv_parser {
 					end: passage.end,
 					enclosed_indices: passage.enclosed_absolute_indices,
 					entity_id,
-					entities: [passage]});
+					entities: [passage],
+				});
 			}
 			// Don't return an empty object.
-			if (osises.length === 0) { continue; }
-			if ((osises.length > 1) && (this.options.consecutive_combination_strategy === "combine")) { osises = this.combine_consecutive_passages(osises, translation_alias); }
+			if (osises.length === 0) {
+				continue;
+			}
+			if (
+				osises.length > 1 &&
+				this.options.consecutive_combination_strategy === "combine"
+			) {
+				osises = this.combine_consecutive_passages(osises, translation_alias);
+			}
 			// Add the osises array to the existing array.
 			if (this.options.sequence_combination_strategy === "separate") {
 				out = out.concat(osises);
-			// Add the OSIS string and some data to the array.
+				// Add the OSIS string and some data to the array.
 			} else {
 				var osis;
 				const strings = [];
 				const last_i = osises.length - 1;
 				// Adjust the end index to match a closing parenthesis when presented with `enclosed` entities. These entities always start mid-sequence (unless there's a book we're ignoring), so we don't need to worry about the start index.
-				if ((osises[last_i].enclosed_indices != null) && (osises[last_i].enclosed_indices[1] >= 0)) { entity.absolute_indices[1] = osises[last_i].enclosed_indices[1]; }
-				for (osis of osises) {
-					if (osis.osis.length > 0) { strings.push(osis.osis); }
+				if (
+					osises[last_i].enclosed_indices != null &&
+					osises[last_i].enclosed_indices[1] >= 0
+				) {
+					entity.absolute_indices[1] = osises[last_i].enclosed_indices[1];
 				}
-				out.push({osis: strings.join(","), indices: entity.absolute_indices, translations, entity_id, entities: osises});
+				for (osis of osises) {
+					if (osis.osis.length > 0) {
+						strings.push(osis.osis);
+					}
+				}
+				out.push({
+					osis: strings.join(","),
+					indices: entity.absolute_indices,
+					translations,
+					entity_id,
+					entities: osises,
+				});
 			}
 		}
 		return out;
@@ -602,50 +791,87 @@ export class bcv_parser {
 
 	to_osis(start: any, end: any, translation: any) {
 		// If it's just a book on its own, how we deal with it depends on whether we want to return just the first chapter or the complete book.
-		if ((end.c == null) && (end.v == null) && (start.b === end.b) && (start.c == null) && (start.v == null) && (this.options.book_alone_strategy === "first_chapter")) { end.c = 1; }
-		const osis = {start: "", end: ""};
+		if (
+			end.c == null &&
+			end.v == null &&
+			start.b === end.b &&
+			start.c == null &&
+			start.v == null &&
+			this.options.book_alone_strategy === "first_chapter"
+		) {
+			end.c = 1;
+		}
+		const osis = { start: "", end: "" };
 		// If no start chapter or verse, assume the first possible.
-		if (start.c == null) { start.c = 1; }
-		if (start.v == null) { start.v = 1; }
+		if (start.c == null) {
+			start.c = 1;
+		}
+		if (start.v == null) {
+			start.v = 1;
+		}
 		// If no end chapter or verse, assume the last possible. If it's a single-chapter book, always use the first chapter for consistency with other `passage_existence_strategy` results (which do respect the single-chapter length).
 		if (end.c == null) {
-			if ((this.options.passage_existence_strategy.indexOf("c") >= 0) || ((this.passage.translations[translation].chapters[end.b] != null) && (this.passage.translations[translation].chapters[end.b].length === 1))) {
+			if (
+				this.options.passage_existence_strategy.indexOf("c") >= 0 ||
+				(this.passage.translations[translation].chapters[end.b] != null &&
+					this.passage.translations[translation].chapters[end.b].length === 1)
+			) {
 				end.c = this.passage.translations[translation].chapters[end.b].length;
 			} else {
 				end.c = 999;
 			}
 		}
 		if (end.v == null) {
-			if ((this.passage.translations[translation].chapters[end.b][end.c - 1] != null) && (this.options.passage_existence_strategy.indexOf("v") >= 0)) {
-				end.v = this.passage.translations[translation].chapters[end.b][end.c - 1];
+			if (
+				this.passage.translations[translation].chapters[end.b][end.c - 1] !=
+					null &&
+				this.options.passage_existence_strategy.indexOf("v") >= 0
+			) {
+				end.v = this.passage.translations[translation].chapters[end.b][
+					end.c - 1
+				];
 			} else {
 				end.v = 999;
 			}
 		}
-		if (this.options.include_apocrypha && (this.options.ps151_strategy === "b") && (((start.c === 151) && (start.b === "Ps")) || ((end.c === 151) && (end.b === "Ps")))) {
+		if (
+			this.options.include_apocrypha &&
+			this.options.ps151_strategy === "b" &&
+			((start.c === 151 && start.b === "Ps") ||
+				(end.c === 151 && end.b === "Ps"))
+		) {
 			this.fix_ps151(start, end, translation);
 		}
 		// If it's a complete book or range of complete books and we want the shortest possible OSIS, return just the book names. The `end.c` and `end.v` equaling 999 is for when the `passage_existence_strategy` sets them to 999, indicating that we should treat it as a complete book or chapter.
-		if ((this.options.osis_compaction_strategy === "b") &&
-		(start.c === 1) &&
-		(start.v === 1) &&
-		(((end.c === 999) && (end.v === 999)) ||
-		((end.c === this.passage.translations[translation].chapters[end.b].length) &&
-		(this.options.passage_existence_strategy.indexOf("c") >= 0) &&
-		((end.v === 999) ||
-		((end.v === this.passage.translations[translation].chapters[end.b][end.c - 1]) && (this.options.passage_existence_strategy.indexOf("v") >= 0)))
-		))) {
+		if (
+			this.options.osis_compaction_strategy === "b" &&
+			start.c === 1 &&
+			start.v === 1 &&
+			((end.c === 999 && end.v === 999) ||
+				(end.c ===
+					this.passage.translations[translation].chapters[end.b].length &&
+					this.options.passage_existence_strategy.indexOf("c") >= 0 &&
+					(end.v === 999 ||
+						(end.v ===
+							this.passage.translations[translation].chapters[end.b][
+								end.c - 1
+							] &&
+							this.options.passage_existence_strategy.indexOf("v") >= 0))))
+		) {
 			osis.start = start.b;
 			osis.end = end.b;
-		// If it's a complete chapter or range of complete chapters and we want a short OSIS, return just the books and chapters. We only care when `osis_compaction_strategy` isn't `bcv` (i.e., length 3) because `bcv` is always fully specified.
-		} else if ((this.options.osis_compaction_strategy.length <= 2) &&
-		(start.v === 1) &&
-		((end.v === 999) ||
-		((end.v === this.passage.translations[translation].chapters[end.b][end.c - 1]) && (this.options.passage_existence_strategy.indexOf("v") >= 0))
-		)) {
+			// If it's a complete chapter or range of complete chapters and we want a short OSIS, return just the books and chapters. We only care when `osis_compaction_strategy` isn't `bcv` (i.e., length 3) because `bcv` is always fully specified.
+		} else if (
+			this.options.osis_compaction_strategy.length <= 2 &&
+			start.v === 1 &&
+			(end.v === 999 ||
+				(end.v ===
+					this.passage.translations[translation].chapters[end.b][end.c - 1] &&
+					this.options.passage_existence_strategy.indexOf("v") >= 0))
+		) {
 			osis.start = `${start.b}.${start.c.toString()}`;
 			osis.end = `${end.b}.${end.c.toString()}`;
-		// Otherwise, return the full BCV reference for both.
+			// Otherwise, return the full BCV reference for both.
 		} else {
 			osis.start = `${start.b}.${start.c.toString()}.${start.v.toString()}`;
 			osis.end = `${end.b}.${end.c.toString()}.${end.v.toString()}`;
@@ -658,36 +884,55 @@ export class bcv_parser {
 			// Otherwise return the range.
 			out = `${osis.start}-${osis.end}`;
 		}
-		if (start.extra != null) { out = `${start.extra},${out}`; }
-		if (end.extra != null) { out += `,${end.extra}`; }
+		if (start.extra != null) {
+			out = `${start.extra},${out}`;
+		}
+		if (end.extra != null) {
+			out += `,${end.extra}`;
+		}
 		return out;
 	}
 
 	// If we want to treat Ps151 as a book rather than a chapter, we have to do some gymnastics to make sure it returns properly.
 	fix_ps151(start: any, end: any, translation: any) {
 		// Ps151 doesn't necessarily get promoted into the translation chapter list because during the string parsing, we treat it as `Ps` rather than `Ps151`.
-		if ((translation !== "default") && (this.translations[translation]?.chapters["Ps151"] == null)) {
+		if (
+			translation !== "default" &&
+			this.translations[translation]?.chapters["Ps151"] == null
+		) {
 			this.passage.promote_book_to_translation("Ps151", translation);
 		}
-		if ((start.c === 151) && (start.b === "Ps")) {
+		if (start.c === 151 && start.b === "Ps") {
 			// If the whole range is in Ps151, we can just reset both sets of books and chapters; we don't have to worry about odd ranges.
-			if ((end.c === 151) && (end.b === "Ps")) {
+			if (end.c === 151 && end.b === "Ps") {
 				start.b = "Ps151";
 				start.c = 1;
 				end.b = "Ps151";
 				end.c = 1;
-			// Otherwise, we generate the OSIS for Ps151 and then set the beginning of the range to the next book. We assume that the next book is Prov, which isn't necessarily the case. I'm not aware of a canon that doesn't place Prov after Ps, however.
+				// Otherwise, we generate the OSIS for Ps151 and then set the beginning of the range to the next book. We assume that the next book is Prov, which isn't necessarily the case. I'm not aware of a canon that doesn't place Prov after Ps, however.
 			} else {
 				// This is the string we're going to prepend to our final output.
-				start.extra = this.to_osis({b: "Ps151", c: 1, v: start.v}, {b: "Ps151", c: 1, v: this.passage.translations[translation].chapters["Ps151"][0]}, translation);
+				start.extra = this.to_osis(
+					{ b: "Ps151", c: 1, v: start.v },
+					{
+						b: "Ps151",
+						c: 1,
+						v: this.passage.translations[translation].chapters["Ps151"][0],
+					},
+					translation
+				);
 				start.b = "Prov";
 				start.c = 1;
 				start.v = 1;
 			}
-		// We know that end is in Ps151 and start is beforehand.
+			// We know that end is in Ps151 and start is beforehand.
 		} else {
 			// This is the string we're going to append to the final output.
-			end.extra = this.to_osis({b: "Ps151", c: 1, v: 1}, {b: "Ps151", c: 1, v: end.v}, translation);
+			end.extra = this.to_osis(
+				{ b: "Ps151", c: 1, v: 1 },
+				{ b: "Ps151", c: 1, v: end.v },
+				translation
+			);
 			// Set the end of the range to be the end of Ps.150, which immediately precedes Ps151.
 			end.c = 150;
 			end.v = this.passage.translations[translation].chapters["Ps"][149];
@@ -711,7 +956,11 @@ export class bcv_parser {
 					enclosed_sequence_start = osis.enclosed_indices[0];
 				}
 				// If we're in an enclosed sequence and it's either the last item in the sequence or the next item in the sequence isn't part of the same enclosed sequence, then we've reached the end of the enclosed sequence.
-				if ((enclosed_sequence_start >= 0) && ((i === last_i) || (osises[i+1].enclosed_indices[0] !== osis.enclosed_indices[0]))) {
+				if (
+					enclosed_sequence_start >= 0 &&
+					(i === last_i ||
+						osises[i + 1].enclosed_indices[0] !== osis.enclosed_indices[0])
+				) {
 					is_enclosed_last = true;
 					// We may need to adjust the indices later.
 					has_enclosed = true;
@@ -723,17 +972,23 @@ export class bcv_parser {
 					out[prev_i].is_enclosed_last = is_enclosed_last;
 					out[prev_i].indices[1] = osis.indices[1];
 					out[prev_i].enclosed_indices[1] = osis.enclosed_indices[1];
-					out[prev_i].osis = this.to_osis(out[prev_i].start, osis.end, translation);
+					out[prev_i].osis = this.to_osis(
+						out[prev_i].start,
+						osis.end,
+						translation
+					);
 				} else {
 					out.push(osis);
 				}
-				prev = {b: osis.end.b, c: osis.end.c, v: osis.end.v};
+				prev = { b: osis.end.b, c: osis.end.c, v: osis.end.v };
 			} else {
 				out.push(osis);
 				prev = {};
 			}
 		}
-		if (has_enclosed) { this.snap_enclosed_indices(out); }
+		if (has_enclosed) {
+			this.snap_enclosed_indices(out);
+		}
 		return out;
 	}
 
@@ -741,7 +996,7 @@ export class bcv_parser {
 	snap_enclosed_indices(osises: any) {
 		for (const osis of osises) {
 			if (osis.is_enclosed_last != null) {
-				if ((osis.enclosed_indices[0] < 0) && osis.is_enclosed_last) {
+				if (osis.enclosed_indices[0] < 0 && osis.is_enclosed_last) {
 					osis.indices[1] = osis.enclosed_indices[1];
 				}
 				delete osis.is_enclosed_last;
@@ -752,17 +1007,40 @@ export class bcv_parser {
 
 	// Given two fully specified objects (complete bcvs), find whether they're sequential.
 	is_verse_consecutive(prev: any, check: any, translation: any) {
-		if (prev.b == null) { return false; }
+		if (prev.b == null) {
+			return false;
+		}
 		// A translation doesn't always have an `order` set. If it doesn't, then use the default order.
-		const translation_order = (this.passage.translations[translation].order != null) ? this.passage.translations[translation].order : this.passage.translations.default.order;
+		const translation_order =
+			this.passage.translations[translation].order != null
+				? this.passage.translations[translation].order
+				: this.passage.translations.default.order;
 		if (prev.b === check.b) {
 			if (prev.c === check.c) {
-				if (prev.v === (check.v - 1)) { return true; }
-			} else if ((check.v === 1) && (prev.c === (check.c - 1))) {
-				if (prev.v === this.passage.translations[translation].chapters[prev.b][prev.c - 1]) { return true; }
+				if (prev.v === check.v - 1) {
+					return true;
+				}
+			} else if (check.v === 1 && prev.c === check.c - 1) {
+				if (
+					prev.v ===
+					this.passage.translations[translation].chapters[prev.b][prev.c - 1]
+				) {
+					return true;
+				}
 			}
-		} else if ((check.c === 1) && (check.v === 1) && (translation_order[prev.b] === (translation_order[check.b] - 1))) {
-			if ((prev.c === this.passage.translations[translation].chapters[prev.b].length) && (prev.v === this.passage.translations[translation].chapters[prev.b][prev.c - 1])) { return true; }
+		} else if (
+			check.c === 1 &&
+			check.v === 1 &&
+			translation_order[prev.b] === translation_order[check.b] - 1
+		) {
+			if (
+				prev.c ===
+					this.passage.translations[translation].chapters[prev.b].length &&
+				prev.v ===
+					this.passage.translations[translation].chapters[prev.b][prev.c - 1]
+			) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -771,11 +1049,15 @@ export class bcv_parser {
 	snap_range(entity: any, passage_i: number) {
 		// If the book is at the start of the range, we want to ignore the first part of the range.
 		let entity_i, source_entity, type;
-		if ((entity.type === "b_range_start") || ((entity.type === "sequence") && (entity.passages[passage_i].type === "b_range_start"))) {
+		if (
+			entity.type === "b_range_start" ||
+			(entity.type === "sequence" &&
+				entity.passages[passage_i].type === "b_range_start")
+		) {
 			entity_i = 1;
 			source_entity = "end";
 			type = "b_range_start";
-		// If the book is at the end of the range, we want to ignore the end of the range.
+			// If the book is at the end of the range, we want to ignore the end of the range.
 		} else {
 			entity_i = 0;
 			source_entity = "start";
@@ -784,11 +1066,14 @@ export class bcv_parser {
 		const target_entity = source_entity === "end" ? "start" : "end";
 		// Rewrite either the start or the end of the range to match the opposite. In effect, we're changing it from a range to a single point.
 		for (const key of Object.keys(entity.passages[passage_i][target_entity])) {
-			entity.passages[passage_i][target_entity][key] = entity.passages[passage_i][source_entity][key];
+			entity.passages[passage_i][target_entity][key] =
+				entity.passages[passage_i][source_entity][key];
 		}
 		if (entity.type === "sequence") {
 			// This can be too long if a range is converted into a sequence where it ends with an open book range (`Matt 10-Rev`) that we want to ignore. At this point, the `passages` and `value` keys can get out-of-sync.
-			if (passage_i >= entity.value.length) { passage_i = entity.value.length - 1; }
+			if (passage_i >= entity.value.length) {
+				passage_i = entity.value.length - 1;
+			}
 			const pluck = this.passage.pluck(type, entity.value[passage_i]);
 			// The `pluck` can be null if we've already overwritten its `type` in a previous recursion. This process is unusual, but can happen in "Proverbs 31:2. Vs 10 to dan".
 			if (pluck != null) {
@@ -800,29 +1085,52 @@ export class bcv_parser {
 					entity.absolute_indices[1] = temp.absolute_indices[1];
 				}
 			}
-		// If it's not a sequence, change the `type` and `absolute_indices` to exclude the book we're omitting.
+			// If it's not a sequence, change the `type` and `absolute_indices` to exclude the book we're omitting.
 		} else {
 			entity.original_type = entity.type;
 			entity.type = entity.value[entity_i].type;
-			entity.absolute_indices = [entity.value[entity_i].absolute_indices[0], entity.value[entity_i].absolute_indices[1]];
+			entity.absolute_indices = [
+				entity.value[entity_i].absolute_indices[0],
+				entity.value[entity_i].absolute_indices[1],
+			];
 		}
 		return entity;
 	}
 
 	// Snap the start/end index of the entity or surrounding passages when there's a lone book or invalid item in a sequence.
-	snap_sequence(type: string, entity: any, osises: any, i: number, length: number) {
+	snap_sequence(
+		type: string,
+		entity: any,
+		osises: any,
+		i: number,
+		length: number
+	) {
 		const passage = entity.passages[i];
 		// If the passage is the first thing in the sequence and something is after it, snap the start index of the whole entity to the start index of the next item.
 		//
 		// But we only want to do this if it's followed by a book (if it's "Matt, 5", we want to be sure to include "Matt" as part of the indices and bypass this step). We can tell if that's the case if the `type` of what follows starts with `b` or if it's a `range` starting in a different book. The tricky part occurs when we have several invalid references at the start (Matt 29, 30, Acts 1)--we need to find the first value that's a book. If there's a valid item before the next book, abort.
-		if ((passage.absolute_indices[0] === entity.absolute_indices[0]) && (i < (length - 1)) && (this.get_snap_sequence_i(entity.passages, i, length) !== i)) {
+		if (
+			passage.absolute_indices[0] === entity.absolute_indices[0] &&
+			i < length - 1 &&
+			this.get_snap_sequence_i(entity.passages, i, length) !== i
+		) {
 			entity.absolute_indices[0] = entity.passages[i + 1].absolute_indices[0];
 			this.remove_absolute_indices(entity.passages, i + 1);
-		// If the passage is the last thing in a sequence (but not the only one), snap the entity end index to the end index of the previous valid item. To handle multiple items at the end, snap back to the last known good item if available.
-		} else if ((passage.absolute_indices[1] === entity.absolute_indices[1]) && (i > 0)) {
-			entity.absolute_indices[1] = osises.length > 0 ? osises[osises.length - 1].indices[1] : entity.passages[i - 1].absolute_indices[1];
-		// Otherwise, if the next item doesn't start with a book, link the start index of the current passage to the next one because we're including the current passage as part of the next one. In "Eph. 4. Gen, Matt, 6", the `Matt, ` should be part of the `6`, but "Eph. 4. Gen, Matt, 1cor6" should exclude `Matt`.
-		} else if ((type === "book") && (i < (length - 1)) && !this.starts_with_book(entity.passages[i + 1])) {
+			// If the passage is the last thing in a sequence (but not the only one), snap the entity end index to the end index of the previous valid item. To handle multiple items at the end, snap back to the last known good item if available.
+		} else if (
+			passage.absolute_indices[1] === entity.absolute_indices[1] &&
+			i > 0
+		) {
+			entity.absolute_indices[1] =
+				osises.length > 0
+					? osises[osises.length - 1].indices[1]
+					: entity.passages[i - 1].absolute_indices[1];
+			// Otherwise, if the next item doesn't start with a book, link the start index of the current passage to the next one because we're including the current passage as part of the next one. In "Eph. 4. Gen, Matt, 6", the `Matt, ` should be part of the `6`, but "Eph. 4. Gen, Matt, 1cor6" should exclude `Matt`.
+		} else if (
+			type === "book" &&
+			i < length - 1 &&
+			!this.starts_with_book(entity.passages[i + 1])
+		) {
 			entity.passages[i + 1].absolute_indices[0] = passage.absolute_indices[0];
 		}
 		// Return something only for unit testing.
@@ -832,25 +1140,41 @@ export class bcv_parser {
 	// Identify whether there are any valid items between the current item and the next book.
 	get_snap_sequence_i(passages: any, i: number, length: number) {
 		for (let j = i + 1; j < length; j++) {
-			if (this.starts_with_book(passages[j])) { return j; }
-			if (passages[j].valid.valid) { return i; }
+			if (this.starts_with_book(passages[j])) {
+				return j;
+			}
+			if (passages[j].valid.valid) {
+				return i;
+			}
 		}
 		return i;
 	}
 
 	// Given a passage, does it start with a book? It never takes a sequence as an argument.
 	starts_with_book(passage: any) {
-		if (passage.type.substr(0, 1) === "b") { return true; }
-		if (((passage.type === "range") || (passage.type === "ff")) && (passage.start.type.substr(0, 1) === "b")) { return true; }
+		if (passage.type.substr(0, 1) === "b") {
+			return true;
+		}
+		if (
+			(passage.type === "range" || passage.type === "ff") &&
+			passage.start.type.substr(0, 1) === "b"
+		) {
+			return true;
+		}
 		return false;
 	}
 
 	// Remove absolute indices from the given passage to the end of the sequence. We do this when we don't want to include the end of a sequence in the sequence (most likely because it's invalid or a book on its own).
 	remove_absolute_indices(passages: any, i: number) {
-		if (passages[i].enclosed_absolute_indices[0] < 0) { return false; }
+		if (passages[i].enclosed_absolute_indices[0] < 0) {
+			return false;
+		}
 		const [start, end] = passages[i].enclosed_absolute_indices;
 		for (const passage of passages.slice(i)) {
-			if ((passage.enclosed_absolute_indices[0] === start) && (passage.enclosed_absolute_indices[1] === end)) {
+			if (
+				passage.enclosed_absolute_indices[0] === start &&
+				passage.enclosed_absolute_indices[1] === end
+			) {
 				passage.enclosed_absolute_indices = [-1, -1];
 			} else {
 				break;

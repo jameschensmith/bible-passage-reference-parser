@@ -3,7 +3,7 @@ import { bcv_parser } from "../core";
 // When adding a new translation, add it both here and bcv_parser::translations.aliases
 bcv_parser.prototype.regexps.translations = new RegExp(`(?:\
 (?:SFB(?:15)?|B(?:1917|2000))\
-)\\b`, 'gi');
+)\\b`, "gi");
 bcv_parser.prototype.translations = {
 	aliases: {
 		

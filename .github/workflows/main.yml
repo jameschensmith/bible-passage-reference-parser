@@ -27,3 +27,6 @@ jobs:
 
       - name: Build | Test
         run: npm test
+
+      - name: Build | Format
+        run: npm run format:check

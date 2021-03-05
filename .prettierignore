@@ -1,0 +1,14 @@
+# Documentation: https://prettier.io/docs/en/ignore.html
+
+# Node.js
+**/node_modules/
+/js/
+package-lock.json
+
+# Tools
+/tools/
+
+# Language files (for now)
+src/*/**
+!src/core/**
+src/*/spec.ts

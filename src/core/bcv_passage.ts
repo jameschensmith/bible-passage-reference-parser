@@ -16,9 +16,13 @@ export class bcv_passage {
 		// `passages` is an array of passage objects.
 		for (const passage of passages) {
 			// The grammar can sometimes emit `null`.
-			if (passage == null) { continue; }
+			if (passage == null) {
+				continue;
+			}
 			// Each `passage` consists of passage objects and, possibly, strings.
-			if (passage.type === "stop") { break; }
+			if (passage.type === "stop") {
+				break;
+			}
 			[accum, context] = this.handle_obj(passage, accum, context);
 		}
 		return [accum, context];
@@ -26,9 +30,11 @@ export class bcv_passage {
 
 	// Handle a typical passage object with an `index`, `type`, and array in `value`.
 	handle_obj(passage: any, accum: any, context: any) {
-		if ((passage.type != null) && ((this as any)[passage.type] != null)) {
+		if (passage.type != null && (this as any)[passage.type] != null) {
 			return (this as any)[passage.type](passage, accum, context);
-		} else { return [accum, context]; }
+		} else {
+			return [accum, context];
+		}
 	}
 
 	// ## Types Returned from the PEG.js Grammar
@@ -40,23 +46,35 @@ export class bcv_passage {
 		passage.passages = [];
 		const alternates = [];
 		for (const b of this.books[passage.value].parsed) {
-			const valid = this.validate_ref(passage.start_context.translations, {b});
-			const obj = {start: {b}, end: {b}, valid};
+			const valid = this.validate_ref(passage.start_context.translations, {
+				b,
+			});
+			const obj = { start: { b }, end: { b }, valid };
 			// Use the first valid book.
-			if ((passage.passages.length === 0) && valid.valid) {
+			if (passage.passages.length === 0 && valid.valid) {
 				passage.passages.push(obj);
 			} else {
 				alternates.push(obj);
 			}
 		}
 		// If none are valid, use the first one.
-		if (passage.passages.length === 0) { passage.passages.push(alternates.shift()); }
-		if (alternates.length > 0) { passage.passages[0].alternates = alternates; }
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		if (passage.passages.length === 0) {
+			passage.passages.push(alternates.shift());
+		}
+		if (alternates.length > 0) {
+			passage.passages[0].alternates = alternates;
+		}
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		accum.push(passage);
-		context = {b: passage.passages[0].start.b};
-		if (passage.start_context.translations != null) { context.translations = passage.start_context.translations; }
+		context = { b: passage.passages[0].start.b };
+		if (passage.start_context.translations != null) {
+			context.translations = passage.start_context.translations;
+		}
 		return [accum, context];
 	}
 
@@ -72,10 +90,23 @@ export class bcv_passage {
 		const book = this.pluck("b", passage.value);
 		let end;
 		[[end], context] = this.b(book, [], context);
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
-		const start_obj = {b: passage.value[0].value + end.passages[0].start.b.substr(1), type: "b"};
-		passage.passages = [{start: start_obj, end: end.passages[0].end, valid: end.passages[0].valid}];
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
+		const start_obj = {
+			b: passage.value[0].value + end.passages[0].start.b.substr(1),
+			type: "b",
+		};
+		passage.passages = [
+			{
+				start: start_obj,
+				end: end.passages[0].end,
+				valid: end.passages[0].valid,
+			},
+		];
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
 		accum.push(passage);
 		return [accum, context];
 	}
@@ -100,11 +131,20 @@ export class bcv_passage {
 		const alternates = [];
 		for (const b of this.books[this.pluck("b", passage.value).value].parsed) {
 			let context_key = "c";
-			const valid = this.validate_ref(passage.start_context.translations, {b, c});
-			const obj: any = {start: {b}, end: {b}, valid};
+			const valid = this.validate_ref(passage.start_context.translations, {
+				b,
+				c,
+			});
+			const obj: any = { start: { b }, end: { b }, valid };
 			// Is it really a `bv` object?
-			if (valid.messages.start_chapter_not_exist_in_single_chapter_book || valid.messages.start_chapter_1) {
-				obj.valid = this.validate_ref(passage.start_context.translations, {b, v: c});
+			if (
+				valid.messages.start_chapter_not_exist_in_single_chapter_book ||
+				valid.messages.start_chapter_1
+			) {
+				obj.valid = this.validate_ref(passage.start_context.translations, {
+					b,
+					v: c,
+				});
 				// If it's `Jude 2`, then note that the chapter doesn't exist.
 				if (valid.messages.start_chapter_not_exist_in_single_chapter_book) {
 					obj.valid.messages.start_chapter_not_exist_in_single_chapter_book = 1;
@@ -115,21 +155,39 @@ export class bcv_passage {
 			}
 			obj.start[context_key] = c;
 			// If it's zero, fix it before assigning the end.
-			[obj.start.c, obj.start.v] = this.fix_start_zeroes(obj.valid, obj.start.c, obj.start.v);
+			[obj.start.c, obj.start.v] = this.fix_start_zeroes(
+				obj.valid,
+				obj.start.c,
+				obj.start.v
+			);
 			// Don't want an undefined key hanging around the object.
-			if (obj.start.v == null) { delete obj.start.v; }
+			if (obj.start.v == null) {
+				delete obj.start.v;
+			}
 			obj.end[context_key] = obj.start[context_key];
-			if ((passage.passages.length === 0) && obj.valid.valid) {
+			if (passage.passages.length === 0 && obj.valid.valid) {
 				passage.passages.push(obj);
 			} else {
 				alternates.push(obj);
 			}
 		}
-		if (passage.passages.length === 0) { passage.passages.push(alternates.shift()); }
-		if (alternates.length > 0) { passage.passages[0].alternates = alternates; }
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
-		this.set_context_from_object(context, ["b", "c", "v"], passage.passages[0].start);
+		if (passage.passages.length === 0) {
+			passage.passages.push(alternates.shift());
+		}
+		if (alternates.length > 0) {
+			passage.passages[0].alternates = alternates;
+		}
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
+		this.set_context_from_object(
+			context,
+			["b", "c", "v"],
+			passage.passages[0].start
+		);
 		accum.push(passage);
 		return [accum, context];
 	}
@@ -141,9 +199,14 @@ export class bcv_passage {
 		let bc;
 		[[bc], context] = this.bc(this.pluck("bc", passage.value), [], context);
 		// We check the first two characters to handle both `Ps` and `Ps151`.
-		if ((bc.passages[0].start.b.substr(0, 2) !== "Ps") && (bc.passages[0].alternates != null)) {
+		if (
+			bc.passages[0].start.b.substr(0, 2) !== "Ps" &&
+			bc.passages[0].alternates != null
+		) {
 			for (let i = 0; i < bc.passages[0].alternates.length; i++) {
-				if (bc.passages[0].alternates[i].start.b.substr(0, 2) !== "Ps") { continue; }
+				if (bc.passages[0].alternates[i].start.b.substr(0, 2) !== "Ps") {
+					continue;
+				}
 				// If Psalms is one of the alternates, promote it to the primary passage and discard the others--we know it's right.
 				bc.passages[0] = bc.passages[0].alternates[i];
 				break;
@@ -158,8 +221,14 @@ export class bcv_passage {
 		// Set the `indices` of the new `v` object to the indices of the `title`. We won't actually use these indices anywhere.
 		let title = this.pluck("title", passage.value);
 		// The `title` will be null if it's being reparsed from a future translation because we rewrite it as a `bcv` while discarding the original `title` object.
-		if (title == null) { title = this.pluck("v", passage.value); }
-		passage.value[1] = {type: "v", value: [{type: "integer", value: 1, indices: title.indices}], indices: title.indices};
+		if (title == null) {
+			title = this.pluck("v", passage.value);
+		}
+		passage.value[1] = {
+			type: "v",
+			value: [{ type: "integer", value: 1, indices: title.indices }],
+			indices: title.indices,
+		};
 		// We don't need to preserve the original `type` for reparsing; if it gets here, it'll always be a `bcv`.
 		passage.type = "bcv";
 		// Treat it as a standard `bcv`.
@@ -176,22 +245,38 @@ export class bcv_passage {
 		let v = this.pluck("v", passage.value).value;
 		const alternates = [];
 		for (const b of this.books[this.pluck("b", bc.value).value].parsed) {
-			const valid = this.validate_ref(passage.start_context.translations, {b, c, v});
+			const valid = this.validate_ref(passage.start_context.translations, {
+				b,
+				c,
+				v,
+			});
 			[c, v] = this.fix_start_zeroes(valid, c, v);
-			const obj = {start: {b, c, v}, end: {b, c, v}, valid};
+			const obj = { start: { b, c, v }, end: { b, c, v }, valid };
 			// Use the first valid option.
-			if ((passage.passages.length === 0) && valid.valid) {
+			if (passage.passages.length === 0 && valid.valid) {
 				passage.passages.push(obj);
 			} else {
 				alternates.push(obj);
 			}
 		}
 		// If there are no valid options, use the first one.
-		if (passage.passages.length === 0) { passage.passages.push(alternates.shift()); }
-		if (alternates.length > 0) { passage.passages[0].alternates = alternates; }
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
-		this.set_context_from_object(context, ["b", "c", "v"], passage.passages[0].start);
+		if (passage.passages.length === 0) {
+			passage.passages.push(alternates.shift());
+		}
+		if (alternates.length > 0) {
+			passage.passages[0].alternates = alternates;
+		}
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
+		this.set_context_from_object(
+			context,
+			["b", "c", "v"],
+			passage.passages[0].start
+		);
 		accum.push(passage);
 		return [accum, context];
 	}
@@ -204,13 +289,18 @@ export class bcv_passage {
 		let bcv: any = {
 			indices: passage.indices,
 			value: [
-				{type: "bc", value: [b, {type: "c", value: [{type: "integer", value: 1}]}]},
-				v
-			]
+				{
+					type: "bc",
+					value: [b, { type: "c", value: [{ type: "integer", value: 1 }] }],
+				},
+				v,
+			],
 		};
 		[[bcv], context] = this.bcv(bcv, [], context);
 		passage.passages = bcv.passages;
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		accum.push(passage);
 		return [accum, context];
 	}
@@ -220,19 +310,34 @@ export class bcv_passage {
 		// This can happen in places like `chapt. 11-1040 of II Kings`, where the invalid range separates the `b` and the `c`.
 		passage.start_context = bcv_utils.shallow_clone(context);
 		// If it's an actual chapter object, the value we want is in the integer object inside it.
-		let c = passage.type === "integer" ? passage.value : this.pluck("integer", passage.value).value;
-		const valid = this.validate_ref(passage.start_context.translations, {b: context.b, c});
+		let c =
+			passage.type === "integer"
+				? passage.value
+				: this.pluck("integer", passage.value).value;
+		const valid = this.validate_ref(passage.start_context.translations, {
+			b: context.b,
+			c,
+		});
 		// If it's a single-chapter book, then treat it as a verse even if it looks like a chapter (unless its value is `1`).
-		if (!valid.valid && valid.messages.start_chapter_not_exist_in_single_chapter_book) {
+		if (
+			!valid.valid &&
+			valid.messages.start_chapter_not_exist_in_single_chapter_book
+		) {
 			return this.v(passage, accum, context);
 		}
 		[c] = this.fix_start_zeroes(valid, c);
-		passage.passages = [{start: {b: context.b, c}, end: {b: context.b, c}, valid}];
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
+		passage.passages = [
+			{ start: { b: context.b, c }, end: { b: context.b, c }, valid },
+		];
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
 		accum.push(passage);
 		context.c = c;
 		this.reset_context(context, ["v"]);
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		return [accum, context];
 	}
 
@@ -243,8 +348,12 @@ export class bcv_passage {
 		// This string always starts with the chapter number, followed by other letters.
 		const c = parseInt(this.books[passage.value].value.match(/^\d+/)[0], 10);
 		passage.value = [
-			{type: "b", value: passage.value, indices: passage.indices},
-			{type: "c", value: [{type: "integer", value: c, indices: passage.indices}], indices: passage.indices}
+			{ type: "b", value: passage.value, indices: passage.indices },
+			{
+				type: "c",
+				value: [{ type: "integer", value: c, indices: passage.indices }],
+				indices: passage.indices,
+			},
 		];
 		return this.bc(passage, accum, context);
 	}
@@ -259,7 +368,11 @@ export class bcv_passage {
 		}
 		// Add a `v` object and treat it as a regular `cv`.
 		const title = this.pluck("title", passage.value);
-		passage.value[1] = {type: "v", value: [{type: "integer", value: 1, indices: title.indices}], indices: title.indices};
+		passage.value[1] = {
+			type: "v",
+			value: [{ type: "integer", value: 1, indices: title.indices }],
+			indices: title.indices,
+		};
 		// Change the type to match the new parsing strategy.
 		passage.type = "cv";
 		return this.cv(passage, accum, passage.start_context);
@@ -270,14 +383,24 @@ export class bcv_passage {
 		passage.start_context = bcv_utils.shallow_clone(context);
 		let c = this.pluck("c", passage.value).value;
 		let v = this.pluck("v", passage.value).value;
-		const valid = this.validate_ref(passage.start_context.translations, {b: context.b, c, v});
+		const valid = this.validate_ref(passage.start_context.translations, {
+			b: context.b,
+			c,
+			v,
+		});
 		[c, v] = this.fix_start_zeroes(valid, c, v);
-		passage.passages = [{start: {b: context.b, c, v}, end: {b: context.b, c, v}, valid}];
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
+		passage.passages = [
+			{ start: { b: context.b, c, v }, end: { b: context.b, c, v }, valid },
+		];
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
 		accum.push(passage);
 		context.c = c;
 		context.v = v;
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		return [accum, context];
 	}
 
@@ -286,7 +409,10 @@ export class bcv_passage {
 		// We don't need to preserve the original `type` for reparsing.
 		passage.type = "range";
 		const [b, start_c, end_c] = passage.value;
-		passage.value = [{type: "bc", value:[b, start_c], indices: passage.indices}, end_c];
+		passage.value = [
+			{ type: "bc", value: [b, start_c], indices: passage.indices },
+			end_c,
+		];
 		end_c.indices[1] = passage.indices[1];
 		return this.range(passage, accum, context);
 	}
@@ -317,7 +443,11 @@ export class bcv_passage {
 	ff(passage: any, accum: any, context: any) {
 		passage.start_context = bcv_utils.shallow_clone(context);
 		// Create a virtual end to pass to `@range`.
-		passage.value.push({type: "integer", indices: passage.indices, value: 999});
+		passage.value.push({
+			type: "integer",
+			indices: passage.indices,
+			value: 999,
+		});
 		[[passage], context] = this.range(passage, [], passage.start_context);
 		// Set the indices to include the end of the range (the "ff").
 		passage.value[0].indices = passage.value[1].indices;
@@ -325,9 +455,15 @@ export class bcv_passage {
 		// And then get rid of the virtual end so it doesn't stick around if we need to reparse it later.
 		passage.value.pop();
 		// Ignore any warnings that the end chapter / verse doesn't exist.
-		if (passage.passages[0].valid.messages.end_verse_not_exist != null) { delete passage.passages[0].valid.messages.end_verse_not_exist; }
-		if (passage.passages[0].valid.messages.end_chapter_not_exist != null) { delete passage.passages[0].valid.messages.end_chapter_not_exist; }
-		if (passage.passages[0].end.original_c != null) { delete passage.passages[0].end.original_c; }
+		if (passage.passages[0].valid.messages.end_verse_not_exist != null) {
+			delete passage.passages[0].valid.messages.end_verse_not_exist;
+		}
+		if (passage.passages[0].valid.messages.end_chapter_not_exist != null) {
+			delete passage.passages[0].valid.messages.end_chapter_not_exist;
+		}
+		if (passage.passages[0].end.original_c != null) {
+			delete passage.passages[0].end.original_c;
+		}
 		// `translations` and `absolute_indices` are handled in `@range`.
 		accum.push(passage);
 		return [accum, context];
@@ -341,11 +477,17 @@ export class bcv_passage {
 			return this.integer(passage.value[0], accum, context);
 		}
 		// Change the `integer` to a `c` object for later passing to `@cv`.
-		passage.value[0] = {type: "c", value: [passage.value[0]], indices: [passage.value[0].indices[0], passage.value[0].indices[1]]};
+		passage.value[0] = {
+			type: "c",
+			value: [passage.value[0]],
+			indices: [passage.value[0].indices[0], passage.value[0].indices[1]],
+		};
 		// Change the `title` object to a `v` object.
 		passage.value[1].type = "v";
 		passage.value[1].original_type = "title";
-		passage.value[1].value = [{type: "integer", value: 1, indices: passage.value[1].value.indices}];
+		passage.value[1].value = [
+			{ type: "integer", value: 1, indices: passage.value[1].value.indices },
+		];
 		// We don't need to preserve the original `type` for reparsing.
 		passage.type = "cv";
 		return this.cv(passage, accum, passage.start_context);
@@ -353,7 +495,9 @@ export class bcv_passage {
 
 	// Pass the integer off to whichever handler is relevant.
 	integer(passage: any, accum: any, context: any) {
-		if (context.v != null) { return this.v(passage, accum, context); }
+		if (context.v != null) {
+			return this.v(passage, accum, context);
+		}
 		return this.c(passage, accum, context);
 	}
 
@@ -363,18 +507,50 @@ export class bcv_passage {
 		// Create a virtual end to pass to `@range`. Start out by just incrementing the last integer in the `passage`.
 		let prev_integer = this.pluck_last_recursively("integer", passage.value);
 		// The grammar should always produce at least one object in `passage` with an integer, so this shouldn't be necessary.
-		if (prev_integer == null) { prev_integer = {value: 1}; }
+		if (prev_integer == null) {
+			prev_integer = { value: 1 };
+		}
 		// Add a temporary object to serve as the next verse or chapter. We set it to an integer so that we don't have to worry about whether to create a `c` or a `v`.
-		passage.value.push({type: "integer", indices: passage.indices, value: prev_integer.value + 1});
+		passage.value.push({
+			type: "integer",
+			indices: passage.indices,
+			value: prev_integer.value + 1,
+		});
 		// We don't overwrite the `passage` object here the way we do in `@ff` because the next `if` statement needs access to the original `passage`.
 		let psg;
 		[[psg], context] = this.range(passage, [], passage.start_context);
 		// If it's at the end of the chapter, try the first verse of the next chapter (unless at the end of a book). Only try if the start verse is valid.
-		if ((psg.passages[0].valid.messages.end_verse_not_exist != null) && (psg.passages[0].valid.messages.start_verse_not_exist == null) && (psg.passages[0].valid.messages.start_chapter_not_exist == null) && (context.c != null)) {
+		if (
+			psg.passages[0].valid.messages.end_verse_not_exist != null &&
+			psg.passages[0].valid.messages.start_verse_not_exist == null &&
+			psg.passages[0].valid.messages.start_chapter_not_exist == null &&
+			context.c != null
+		) {
 			// Get rid of the previous attempt to find the next verse.
 			passage.value.pop();
 			// Construct a `cv` object that points to the first verse of the next chapter. The `context.c` always indicates the current chapter. The indices don't matter because we discard this entire object once we're done with it.
-			passage.value.push({type: "cv", indices: passage.indices, value: [{type: "c", value: [{type: "integer", value: context.c + 1, indices: passage.indices}], indices: passage.indices}, {type: "v", value: [{type: "integer", value: 1, indices: passage.indices}], indices: passage.indices}]});
+			passage.value.push({
+				type: "cv",
+				indices: passage.indices,
+				value: [
+					{
+						type: "c",
+						value: [
+							{
+								type: "integer",
+								value: context.c + 1,
+								indices: passage.indices,
+							},
+						],
+						indices: passage.indices,
+					},
+					{
+						type: "v",
+						value: [{ type: "integer", value: 1, indices: passage.indices }],
+						indices: passage.indices,
+					},
+				],
+			});
 			// And then try again, forcing `@range` to use the first verse of the next chapter.
 			[[psg], context] = this.range(passage, [], passage.start_context);
 		}
@@ -384,9 +560,15 @@ export class bcv_passage {
 		// And then get rid of the virtual end so it doesn't stick around if we need to reparse it later.
 		psg.value.pop();
 		// Ignore any warnings that the end chapter / verse doesn't exist.
-		if (psg.passages[0].valid.messages.end_verse_not_exist != null) { delete psg.passages[0].valid.messages.end_verse_not_exist; }
-		if (psg.passages[0].valid.messages.end_chapter_not_exist != null) { delete psg.passages[0].valid.messages.end_chapter_not_exist; }
-		if (psg.passages[0].end.original_c != null) { delete psg.passages[0].end.original_c; }
+		if (psg.passages[0].valid.messages.end_verse_not_exist != null) {
+			delete psg.passages[0].valid.messages.end_verse_not_exist;
+		}
+		if (psg.passages[0].valid.messages.end_chapter_not_exist != null) {
+			delete psg.passages[0].valid.messages.end_chapter_not_exist;
+		}
+		if (psg.passages[0].end.original_c != null) {
+			delete psg.passages[0].end.original_c;
+		}
 		// `translations` and `absolute_indices` are handled in `@range`.
 		accum.push(psg);
 		return [accum, context];
@@ -401,19 +583,31 @@ export class bcv_passage {
 			[[psg], context] = this.handle_array(obj, [], context);
 			// There's only more than one `sub_psg` if there was a range error.
 			for (const sub_psg of psg.passages) {
-				if (sub_psg.type == null) { sub_psg.type = psg.type; }
+				if (sub_psg.type == null) {
+					sub_psg.type = psg.type;
+				}
 				// Add the indices so we can possibly retrieve them later, depending on our `sequence_combination_strategy`.
-				if (sub_psg.absolute_indices == null) { sub_psg.absolute_indices = psg.absolute_indices; }
-				if (psg.start_context.translations != null) { sub_psg.translations = psg.start_context.translations; }
+				if (sub_psg.absolute_indices == null) {
+					sub_psg.absolute_indices = psg.absolute_indices;
+				}
+				if (psg.start_context.translations != null) {
+					sub_psg.translations = psg.start_context.translations;
+				}
 				// Save the index of any closing punctuation if the sequence ends with a `sequence_post_enclosed`.
-				sub_psg.enclosed_absolute_indices = psg.type === "sequence_post_enclosed" ? psg.absolute_indices : [-1, -1];
+				sub_psg.enclosed_absolute_indices =
+					psg.type === "sequence_post_enclosed"
+						? psg.absolute_indices
+						: [-1, -1];
 				passage.passages.push(sub_psg);
 			}
 		}
 		if (passage.absolute_indices == null) {
 			// If it's `sequence_post_enclosed`, don't snap the end index; include the closing punctuation.
-			if ((passage.passages.length > 0) && (passage.type === "sequence")) {
-				passage.absolute_indices = [passage.passages[0].absolute_indices[0], passage.passages[passage.passages.length - 1].absolute_indices[1]];
+			if (passage.passages.length > 0 && passage.type === "sequence") {
+				passage.absolute_indices = [
+					passage.passages[0].absolute_indices[0],
+					passage.passages[passage.passages.length - 1].absolute_indices[1],
+				];
 			} else {
 				passage.absolute_indices = this.get_absolute_indices(passage.indices);
 			}
@@ -429,16 +623,29 @@ export class bcv_passage {
 
 	// Handle a verse, either as part of a sequence or because someone explicitly wrote "verse".
 	v(passage: any, accum: any, context: any) {
-		let v = passage.type === "integer" ? passage.value : this.pluck("integer", passage.value).value;
+		let v =
+			passage.type === "integer"
+				? passage.value
+				: this.pluck("integer", passage.value).value;
 		passage.start_context = bcv_utils.shallow_clone(context);
 		// The chapter context might not be set if it follows a book in a sequence.
-		const c = (context.c != null) ? context.c : 1;
-		const valid = this.validate_ref(passage.start_context.translations, {b: context.b, c, v});
+		const c = context.c != null ? context.c : 1;
+		const valid = this.validate_ref(passage.start_context.translations, {
+			b: context.b,
+			c,
+			v,
+		});
 		let no_c;
 		[no_c, v] = this.fix_start_zeroes(valid, 0, v);
-		passage.passages = [{start: {b: context.b, c, v}, end: {b: context.b, c, v}, valid}];
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		passage.passages = [
+			{ start: { b: context.b, c, v }, end: { b: context.b, c, v }, valid },
+		];
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		accum.push(passage);
 		context.v = v;
 		return [accum, context];
@@ -452,7 +659,14 @@ export class bcv_passage {
 		// `@handle_obj` always returns exactly one object that we're interested in.
 		[[start], context] = this.handle_obj(start, [], context);
 		// Matt 5-verse 6 = Matt.5.6
-		if ((end.type === "v") && (((start.type === "bc") && !start.passages?.[0]?.valid?.messages?.start_chapter_not_exist_in_single_chapter_book)|| (start.type === "c")) && (this.options.end_range_digits_strategy === "verse")) {
+		if (
+			end.type === "v" &&
+			((start.type === "bc" &&
+				!start.passages?.[0]?.valid?.messages
+					?.start_chapter_not_exist_in_single_chapter_book) ||
+				start.type === "c") &&
+			this.options.end_range_digits_strategy === "verse"
+		) {
 			// If we had to change the `type`, reflect that here.
 			passage.value[0] = start;
 			return this.range_change_integer_end(passage, accum);
@@ -465,27 +679,71 @@ export class bcv_passage {
 		// We'll also need to recalculate these if they exist.
 		delete passage.absolute_indices;
 		// Create the prospective start and end objects that will end up in `passage.passages`.
-		const start_obj = {b: start.passages[0].start.b, c: start.passages[0].start.c, v: start.passages[0].start.v, type: start.type};
-		const end_obj = {b: end.passages[0].end.b, c: end.passages[0].end.c, v: end.passages[0].end.v, type: end.type};
+		const start_obj = {
+			b: start.passages[0].start.b,
+			c: start.passages[0].start.c,
+			v: start.passages[0].start.v,
+			type: start.type,
+		};
+		const end_obj = {
+			b: end.passages[0].end.b,
+			c: end.passages[0].end.c,
+			v: end.passages[0].end.v,
+			type: end.type,
+		};
 		// Make sure references like `Ps 20:1-0:4` don't change to `Ps 20:1-1:4`. In other words, don't upgrade zero end ranges.
-		if (end.passages[0].valid.messages.start_chapter_is_zero) { end_obj.c = 0; }
-		if (end.passages[0].valid.messages.start_verse_is_zero) { end_obj.v = 0; }
-		const valid = this.validate_ref(passage.start_context.translations, start_obj, end_obj);
+		if (end.passages[0].valid.messages.start_chapter_is_zero) {
+			end_obj.c = 0;
+		}
+		if (end.passages[0].valid.messages.start_verse_is_zero) {
+			end_obj.v = 0;
+		}
+		const valid = this.validate_ref(
+			passage.start_context.translations,
+			start_obj,
+			end_obj
+		);
 		// If it's valid, sometimes we want to return the value from `@range_handle_valid_end`, and sometimes not; it depends on what kinds of corrections we need to make.
 		if (valid.valid) {
-			const [return_now, return_value] = this.range_handle_valid(valid, passage, start, start_obj, end, end_obj, accum);
-			if (return_now) { return return_value; }
-		// If it's invalid, always return the value.
+			const [return_now, return_value] = this.range_handle_valid(
+				valid,
+				passage,
+				start,
+				start_obj,
+				end,
+				end_obj,
+				accum
+			);
+			if (return_now) {
+				return return_value;
+			}
+			// If it's invalid, always return the value.
 		} else {
-			return this.range_handle_invalid(valid, passage, start, start_obj, end, end_obj, accum);
+			return this.range_handle_invalid(
+				valid,
+				passage,
+				start,
+				start_obj,
+				end,
+				end_obj,
+				accum
+			);
 		}
 		// We've already reset the indices to match the indices of the contained objects.
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
-		passage.passages = [{start: start_obj, end: end_obj, valid}];
-		if (passage.start_context.translations != null) { passage.passages[0].translations = passage.start_context.translations; }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
+		passage.passages = [{ start: start_obj, end: end_obj, valid }];
+		if (passage.start_context.translations != null) {
+			passage.passages[0].translations = passage.start_context.translations;
+		}
 		// We may need to filter out books on their own depending on the `book_alone_strategy` or the `book_range_strategy`.
 		if (start_obj.type === "b") {
-			if (end_obj.type === "b") { passage.type = "b_range"; } else { passage.type = "b_range_start"; }
+			if (end_obj.type === "b") {
+				passage.type = "b_range";
+			} else {
+				passage.type = "b_range_start";
+			}
 		} else if (end_obj.type === "b") {
 			passage.type = "range_end_b";
 		}
@@ -517,29 +775,49 @@ export class bcv_passage {
 	range_change_integer_end(passage: any, accum: any) {
 		const [start, end] = passage.value;
 		// We want to retain the originals beacuse a future reparsing may lead to a different outcome.
-		if (passage.original_type == null) { passage.original_type = passage.type; }
-		if (passage.original_value == null) { passage.original_value = [start, end]; }
+		if (passage.original_type == null) {
+			passage.original_type = passage.type;
+		}
+		if (passage.original_value == null) {
+			passage.original_value = [start, end];
+		}
 		// The start.type is only bc, c, or integer; we're just adding a v for the first two.
 		passage.type = start.type === "integer" ? "cv" : start.type + "v";
 		// Create the object in the expected format if it's not already a verse.
-		if (start.type === "integer") { passage.value[0] = {type: "c", value: [start], indices: start.indices}; }
-		if (end.type === "integer") { passage.value[1] = {type: "v", value: [end], indices: end.indices}; }
+		if (start.type === "integer") {
+			passage.value[0] = { type: "c", value: [start], indices: start.indices };
+		}
+		if (end.type === "integer") {
+			passage.value[1] = { type: "v", value: [end], indices: end.indices };
+		}
 		return this.handle_obj(passage, accum, passage.start_context);
 	}
 
 	// If a new end chapter/verse in a range may be necessary, calculate it.
-	range_check_new_end(translations: any, start_obj: any, end_obj: any, valid: any) {
+	range_check_new_end(
+		translations: any,
+		start_obj: any,
+		end_obj: any,
+		valid: any
+	) {
 		let new_end = 0;
 		let type: any = null;
 		// See whether a digit might be omitted (e.g., Gen 22-4 = Gen 22-24).
-		if (valid.messages.end_chapter_before_start) { type = "c";
-		} else if (valid.messages.end_verse_before_start) { type = "v"; }
-		if (type != null) { new_end = this.range_get_new_end_value(start_obj, end_obj, valid, type); }
+		if (valid.messages.end_chapter_before_start) {
+			type = "c";
+		} else if (valid.messages.end_verse_before_start) {
+			type = "v";
+		}
+		if (type != null) {
+			new_end = this.range_get_new_end_value(start_obj, end_obj, valid, type);
+		}
 		if (new_end > 0) {
-			const obj_to_validate: any = {b: end_obj.b, c: end_obj.c, v: end_obj.v};
+			const obj_to_validate: any = { b: end_obj.b, c: end_obj.c, v: end_obj.v };
 			obj_to_validate[type] = new_end;
 			const new_valid = this.validate_ref(translations, obj_to_validate);
-			if (!new_valid.valid) { new_end = 0; }
+			if (!new_valid.valid) {
+				new_end = 0;
+			}
 		}
 		return new_end;
 	}
@@ -553,13 +831,26 @@ export class bcv_passage {
 	range_get_new_end_value(start_obj: any, end_obj: any, valid: any, key: any) {
 		// Return 0 unless it's salvageable.
 		let new_end = 0;
-		if (((key === "c") && valid.messages.end_chapter_is_zero) || ((key === "v") && valid.messages.end_verse_is_zero)) { return new_end; }
+		if (
+			(key === "c" && valid.messages.end_chapter_is_zero) ||
+			(key === "v" && valid.messages.end_verse_is_zero)
+		) {
+			return new_end;
+		}
 		// 54-5, not 54-43, 54-3, or 54-4.
-		if ((start_obj[key] >= 10) && (end_obj[key] < 10) && ((start_obj[key] - (10 * Math.floor(start_obj[key] / 10))) < end_obj[key])) {
+		if (
+			start_obj[key] >= 10 &&
+			end_obj[key] < 10 &&
+			start_obj[key] - 10 * Math.floor(start_obj[key] / 10) < end_obj[key]
+		) {
 			// Add the start tens digit to the original end value: 54-5 = 54 through 50 + 5.
-			new_end = end_obj[key] + (10 * Math.floor(start_obj[key] / 10));
-		// 123-40, not 123-22 or 123-23; 123-4 is taken care of in the first case.
-		} else if ((start_obj[key] >= 100) && (end_obj[key] < 100) && ((start_obj[key] - 100) < end_obj[key])) {
+			new_end = end_obj[key] + 10 * Math.floor(start_obj[key] / 10);
+			// 123-40, not 123-22 or 123-23; 123-4 is taken care of in the first case.
+		} else if (
+			start_obj[key] >= 100 &&
+			end_obj[key] < 100 &&
+			start_obj[key] - 100 < end_obj[key]
+		) {
 			// Add 100 to the original end value: 100-12 = 100 through 100 + 12.
 			new_end = end_obj[key] + 100;
 		}
@@ -567,38 +858,98 @@ export class bcv_passage {
 	}
 
 	// The range doesn't look valid, but maybe we can fix it. If not, convert it to a sequence.
-	range_handle_invalid(valid: any, passage: any, start: any, start_obj: any, end: any, end_obj: any, accum: any) {
+	range_handle_invalid(
+		valid: any,
+		passage: any,
+		start: any,
+		start_obj: any,
+		end: any,
+		end_obj: any,
+		accum: any
+	) {
 		// Is it not valid because the end is before the start and the `end` is an `integer` (Matt 15-6) or a `cv` (Matt 15-6:2) (since anything else resets our expectations)?
 		//
 		// Only go with a `cv` if it's the chapter that's too low (to avoid doing weird things with 31:30-31:1).
-		if (((valid.valid === false) && (valid.messages.end_chapter_before_start || valid.messages.end_verse_before_start) && ((end.type === "integer") || (end.type === "v"))) || ((valid.valid === false) && valid.messages.end_chapter_before_start && (end.type === "cv"))) {
-			const new_end = this.range_check_new_end(passage.start_context.translations, start_obj, end_obj, valid);
+		if (
+			(valid.valid === false &&
+				(valid.messages.end_chapter_before_start ||
+					valid.messages.end_verse_before_start) &&
+				(end.type === "integer" || end.type === "v")) ||
+			(valid.valid === false &&
+				valid.messages.end_chapter_before_start &&
+				end.type === "cv")
+		) {
+			const new_end = this.range_check_new_end(
+				passage.start_context.translations,
+				start_obj,
+				end_obj,
+				valid
+			);
 			// If that's the case, then reparse the current passage object after correcting the end value, which is an integer.
-			if (new_end > 0) { return this.range_change_end(passage, accum, new_end); }
+			if (new_end > 0) {
+				return this.range_change_end(passage, accum, new_end);
+			}
 		}
 		// If someone enters "Jer 33-11", they probably mean "Jer.33.11"; as in `@range_handle_valid`, this may be too clever for its own good.
-		if ((this.options.end_range_digits_strategy === "verse") && (start_obj.v == null) && ((end.type === "integer") || (end.type === "v"))) {
+		if (
+			this.options.end_range_digits_strategy === "verse" &&
+			start_obj.v == null &&
+			(end.type === "integer" || end.type === "v")
+		) {
 			// I don't know that `end.type` can ever be `v` here. Such a `c-v` pattern is parsed as `cv`.
-			const temp_value = end.type === "v" ? this.pluck("integer", end.value) : end.value;
-			const temp_valid = this.validate_ref(passage.start_context.translations, {b: start_obj.b, c: start_obj.c, v: temp_value});
-			if (temp_valid.valid) { return this.range_change_integer_end(passage, accum); }
+			const temp_value =
+				end.type === "v" ? this.pluck("integer", end.value) : end.value;
+			const temp_valid = this.validate_ref(passage.start_context.translations, {
+				b: start_obj.b,
+				c: start_obj.c,
+				v: temp_value,
+			});
+			if (temp_valid.valid) {
+				return this.range_change_integer_end(passage, accum);
+			}
 		}
 		// Otherwise, if we couldn't fix the range, then treat the range as a sequence. We want to retain the original `type` and `value` in case we need to reparse it differently later.
-		if (passage.original_type == null) { passage.original_type = passage.type; }
+		if (passage.original_type == null) {
+			passage.original_type = passage.type;
+		}
 		passage.type = "sequence";
 		// Construct the sequence value in the format expected.
-		[passage.original_value, passage.value] = [[start, end], [[start], [end]]];
+		[passage.original_value, passage.value] = [
+			[start, end],
+			[[start], [end]],
+		];
 		// Don't use the `context` object because we changed it in `@range`.
 		return this.sequence(passage, accum, passage.start_context);
 	}
 
 	// The range looks valid, but we should check for some special cases.
-	range_handle_valid(valid: any, passage: any, start: any, start_obj: any, end: any, end_obj: any, accum: any) {
+	range_handle_valid(
+		valid: any,
+		passage: any,
+		start: any,
+		start_obj: any,
+		end: any,
+		end_obj: any,
+		accum: any
+	) {
 		// If Heb 13-15, treat it as Heb 13:15. This may be too clever for its own good. We check the `passage_existence_strategy` because otherwise `Gen 49-76` becomes `Gen.49.76`.
-		if (valid.messages.end_chapter_not_exist && (this.options.end_range_digits_strategy === "verse") && (start_obj.v == null) && ((end.type === "integer") || (end.type === "v")) && (this.options.passage_existence_strategy.indexOf("v") >= 0)) {
-			const temp_value = end.type === "v" ? this.pluck("integer", end.value) : end.value;
-			const temp_valid = this.validate_ref(passage.start_context.translations, {b: start_obj.b, c: start_obj.c, v: temp_value});
-			if (temp_valid.valid) { return [true, this.range_change_integer_end(passage, accum)]; }
+		if (
+			valid.messages.end_chapter_not_exist &&
+			this.options.end_range_digits_strategy === "verse" &&
+			start_obj.v == null &&
+			(end.type === "integer" || end.type === "v") &&
+			this.options.passage_existence_strategy.indexOf("v") >= 0
+		) {
+			const temp_value =
+				end.type === "v" ? this.pluck("integer", end.value) : end.value;
+			const temp_valid = this.validate_ref(passage.start_context.translations, {
+				b: start_obj.b,
+				c: start_obj.c,
+				v: temp_value,
+			});
+			if (temp_valid.valid) {
+				return [true, this.range_change_integer_end(passage, accum)];
+			}
 		}
 		// Otherwise, snap start/end chapters/verses if they're too high or low.
 		this.range_validate(valid, start_obj, end_obj, passage);
@@ -608,25 +959,45 @@ export class bcv_passage {
 	// If the end object goes past the end of the book or chapter, snap it back to a verse that exists.
 	range_validate(valid: any, start_obj: any, end_obj: any, passage: any) {
 		// If it's valid but the end range goes too high, snap it back to the appropriate chapter or verse.
-		if (valid.messages.end_chapter_not_exist || valid.messages.end_chapter_not_exist_in_single_chapter_book) {
+		if (
+			valid.messages.end_chapter_not_exist ||
+			valid.messages.end_chapter_not_exist_in_single_chapter_book
+		) {
 			// `end_chapter_not_exist` gives the highest chapter for the book.
 			end_obj.original_c = end_obj.c;
-			end_obj.c = valid.messages.end_chapter_not_exist ? valid.messages.end_chapter_not_exist : valid.messages.end_chapter_not_exist_in_single_chapter_book;
+			end_obj.c = valid.messages.end_chapter_not_exist
+				? valid.messages.end_chapter_not_exist
+				: valid.messages.end_chapter_not_exist_in_single_chapter_book;
 			// If we've snapped it back to the last chapter and there's a verse, also snap to the end of that chapter. If we've already overshot the chapter, there's no reason to think we've gotten the verse right; Gen 50:1-51:1 = Gen 50:1-26 = Gen 50. If there's no verse, we don't need to worry about it.
 			if (end_obj.v != null) {
 				// `end_verse_not_exist` gives the maximum verse for the chapter.
-				end_obj.v = this.validate_ref(passage.start_context.translations, {b: end_obj.b, c: end_obj.c, v: 999}).messages.end_verse_not_exist;
+				end_obj.v = this.validate_ref(passage.start_context.translations, {
+					b: end_obj.b,
+					c: end_obj.c,
+					v: 999,
+				}).messages.end_verse_not_exist;
 				// If the range ended at Exodus 41:0, make sure we're not going to change it to Exodus 40:1.
 				delete valid.messages.end_verse_is_zero;
 			}
-		// If the end verse is too high, snap back to the maximum verse.
+			// If the end verse is too high, snap back to the maximum verse.
 		} else if (valid.messages.end_verse_not_exist) {
 			end_obj.original_v = end_obj.v;
 			end_obj.v = valid.messages.end_verse_not_exist;
 		}
-		if (valid.messages.end_verse_is_zero && (this.options.zero_verse_strategy !== "allow")) { end_obj.v = valid.messages.end_verse_is_zero; }
-		if (valid.messages.end_chapter_is_zero) { end_obj.c = valid.messages.end_chapter_is_zero; }
-		[start_obj.c, start_obj.v] = this.fix_start_zeroes(valid, start_obj.c, start_obj.v);
+		if (
+			valid.messages.end_verse_is_zero &&
+			this.options.zero_verse_strategy !== "allow"
+		) {
+			end_obj.v = valid.messages.end_verse_is_zero;
+		}
+		if (valid.messages.end_chapter_is_zero) {
+			end_obj.c = valid.messages.end_chapter_is_zero;
+		}
+		[start_obj.c, start_obj.v] = this.fix_start_zeroes(
+			valid,
+			start_obj.c,
+			start_obj.v
+		);
 		return true;
 	}
 
@@ -636,21 +1007,29 @@ export class bcv_passage {
 		passage.start_context = bcv_utils.shallow_clone(context);
 		const translations: any = [];
 		// First get all the translations in the sequence; the first one is separate from the others (which may not exist).
-		translations.push({translation: this.books[passage.value[0].value].parsed});
+		translations.push({
+			translation: this.books[passage.value[0].value].parsed,
+		});
 		for (let val of passage.value[1]) {
 			// `val` at this point is an array.
 			val = this.books[this.pluck("translation", val).value].parsed;
 			// And now `val` is the literal, lower-cased match.
-			if (val != null) { translations.push({translation: val}); }
+			if (val != null) {
+				translations.push({ translation: val });
+			}
 		}
 		// We need some metadata to do this right.
 		for (const translation of translations) {
 			// Do we know anything about this translation? If so, use that. If not, use the default.
 			if (this.translations.aliases[translation.translation] != null) {
 				// `alias` is what we use internally to get bcv data for the translation.
-				translation.alias = this.translations.aliases[translation.translation].alias;
+				translation.alias = this.translations.aliases[
+					translation.translation
+				].alias;
 				// `osis` is what we'll eventually use in output.
-				translation.osis = this.translations.aliases[translation.translation].osis || translation.translation.toUpperCase();
+				translation.osis =
+					this.translations.aliases[translation.translation].osis ||
+					translation.translation.toUpperCase();
 			} else {
 				translation.alias = "default";
 				// If we don't know what the correct abbreviation should be, then just upper-case what we have.
@@ -658,9 +1037,13 @@ export class bcv_passage {
 			}
 		}
 		// Apply the new translations to the existing objects.
-		if (accum.length > 0) { context = this.translation_sequence_apply(accum, translations); }
+		if (accum.length > 0) {
+			context = this.translation_sequence_apply(accum, translations);
+		}
 		// We may need these indices later, depending on how we want to output the data.
-		if (passage.absolute_indices == null) { passage.absolute_indices = this.get_absolute_indices(passage.indices); }
+		if (passage.absolute_indices == null) {
+			passage.absolute_indices = this.get_absolute_indices(passage.indices);
+		}
 		// Include the `translation_sequence` object in `accum` so that we can handle any later `translation_sequence` objects without overlapping this one.
 		accum.push(passage);
 		// Don't carry over the translations into any later references; translations only apply backwards.
@@ -674,9 +1057,15 @@ export class bcv_passage {
 		// Start with the most recent and go backward--we don't want to overlap another `translation_sequence`.
 		for (let i = accum.length - 1; i >= 0; i--) {
 			// With a new translation comes the possibility that a previously invalid reference will become valid, so reset it to its original type. For example, a multi-book range may be correct in a different translation because the books are in a different order.
-			if (accum[i].original_type != null) { accum[i].type = accum[i].original_type; }
-			if (accum[i].original_value != null) { accum[i].value = accum[i].original_value; }
-			if (accum[i].type !== "translation_sequence") { continue; }
+			if (accum[i].original_type != null) {
+				accum[i].type = accum[i].original_type;
+			}
+			if (accum[i].original_value != null) {
+				accum[i].value = accum[i].original_value;
+			}
+			if (accum[i].type !== "translation_sequence") {
+				continue;
+			}
 			// If we made it here, then we hit a translation sequence, and we know that the item following it is the first one we care about.
 			use_i = i + 1;
 			break;
@@ -689,8 +1078,12 @@ export class bcv_passage {
 			let new_accum;
 			accum[use_i].start_context.translations = translations;
 			// The objects in accum are replaced in-place, so we don't need to try to merge them back. We re-parse them because the translation may cause previously valid (or invalid) references to flip the other way--if the new translation includes (or doesn't) the Deuterocanonicals, for example. We ignore the `new_accum`, but we definitely care about the new `context`.
-			[new_accum, context] = this.handle_array(accum.slice(use_i), [], accum[use_i].start_context);
-		// Use the start context from the last translation_sequence if that's all that's available.
+			[new_accum, context] = this.handle_array(
+				accum.slice(use_i),
+				[],
+				accum[use_i].start_context
+			);
+			// Use the start context from the last translation_sequence if that's all that's available.
 		} else {
 			context = bcv_utils.shallow_clone(accum[accum.length - 1].start_context);
 		}
@@ -703,8 +1096,12 @@ export class bcv_passage {
 	pluck(type: string, passages: any): any {
 		for (const passage of passages) {
 			// `passage` can be null if a range needed to be adjusted into a sequence.
-			if ((passage == null) || (passage.type == null) || (passage.type !== type)) { continue; }
-			if ((type === "c") || (type === "v")) { return this.pluck("integer", passage.value); }
+			if (passage == null || passage.type == null || passage.type !== type) {
+				continue;
+			}
+			if (type === "c" || type === "v") {
+				return this.pluck("integer", passage.value);
+			}
 			return passage;
 		}
 		return null;
@@ -716,12 +1113,18 @@ export class bcv_passage {
 		for (let i = passages.length - 1; i >= 0; i--) {
 			// Skip null values.
 			const passage = passages[i];
-			if ((passage == null) || (passage.type == null)) { continue; }
+			if (passage == null || passage.type == null) {
+				continue;
+			}
 			// Rely on `@pluck` if we've found a match. It expects an array.
-			if (passage.type === type) { return this.pluck(type, [passage]); }
+			if (passage.type === type) {
+				return this.pluck(type, [passage]);
+			}
 			// If `passage.type` exists, we know that `passage.value` exists.
 			const value = this.pluck_last_recursively(type, passage.value);
-			if (value != null) { return value; }
+			if (value != null) {
+				return value;
+			}
 		}
 		return null;
 	}
@@ -729,7 +1132,9 @@ export class bcv_passage {
 	// Set all the available context keys.
 	set_context_from_object(context: any, keys: any, obj: any) {
 		for (const type of keys) {
-			if (obj[type] == null) { continue; }
+			if (obj[type] == null) {
+				continue;
+			}
 			context[type] = obj[type];
 		}
 	}
@@ -743,8 +1148,18 @@ export class bcv_passage {
 
 	// If the start chapter or verse is 0 and the appropriate option is set to `upgrade`, convert it to a 1.
 	fix_start_zeroes(valid: any, c: any, v?: any) {
-		if (valid.messages.start_chapter_is_zero && (this.options.zero_chapter_strategy === "upgrade")) { c = valid.messages.start_chapter_is_zero; }
-		if (valid.messages.start_verse_is_zero && (this.options.zero_verse_strategy === "upgrade")) { v = valid.messages.start_verse_is_zero; }
+		if (
+			valid.messages.start_chapter_is_zero &&
+			this.options.zero_chapter_strategy === "upgrade"
+		) {
+			c = valid.messages.start_chapter_is_zero;
+		}
+		if (
+			valid.messages.start_verse_is_zero &&
+			this.options.zero_verse_strategy === "upgrade"
+		) {
+			v = valid.messages.start_verse_is_zero;
+		}
 		return [c, v];
 	}
 
@@ -770,30 +1185,45 @@ export class bcv_passage {
 			switch_type = switch_type === "book" ? "rest" : "book";
 			// Empty strings don't move the index. This could happen with consecutive books.
 			const part_length = part.length;
-			if (part_length === 0) { continue; }
+			if (part_length === 0) {
+				continue;
+			}
 			// If it's a book, then get the start index of the actual book, add the length of the actual string, then subtract the length of the integer id and the two surrounding characters.
 			if (switch_type === "book") {
 				// Remove any stray extra indicators.
 				part = part.replace(/\/\d+$/, "");
 				// Get the length of the id + the surrounding characters. We want the `end` to be the position, not the length. If the part starts at position 0 and is one character (i.e., three characters total, or `\x1f0\x1f`), `end` should be 1, since it occupies positions 0, 1, and 2, and we want the last character to be part of the next index so that we keep track of the end. For example, with "Genesis" at start index 0, the index starting at position 6 ("s") should be 4. Keep the adjust as-is, but set it next.
 				const end_index = match_index + part_length;
-				if ((indices.length > 0) && (indices[indices.length - 1].index === adjust)) {
+				if (
+					indices.length > 0 &&
+					indices[indices.length - 1].index === adjust
+				) {
 					indices[indices.length - 1].end = end_index;
 				} else {
-					indices.push({start: match_index, end: end_index, index: adjust});
+					indices.push({ start: match_index, end: end_index, index: adjust });
 				}
 				// If the part is one character (three characters total) starting at `match_index` 0, we want the next `match_index` to be 3; it occupies positions 0, 1, and 2. Similarly, if it's two characters, it should be four characters total.
 				match_index += part_length + 2;
 				// Use the known `start_index` from the book, subtracting the current index in the match, to get the new. So if the previous `match_index` == 5 and the book's id is 0, the book's `start_index` == 10, and the book's length == 7, we want the next adjust to be 10 + 7 - 8 = 9 (the 8 is the `match_index` where the new `adjust` starts): 4(+5) = 9, 5(+5) = 10, 6(+5) = 11, 7(+5) = 12, 8(+9) = 17.
-				adjust = (this.books[part].start_index + this.books[part].value.length) - match_index;
-				indices.push({start: end_index + 1, end: end_index + 1, index: adjust});
+				adjust =
+					this.books[part].start_index +
+					this.books[part].value.length -
+					match_index;
+				indices.push({
+					start: end_index + 1,
+					end: end_index + 1,
+					index: adjust,
+				});
 			} else {
 				// The `- 1` is because we want the `end` to be the position of the last character. If the part starts at position 0 and is three characters long, the `end` should be two, since it occupies positions 0, 1, and 2.
-				const end_index = (match_index + part_length) - 1;
-				if ((indices.length > 0) && (indices[indices.length - 1].index === adjust)) {
+				const end_index = match_index + part_length - 1;
+				if (
+					indices.length > 0 &&
+					indices[indices.length - 1].index === adjust
+				) {
 					indices[indices.length - 1].end = end_index;
 				} else {
-					indices.push({start: match_index, end: end_index, index: adjust});
+					indices.push({ start: match_index, end: end_index, index: adjust });
 				}
 				match_index += part_length;
 			}
@@ -808,7 +1238,7 @@ export class bcv_passage {
 		// `@indices` contains the absolute indices for each range of indices in the string.
 		for (const index of this.indices) {
 			// If we haven't found the absolute start index yet, set it.
-			if ((start_out === null) && (index.start <= start && start <= index.end)) {
+			if (start_out === null && index.start <= start && start <= index.end) {
 				start_out = start + index.index;
 			}
 			// This may be in the same loop iteration as `start`. The `+ 1` matches Twitter's implementation of indices, where start is the character index and end is the character after the index. So `Gen` is `[0, 3]`.
@@ -824,42 +1254,72 @@ export class bcv_passage {
 	// Given a start and optional end bcv object, validate that the verse exists and is valid. It returns a `true` value for `valid` if any of the translations is valid.
 	validate_ref(translations: any, start: any, end?: any) {
 		// The `translation` key is optional; if it doesn't exist, assume the default translation.
-		if ((translations == null) || !(translations.length > 0)) { translations = [{translation: "default", osis: "", alias: "default"}]; }
+		if (translations == null || !(translations.length > 0)) {
+			translations = [{ translation: "default", osis: "", alias: "default" }];
+		}
 		let valid = false;
 		const messages: any = {};
 		// `translation` is a translation object, but all we care about is the string.
 		for (const translation of translations) {
-			if (translation.alias == null) { translation.alias = "default"; }
+			if (translation.alias == null) {
+				translation.alias = "default";
+			}
 			// Only true if `translation` isn't the right type.
 			if (translation.alias == null) {
-				if (messages.translation_invalid == null) { messages.translation_invalid = []; }
+				if (messages.translation_invalid == null) {
+					messages.translation_invalid = [];
+				}
 				messages.translation_invalid.push(translation);
 				continue;
 			}
 			// Not a fatal error because we assume that translations match the default unless we know differently. But we still record it because we may want to know about it later. Translations in `alternates` get generated on-demand.
 			if (this.translations.aliases[translation.alias] == null) {
 				translation.alias = "default";
-				if (messages.translation_unknown == null) { messages.translation_unknown = []; }
+				if (messages.translation_unknown == null) {
+					messages.translation_unknown = [];
+				}
 				messages.translation_unknown.push(translation);
 			}
-			let [temp_valid] = this.validate_start_ref(translation.alias, start, messages);
-			if (end) { [temp_valid] = this.validate_end_ref(translation.alias, start, end, temp_valid, messages); }
-			if (temp_valid === true) { valid = true; }
+			let [temp_valid] = this.validate_start_ref(
+				translation.alias,
+				start,
+				messages
+			);
+			if (end) {
+				[temp_valid] = this.validate_end_ref(
+					translation.alias,
+					start,
+					end,
+					temp_valid,
+					messages
+				);
+			}
+			if (temp_valid === true) {
+				valid = true;
+			}
 		}
-		return {valid, messages};
+		return { valid, messages };
 	}
 
 	// Make sure that the start ref exists in the given translation.
 	validate_start_ref(translation: string, start: any, messages: any) {
 		let valid = true;
-		if ((translation !== "default") && (this.translations[translation]?.chapters[start.b] == null)) {
+		if (
+			translation !== "default" &&
+			this.translations[translation]?.chapters[start.b] == null
+		) {
 			this.promote_book_to_translation(start.b, translation);
 		}
-		const translation_order = (this.translations[translation]?.order != null) ? translation : "default";
-		if (start.v != null) { start.v = parseInt(start.v, 10); }
+		const translation_order =
+			this.translations[translation]?.order != null ? translation : "default";
+		if (start.v != null) {
+			start.v = parseInt(start.v, 10);
+		}
 		// Matt
 		if (this.translations[translation_order].order[start.b] != null) {
-			if (start.c == null) { start.c = 1; }
+			if (start.c == null) {
+				start.c = 1;
+			}
 			start.c = parseInt(start.c, 10);
 			// Matt five
 			if (isNaN(start.c)) {
@@ -870,53 +1330,81 @@ export class bcv_passage {
 			// Matt 0
 			if (start.c === 0) {
 				messages.start_chapter_is_zero = 1;
-				if (this.options.zero_chapter_strategy === "error") { valid = false;
-				} else { start.c = 1; }
+				if (this.options.zero_chapter_strategy === "error") {
+					valid = false;
+				} else {
+					start.c = 1;
+				}
 			}
 			// Matt 5:0
-			if ((start.v != null) && (start.v === 0)) {
+			if (start.v != null && start.v === 0) {
 				messages.start_verse_is_zero = 1;
-				if (this.options.zero_verse_strategy === "error") { valid = false;
-				// Can't just have `else` because `allow` is a valid `zero_verse_strategy`.
-				} else if (this.options.zero_verse_strategy === "upgrade") { start.v = 1; }
+				if (this.options.zero_verse_strategy === "error") {
+					valid = false;
+					// Can't just have `else` because `allow` is a valid `zero_verse_strategy`.
+				} else if (this.options.zero_verse_strategy === "upgrade") {
+					start.v = 1;
+				}
 			}
 			// Matt 5
-			if ((start.c > 0) && (this.translations[translation].chapters[start.b][start.c - 1] != null)) {
+			if (
+				start.c > 0 &&
+				this.translations[translation].chapters[start.b][start.c - 1] != null
+			) {
 				// Matt 5:10
 				if (start.v != null) {
 					// Matt 5:ten
 					if (isNaN(start.v)) {
 						valid = false;
 						messages.start_verse_not_numeric = true;
-					// Matt 5:100
-					} else if (start.v > this.translations[translation].chapters[start.b][start.c - 1]) {
+						// Matt 5:100
+					} else if (
+						start.v >
+						this.translations[translation].chapters[start.b][start.c - 1]
+					) {
 						// Not part of the same `if` statement in case we ever add a new `else` condition.
 						if (this.options.passage_existence_strategy.indexOf("v") >= 0) {
 							valid = false;
-							messages.start_verse_not_exist = this.translations[translation].chapters[start.b][start.c - 1];
+							messages.start_verse_not_exist = this.translations[
+								translation
+							].chapters[start.b][start.c - 1];
 						}
 					}
-				// Jude 1 when wanting to treat the `1` as a verse rather than a chapter.
-				} else if ((start.c === 1) && (this.options.single_chapter_1_strategy === "verse") && (this.translations[translation].chapters[start.b].length === 1)) {
+					// Jude 1 when wanting to treat the `1` as a verse rather than a chapter.
+				} else if (
+					start.c === 1 &&
+					this.options.single_chapter_1_strategy === "verse" &&
+					this.translations[translation].chapters[start.b].length === 1
+				) {
 					messages.start_chapter_1 = 1;
 				}
-			// Matt 50
+				// Matt 50
 			} else {
-				if ((start.c !== 1) && (this.translations[translation].chapters[start.b].length === 1)) {
+				if (
+					start.c !== 1 &&
+					this.translations[translation].chapters[start.b].length === 1
+				) {
 					valid = false;
 					messages.start_chapter_not_exist_in_single_chapter_book = 1;
-				} else if ((start.c > 0) && (this.options.passage_existence_strategy.indexOf("c") >= 0)) {
+				} else if (
+					start.c > 0 &&
+					this.options.passage_existence_strategy.indexOf("c") >= 0
+				) {
 					valid = false;
-					messages.start_chapter_not_exist = this.translations[translation].chapters[start.b].length;
+					messages.start_chapter_not_exist = this.translations[
+						translation
+					].chapters[start.b].length;
 				}
 			}
-		// An unusual situation in which there's no defined start book. This only happens when a `c` becomes dissociated from its `b`.
-		} else if ((start.b == null)) {
+			// An unusual situation in which there's no defined start book. This only happens when a `c` becomes dissociated from its `b`.
+		} else if (start.b == null) {
 			valid = false;
 			messages.start_book_not_defined = true;
-		// None 2:1
+			// None 2:1
 		} else {
-			if (this.options.passage_existence_strategy.indexOf("b") >= 0) { valid = false; }
+			if (this.options.passage_existence_strategy.indexOf("b") >= 0) {
+				valid = false;
+			}
 			messages.start_book_not_exist = true;
 		}
 		// We return an array to make unit testing easier; we only use `valid`.
@@ -924,9 +1412,16 @@ export class bcv_passage {
 	}
 
 	// The end ref pretty much just has to be after the start ref; beyond the book, we don't	require the chapter or verse to exist. This approach is useful when people get end verses wrong.
-	validate_end_ref(translation: string, start: any, end: any, valid: boolean, messages: any) {
+	validate_end_ref(
+		translation: string,
+		start: any,
+		end: any,
+		valid: boolean,
+		messages: any
+	) {
 		// It's not necessary to check for whether the book exists in a non-default translation here because we've already validated that it works as a `start_ref`, which created the book if it didn't exist. So we don't call `@promote_book_to_translation`.
-		const translation_order = (this.translations[translation]?.order != null) ? translation : "default";
+		const translation_order =
+			this.translations[translation]?.order != null ? translation : "default";
 		// Matt 0
 		if (end.c != null) {
 			end.c = parseInt(end.c, 10);
@@ -936,8 +1431,11 @@ export class bcv_passage {
 				messages.end_chapter_not_numeric = true;
 			} else if (end.c === 0) {
 				messages.end_chapter_is_zero = 1;
-				if (this.options.zero_chapter_strategy === "error") { valid = false;
-				} else { end.c = 1; }
+				if (this.options.zero_chapter_strategy === "error") {
+					valid = false;
+				} else {
+					end.c = 1;
+				}
 			}
 		}
 		// Matt 5:0
@@ -949,52 +1447,82 @@ export class bcv_passage {
 				messages.end_verse_not_numeric = true;
 			} else if (end.v === 0) {
 				messages.end_verse_is_zero = 1;
-				if (this.options.zero_verse_strategy === "error") { valid = false;
-				} else if (this.options.zero_verse_strategy === "upgrade") { end.v = 1; }
+				if (this.options.zero_verse_strategy === "error") {
+					valid = false;
+				} else if (this.options.zero_verse_strategy === "upgrade") {
+					end.v = 1;
+				}
 			}
 		}
 
 		// Matt-Mark
 		if (this.translations[translation_order].order[end.b] != null) {
 			// Even if the `passage_existence_strategy` doesn't include `c`, make sure to treat single-chapter books as single-chapter books.
-			if ((end.c == null) && (this.translations[translation].chapters[end.b].length === 1)) { end.c = 1; }
+			if (
+				end.c == null &&
+				this.translations[translation].chapters[end.b].length === 1
+			) {
+				end.c = 1;
+			}
 			// Mark 4-Matt 5, None 4-Matt 5
-			if ((this.translations[translation_order].order[start.b] != null) && (this.translations[translation_order].order[start.b] > this.translations[translation_order].order[end.b])) {
-				if (this.options.passage_existence_strategy.indexOf("b") >= 0) { valid = false; }
+			if (
+				this.translations[translation_order].order[start.b] != null &&
+				this.translations[translation_order].order[start.b] >
+					this.translations[translation_order].order[end.b]
+			) {
+				if (this.options.passage_existence_strategy.indexOf("b") >= 0) {
+					valid = false;
+				}
 				messages.end_book_before_start = true;
 			}
 			// Matt 5-6
-			if ((start.b === end.b) && (end.c != null) && !isNaN(end.c)) {
+			if (start.b === end.b && end.c != null && !isNaN(end.c)) {
 				// Matt-Matt 4
-				if (start.c == null) { start.c = 1; }
+				if (start.c == null) {
+					start.c = 1;
+				}
 				// Matt 5-4
-				if (!isNaN(parseInt(start.c, 10)) && (start.c > end.c)) {
+				if (!isNaN(parseInt(start.c, 10)) && start.c > end.c) {
 					valid = false;
 					messages.end_chapter_before_start = true;
-				// Matt 5:7-5:8
-				} else if ((start.c === end.c) && (end.v != null) && !isNaN(end.v)) {
+					// Matt 5:7-5:8
+				} else if (start.c === end.c && end.v != null && !isNaN(end.v)) {
 					// Matt 5-5:8
-					if (start.v == null) { start.v = 1; }
+					if (start.v == null) {
+						start.v = 1;
+					}
 					// Matt 5:8-7
-					if (!isNaN(parseInt(start.v, 10)) && (start.v > end.v)) {
+					if (!isNaN(parseInt(start.v, 10)) && start.v > end.v) {
 						valid = false;
 						messages.end_verse_before_start = true;
 					}
 				}
 			}
-			if ((end.c != null) && !isNaN(end.c)) {
-				if ((this.translations[translation].chapters[end.b][end.c - 1] == null)) {
+			if (end.c != null && !isNaN(end.c)) {
+				if (this.translations[translation].chapters[end.b][end.c - 1] == null) {
 					if (this.translations[translation].chapters[end.b].length === 1) {
 						messages.end_chapter_not_exist_in_single_chapter_book = 1;
-					} else if ((end.c > 0) && (this.options.passage_existence_strategy.indexOf("c") >= 0)) {
-						messages.end_chapter_not_exist = this.translations[translation].chapters[end.b].length;
+					} else if (
+						end.c > 0 &&
+						this.options.passage_existence_strategy.indexOf("c") >= 0
+					) {
+						messages.end_chapter_not_exist = this.translations[
+							translation
+						].chapters[end.b].length;
 					}
 				}
 			}
-			if ((end.v != null) && !isNaN(end.v)) {
-				if (end.c == null) { end.c = this.translations[translation].chapters[end.b].length; }
-				if ((end.v > this.translations[translation].chapters[end.b][end.c - 1]) && (this.options.passage_existence_strategy.indexOf("v") >= 0)) {
-					messages.end_verse_not_exist = this.translations[translation].chapters[end.b][end.c - 1];
+			if (end.v != null && !isNaN(end.v)) {
+				if (end.c == null) {
+					end.c = this.translations[translation].chapters[end.b].length;
+				}
+				if (
+					end.v > this.translations[translation].chapters[end.b][end.c - 1] &&
+					this.options.passage_existence_strategy.indexOf("v") >= 0
+				) {
+					messages.end_verse_not_exist = this.translations[
+						translation
+					].chapters[end.b][end.c - 1];
 				}
 			}
 			// Matt 5:1-None 6
@@ -1008,11 +1536,19 @@ export class bcv_passage {
 
 	// Gradually add books to translations as they're needed.
 	promote_book_to_translation(book: string, translation: string) {
-		if (this.translations[translation] == null) { this.translations[translation] = {}; }
-		if (this.translations[translation].chapters == null) { this.translations[translation].chapters = {}; }
+		if (this.translations[translation] == null) {
+			this.translations[translation] = {};
+		}
+		if (this.translations[translation].chapters == null) {
+			this.translations[translation].chapters = {};
+		}
 		// If the translation specifically overrides the default, use that. Otherwise stick with the default.
 		if (this.translations[translation].chapters[book] == null) {
-			this.translations[translation].chapters[book] = bcv_utils.shallow_clone_array(this.translations.default.chapters[book]);
+			this.translations[translation].chapters[
+				book
+			] = bcv_utils.shallow_clone_array(
+				this.translations.default.chapters[book]
+			);
 		}
 	}
 }

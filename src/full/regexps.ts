@@ -279,7 +279,7 @@ bcv_parser.prototype.regexps.get_books = (include_apocrypha: boolean, case_sensi
 |(?:150|1[0-4][04-9]|[1-9][04-9]|[4-9])${bcv_parser.prototype.regexps.space}*th\
 )\
 ${bcv_parser.prototype.regexps.space}*Psalm\
-)\\b`, 'gi')
+)\\b`, "gi")
 		},
 
 		{
