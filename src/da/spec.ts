@@ -2,7 +2,7 @@
 import { bcv_parser } from "../../js/da";
 
 describe("Parsing", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.options.osis_compaction_strategy = "b";
@@ -54,7 +54,7 @@ describe("Parsing", () => {
 });
 
 describe("Localized book Gen (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -81,7 +81,7 @@ describe("Localized book Gen (da)", () => {
 	});
 });
 describe("Localized book Exod (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -108,7 +108,7 @@ describe("Localized book Exod (da)", () => {
 	});
 });
 describe("Localized book Bel (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -120,7 +120,7 @@ describe("Localized book Bel (da)", () => {
 	});
 });
 describe("Localized book Lev (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -147,7 +147,7 @@ describe("Localized book Lev (da)", () => {
 	});
 });
 describe("Localized book Num (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -174,7 +174,7 @@ describe("Localized book Num (da)", () => {
 	});
 });
 describe("Localized book Sir (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -187,7 +187,7 @@ describe("Localized book Sir (da)", () => {
 	});
 });
 describe("Localized book Wis (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -200,7 +200,7 @@ describe("Localized book Wis (da)", () => {
 	});
 });
 describe("Localized book Lam (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -219,7 +219,7 @@ describe("Localized book Lam (da)", () => {
 	});
 });
 describe("Localized book EpJer (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -232,7 +232,7 @@ describe("Localized book EpJer (da)", () => {
 	});
 });
 describe("Localized book Rev (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -279,7 +279,7 @@ describe("Localized book Rev (da)", () => {
 	});
 });
 describe("Localized book PrMan (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -291,7 +291,7 @@ describe("Localized book PrMan (da)", () => {
 	});
 });
 describe("Localized book Deut (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -318,7 +318,7 @@ describe("Localized book Deut (da)", () => {
 	});
 });
 describe("Localized book Josh (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -341,7 +341,7 @@ describe("Localized book Josh (da)", () => {
 	});
 });
 describe("Localized book Judg (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -360,7 +360,7 @@ describe("Localized book Judg (da)", () => {
 	});
 });
 describe("Localized book Ruth (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -377,7 +377,7 @@ describe("Localized book Ruth (da)", () => {
 	});
 });
 describe("Localized book 1Esd (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -394,7 +394,7 @@ describe("Localized book 1Esd (da)", () => {
 	});
 });
 describe("Localized book 2Esd (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -411,7 +411,7 @@ describe("Localized book 2Esd (da)", () => {
 	});
 });
 describe("Localized book Isa (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -434,7 +434,7 @@ describe("Localized book Isa (da)", () => {
 	});
 });
 describe("Localized book 2Sam (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -471,7 +471,7 @@ describe("Localized book 2Sam (da)", () => {
 	});
 });
 describe("Localized book 1Sam (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -508,7 +508,7 @@ describe("Localized book 1Sam (da)", () => {
 	});
 });
 describe("Localized book 2Kgs (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -539,7 +539,7 @@ describe("Localized book 2Kgs (da)", () => {
 	});
 });
 describe("Localized book 1Kgs (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -570,7 +570,7 @@ describe("Localized book 1Kgs (da)", () => {
 	});
 });
 describe("Localized book 2Chr (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -601,7 +601,7 @@ describe("Localized book 2Chr (da)", () => {
 	});
 });
 describe("Localized book 1Chr (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -632,7 +632,7 @@ describe("Localized book 1Chr (da)", () => {
 	});
 });
 describe("Localized book Ezra (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -647,7 +647,7 @@ describe("Localized book Ezra (da)", () => {
 	});
 });
 describe("Localized book Neh (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -664,7 +664,7 @@ describe("Localized book Neh (da)", () => {
 	});
 });
 describe("Localized book GkEsth (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -675,7 +675,7 @@ describe("Localized book GkEsth (da)", () => {
 	});
 });
 describe("Localized book Esth (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -694,7 +694,7 @@ describe("Localized book Esth (da)", () => {
 	});
 });
 describe("Localized book Job (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -711,7 +711,7 @@ describe("Localized book Job (da)", () => {
 	});
 });
 describe("Localized book Ps (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -732,7 +732,7 @@ describe("Localized book Ps (da)", () => {
 	});
 });
 describe("Localized book PrAzar (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -745,7 +745,7 @@ describe("Localized book PrAzar (da)", () => {
 	});
 });
 describe("Localized book Prov (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -764,7 +764,7 @@ describe("Localized book Prov (da)", () => {
 	});
 });
 describe("Localized book Eccl (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -785,7 +785,7 @@ describe("Localized book Eccl (da)", () => {
 	});
 });
 describe("Localized book SgThree (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -798,7 +798,7 @@ describe("Localized book SgThree (da)", () => {
 	});
 });
 describe("Localized book Song (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -819,7 +819,7 @@ describe("Localized book Song (da)", () => {
 	});
 });
 describe("Localized book Jer (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -838,7 +838,7 @@ describe("Localized book Jer (da)", () => {
 	});
 });
 describe("Localized book Ezek (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -861,7 +861,7 @@ describe("Localized book Ezek (da)", () => {
 	});
 });
 describe("Localized book Dan (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -878,7 +878,7 @@ describe("Localized book Dan (da)", () => {
 	});
 });
 describe("Localized book Hos (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -895,7 +895,7 @@ describe("Localized book Hos (da)", () => {
 	});
 });
 describe("Localized book Joel (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -910,7 +910,7 @@ describe("Localized book Joel (da)", () => {
 	});
 });
 describe("Localized book Amos (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -929,7 +929,7 @@ describe("Localized book Amos (da)", () => {
 	});
 });
 describe("Localized book Obad (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -948,7 +948,7 @@ describe("Localized book Obad (da)", () => {
 	});
 });
 describe("Localized book Jonah (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -969,7 +969,7 @@ describe("Localized book Jonah (da)", () => {
 	});
 });
 describe("Localized book Mic (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -988,7 +988,7 @@ describe("Localized book Mic (da)", () => {
 	});
 });
 describe("Localized book Nah (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1005,7 +1005,7 @@ describe("Localized book Nah (da)", () => {
 	});
 });
 describe("Localized book Hab (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1022,7 +1022,7 @@ describe("Localized book Hab (da)", () => {
 	});
 });
 describe("Localized book Zeph (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1047,7 +1047,7 @@ describe("Localized book Zeph (da)", () => {
 	});
 });
 describe("Localized book Hag (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1066,7 +1066,7 @@ describe("Localized book Hag (da)", () => {
 	});
 });
 describe("Localized book Zech (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1087,7 +1087,7 @@ describe("Localized book Zech (da)", () => {
 	});
 });
 describe("Localized book Mal (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1104,7 +1104,7 @@ describe("Localized book Mal (da)", () => {
 	});
 });
 describe("Localized book Matt (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1123,7 +1123,7 @@ describe("Localized book Matt (da)", () => {
 	});
 });
 describe("Localized book Mark (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1140,7 +1140,7 @@ describe("Localized book Mark (da)", () => {
 	});
 });
 describe("Localized book Luke (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1161,7 +1161,7 @@ describe("Localized book Luke (da)", () => {
 	});
 });
 describe("Localized book 1John (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1216,7 +1216,7 @@ describe("Localized book 1John (da)", () => {
 	});
 });
 describe("Localized book 2John (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1265,7 +1265,7 @@ describe("Localized book 2John (da)", () => {
 	});
 });
 describe("Localized book 3John (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1320,7 +1320,7 @@ describe("Localized book 3John (da)", () => {
 	});
 });
 describe("Localized book John (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1339,7 +1339,7 @@ describe("Localized book John (da)", () => {
 	});
 });
 describe("Localized book Acts (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1362,7 +1362,7 @@ describe("Localized book Acts (da)", () => {
 	});
 });
 describe("Localized book Rom (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1383,7 +1383,7 @@ describe("Localized book Rom (da)", () => {
 	});
 });
 describe("Localized book 2Cor (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1426,7 +1426,7 @@ describe("Localized book 2Cor (da)", () => {
 	});
 });
 describe("Localized book 1Cor (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1475,7 +1475,7 @@ describe("Localized book 1Cor (da)", () => {
 	});
 });
 describe("Localized book Gal (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1498,7 +1498,7 @@ describe("Localized book Gal (da)", () => {
 	});
 });
 describe("Localized book Eph (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1521,7 +1521,7 @@ describe("Localized book Eph (da)", () => {
 	});
 });
 describe("Localized book Phil (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1544,7 +1544,7 @@ describe("Localized book Phil (da)", () => {
 	});
 });
 describe("Localized book Col (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1567,7 +1567,7 @@ describe("Localized book Col (da)", () => {
 	});
 });
 describe("Localized book 2Thess (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1604,7 +1604,7 @@ describe("Localized book 2Thess (da)", () => {
 	});
 });
 describe("Localized book 1Thess (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1647,7 +1647,7 @@ describe("Localized book 1Thess (da)", () => {
 	});
 });
 describe("Localized book 2Tim (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1690,7 +1690,7 @@ describe("Localized book 2Tim (da)", () => {
 	});
 });
 describe("Localized book 1Tim (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1739,7 +1739,7 @@ describe("Localized book 1Tim (da)", () => {
 	});
 });
 describe("Localized book Titus (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1760,7 +1760,7 @@ describe("Localized book Titus (da)", () => {
 	});
 });
 describe("Localized book Phlm (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1785,7 +1785,7 @@ describe("Localized book Phlm (da)", () => {
 	});
 });
 describe("Localized book Heb (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1806,7 +1806,7 @@ describe("Localized book Heb (da)", () => {
 	});
 });
 describe("Localized book Jas (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1827,7 +1827,7 @@ describe("Localized book Jas (da)", () => {
 	});
 });
 describe("Localized book 2Pet (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1862,7 +1862,7 @@ describe("Localized book 2Pet (da)", () => {
 	});
 });
 describe("Localized book 1Pet (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1899,7 +1899,7 @@ describe("Localized book 1Pet (da)", () => {
 	});
 });
 describe("Localized book Jude (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1922,7 +1922,7 @@ describe("Localized book Jude (da)", () => {
 	});
 });
 describe("Localized book Tob (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1935,7 +1935,7 @@ describe("Localized book Tob (da)", () => {
 	});
 });
 describe("Localized book Jdt (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1948,7 +1948,7 @@ describe("Localized book Jdt (da)", () => {
 	});
 });
 describe("Localized book Bar (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1961,7 +1961,7 @@ describe("Localized book Bar (da)", () => {
 	});
 });
 describe("Localized book Sus (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1973,7 +1973,7 @@ describe("Localized book Sus (da)", () => {
 	});
 });
 describe("Localized book 2Macc (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -1990,7 +1990,7 @@ describe("Localized book 2Macc (da)", () => {
 	});
 });
 describe("Localized book 3Macc (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -2007,7 +2007,7 @@ describe("Localized book 3Macc (da)", () => {
 	});
 });
 describe("Localized book 4Macc (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -2024,7 +2024,7 @@ describe("Localized book 4Macc (da)", () => {
 	});
 });
 describe("Localized book 1Macc (da)", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore",book_sequence_strategy: "ignore",osis_compaction_strategy: "bc",captive_end_digits_strategy: "delete"});
@@ -2042,7 +2042,7 @@ describe("Localized book 1Macc (da)", () => {
 });
 
 describe("Miscellaneous tests", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "ignore", book_sequence_strategy: "ignore", osis_compaction_strategy: "bc", captive_end_digits_strategy: "delete"});

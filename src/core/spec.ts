@@ -2,9 +2,8 @@
 import { bcv_parser } from "../../js/en";
 
 describe("Pre-parsing", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 	});
 
@@ -288,10 +287,9 @@ describe("Pre-parsing", () => {
 });
 
 describe("OSIS parsing strategies", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	let translation = {};
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 		p.reset();
 		translation = "default";
@@ -438,11 +436,10 @@ describe("OSIS parsing strategies", () => {
 });
 
 describe("Basic passage parsing", () => {
-	let p: any = new bcv_parser();
+	let p: InstanceType<typeof bcv_parser>;
 	let psg: any = {};
 	const ignored_translation_obj = {translation: "default", osis: "", alias: "default"};
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 		p.reset();
 		psg = p.passage;
@@ -600,9 +597,8 @@ describe("Basic passage parsing", () => {
 });
 
 describe("Parsing with context", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 		p.options.osis_compaction_strategy = "b";
 		p.options.sequence_combination_strategy = "combine";
@@ -670,7 +666,7 @@ describe("Parsing with context", () => {
 });
 
 describe("Parsing", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.options.osis_compaction_strategy = "b";
@@ -1603,7 +1599,7 @@ describe("Parsing", () => {
 });
 
 describe("Apocrypha parsing", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.options.osis_compaction_strategy = "b";
@@ -1886,7 +1882,7 @@ describe("Apocrypha parsing", () => {
 });
 
 describe("Passage existence", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
 		p = new bcv_parser();
 		p.set_options({osis_compaction_strategy: "bc"});
@@ -2435,7 +2431,7 @@ describe("Passage existence", () => {
 	*/
 
 	it("should handle full books with `passage_existence_strategy = b`", () => {
-		p.set_options({osis_compaction_strategy: "b", book_alone_strategy: "full"}, p.set_options({passage_existence_strategy: "b"}));
+		p.set_options({osis_compaction_strategy: "b", book_alone_strategy: "full", passage_existence_strategy: "b"});
 		expect(p.parse("Genesis").osis()).toEqual("Gen");
 		expect(p.parse("Genesis 1-50").osis()).toEqual("Gen.1-Gen.50");
 		expect(p.parse("Genesis 1-50:26").osis()).toEqual("Gen.1.1-Gen.50.26");
@@ -2532,9 +2528,8 @@ describe("Documentation compatibility", () => {
 });
 
 describe("Administrative behavior", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 	});
 
@@ -2567,8 +2562,8 @@ describe("Administrative behavior", () => {
 
 	it("should handle `translation_info` given unknown inputs", () => {
 		p.set_options({versification_system: "nab"});
-		const array_response = p.translation_info([]);
-		const null_response = p.translation_info(null);
+		const array_response = p.translation_info([] as any);
+		const null_response = p.translation_info(null as any);
 		expect(array_response.chapters["3John"][0]).toEqual(15);
 		expect(null_response.chapters["3John"][0]).toEqual(15);
 	});
@@ -2579,9 +2574,8 @@ describe("Administrative behavior", () => {
 });
 
 describe("Real-world parsing", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 		p.options.book_alone_strategy = "ignore";
 		p.options.book_sequence_strategy = "ignore";
@@ -2854,10 +2848,9 @@ describe("Real-world parsing", () => {
 
 // "Adding new translations" should be the last spec; it overwrites `bcv_parser` in destructive ways.
 describe("Adding new translations", () => {
-	let p: any = {};
+	let p: InstanceType<typeof bcv_parser>;
 
 	beforeEach(() => {
-		p = {};
 		p = new bcv_parser();
 		p.set_options({book_alone_strategy: "full"});
 		// Don't do this in real life. It edits the prototype and affects all subsequent objects on the page.

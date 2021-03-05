@@ -697,7 +697,7 @@ function make_tests() {
 			});
 		});
 		out_array.push(`describe("Localized book ${osis} (${lang})", () => {`);
-		out_array.push("\tlet p: any = {};");
+		out_array.push("\tlet p: InstanceType<typeof bcv_parser>;");
 		out_array.push("\tbeforeEach(() => {");
 		out_array.push("\t\tp = new bcv_parser();");
 		out_array.push(
