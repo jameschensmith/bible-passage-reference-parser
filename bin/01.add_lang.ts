@@ -3,39 +3,52 @@ import fs from "fs";
 
 import regexgen from "regexgen";
 
-const lang = process.argv[2];
-if (!lang || !/^\w+$/.test(lang)) {
-	throw new Error(
-		'The first argument should be a language iso code (e.g., "fr")'
-	);
-}
+type Abbrevs = Record<string, Record<string, number>>;
+type RawAbbrevs = Record<string, Record<string, number>>;
+type AllAbbrevs = Record<string, any>;
+type Order = { osis: string; apocrypha: 0 | 1 }[];
+type Vars = Record<string, string[]>;
+type BookType = "ot_nt" | "apocrypha";
+type ValidOsises = Record<string, BookType>;
 
 const dir = "src";
 const tools_dir = "tools";
+const default_alternates_file = `${dir}/en/translation_alternates.ts`;
 const regexp_space = "[\\s\xa0]";
 let valid_characters =
 	"[\\\\d\\\\s\\\\xa0.:,;\\\\x1e\\\\x1f&\\\\(\\\\)\\\\uff08\\\\uff09\\\\[\\\\]/\"'\\\\*=~\\\\-\\\\u2013\\\\u2014]";
-let letters = "";
 // prettier-ignore
 const valid_osises = make_valid_osises(["Gen","Exod","Lev","Num","Deut","Josh","Judg","Ruth","1Sam","2Sam","1Kgs","2Kgs","1Chr","2Chr","Ezra","Neh","Esth","Job","Ps","Prov","Eccl","Song","Isa","Jer","Lam","Ezek","Dan","Hos","Joel","Amos","Obad","Jonah","Mic","Nah","Hab","Zeph","Hag","Zech","Mal","Matt","Mark","Luke","John","Acts","Rom","1Cor","2Cor","Gal","Eph","Phil","Col","1Thess","2Thess","1Tim","2Tim","Titus","Phlm","Heb","Jas","1Pet","2Pet","1John","2John","3John","Jude","Rev","Tob","Jdt","GkEsth","Wis","Sir","Bar","PrAzar","Sus","Bel","SgThree","EpJer","1Macc","2Macc","3Macc","4Macc","1Esd","2Esd","PrMan","AddEsth","AddDan"]);
 
-const raw_abbrevs: Record<string, Record<string, number>> = {};
-const vars = get_vars();
-const abbrevs = get_abbrevs();
-const order = get_order();
-const all_abbrevs = make_tests();
-make_regexps();
-make_grammar();
-const default_alternates_file = `${dir}/en/translation_alternates.ts`;
-make_translations();
-make_index();
+const langs = fs.readdirSync("src").filter((dir) => dir !== "core");
+const arg_lang = process.argv[2];
+if (arg_lang && langs.includes(arg_lang)) {
+	make_lang(arg_lang);
+} else if (arg_lang && arg_lang === "cross") {
+	langs.filter((lang) => lang.length > 3).forEach(make_lang);
+} else {
+	langs.filter((lang) => lang.length <= 3).forEach(make_lang);
+}
 
-function make_index() {
+function make_lang(lang: string) {
+	console.log(`Generating lang '${lang}'...`);
+	const raw_abbrevs: RawAbbrevs = {};
+	const vars = get_vars(lang);
+	const abbrevs = get_abbrevs(lang, vars, raw_abbrevs);
+	const order = get_order(lang, abbrevs, raw_abbrevs);
+	const all_abbrevs = make_tests(lang, vars, order, abbrevs, raw_abbrevs);
+	make_regexps(lang, vars, order, raw_abbrevs, all_abbrevs);
+	make_grammar(lang, vars);
+	make_translations(lang, vars);
+	make_index(lang);
+}
+
+function make_index(lang: string) {
 	const out = get_file_contents(`${tools_dir}/template/index.ts`);
 	fs.writeFileSync(`${dir}/${lang}/index.ts`, out);
 }
 
-function make_translations() {
+function make_translations(lang: string, vars: Vars) {
 	let out = get_file_contents(`${tools_dir}/template/translations.ts`);
 	const regexps: string[] = [];
 	const aliases: string[] = [];
@@ -87,7 +100,7 @@ function make_translations() {
 	}
 }
 
-function make_grammar() {
+function make_grammar(lang: string, vars: Vars) {
 	let out = get_file_contents(`${tools_dir}/template/grammar.pegjs`);
 	if (!vars.$NEXT) {
 		out = out
@@ -103,7 +116,7 @@ function make_grammar() {
 		.forEach((key) => {
 			const safe_key = key.replace(/^\$/, "\\$");
 			const re = new RegExp(`${safe_key}`, "g");
-			out = out.replace(re, () => format_var("pegjs", key));
+			out = out.replace(re, () => format_var(vars, "pegjs", key));
 		});
 	fs.writeFileSync(`${dir}/${lang}/grammar.pegjs`, out);
 	const found = out.match(/(\$[A-Z_]+)/);
@@ -112,7 +125,13 @@ function make_grammar() {
 	}
 }
 
-function make_regexps() {
+function make_regexps(
+	lang: string,
+	vars: Vars,
+	order: Order,
+	raw_abbrevs: RawAbbrevs,
+	all_abbrevs: AllAbbrevs
+) {
 	let out = get_file_contents(`${tools_dir}/template/regexps.ts`);
 	if (!vars.$NEXT) {
 		out = out.replace(/\n.+\$NEXT.+\n/, "\n");
@@ -132,7 +151,13 @@ function make_regexps() {
 				valid_osises[temp] && valid_osises[temp] === "apocrypha" ? 1 : 0;
 			osises.push({ osis, apocrypha });
 		});
-	const book_regexps = make_regexp_set(osises);
+	const book_regexps = make_regexp_set(
+		lang,
+		vars,
+		osises,
+		raw_abbrevs,
+		all_abbrevs
+	);
 	out = out
 		.replace(/\$BOOK_REGEXPS/, book_regexps)
 		.replace(/\$VALID_CHARACTERS/, valid_characters)
@@ -141,7 +166,7 @@ function make_regexps() {
 			vars.$PRE_PASSAGE_ALLOWED_CHARACTERS.join("|").replace(/\\/g, "\\\\")
 		);
 	const pre = vars.$PRE_BOOK_ALLOWED_CHARACTERS
-		.map((c) => format_value("quote", c))
+		.map((c) => format_value(vars, "quote", c))
 		.join("|");
 	out = out.replace(/\$PRE_BOOK_ALLOWED_CHARACTERS/, pre);
 	let passage_components: string[] = [];
@@ -149,7 +174,7 @@ function make_regexps() {
 	variables.forEach((variable) => {
 		if (vars[variable]) {
 			passage_components = passage_components.concat(
-				vars[variable].map((v) => format_value("regexp", v))
+				vars[variable].map((v) => format_value(vars, "regexp", v))
 			);
 		}
 	});
@@ -160,7 +185,7 @@ function make_regexps() {
 		.forEach((key) => {
 			const safe_key = key.replace(/^\$/, "\\$");
 			const re = new RegExp(`${safe_key}(?!\\w)`, "g");
-			out = out.replace(re, () => format_var("regexp", key));
+			out = out.replace(re, () => format_var(vars, "regexp", key));
 		});
 	fs.writeFileSync(`${dir}/${lang}/regexps.ts`, out);
 	const found = out.match(/(\$[A-Z_]+)/);
@@ -169,7 +194,13 @@ function make_regexps() {
 	}
 }
 
-function make_regexp_set(osises: { osis: string; apocrypha: number }[]) {
+function make_regexp_set(
+	lang: string,
+	vars: Vars,
+	osises: Order,
+	raw_abbrevs: RawAbbrevs,
+	all_abbrevs: AllAbbrevs
+) {
 	const out: string[] = [];
 	let has_psalm_cb = 0;
 	osises.forEach((ref) => {
@@ -189,16 +220,24 @@ function make_regexp_set(osises: { osis: string; apocrypha: number }[]) {
 		});
 		out.push(
 			make_regexp(
+				vars,
 				osis,
 				apocrypha,
-				Object.keys(safes).sort((a, b) => safes[b] - safes[a])
+				Object.keys(safes).sort((a, b) => safes[b] - safes[a]),
+				all_abbrevs
 			)
 		);
 	});
 	return out.join("\x0a");
 }
 
-function make_regexp(osis: string, apocrypha: number, safes: string[]) {
+function make_regexp(
+	vars: Vars,
+	osis: string,
+	apocrypha: number,
+	safes: string[],
+	all_abbrevs: AllAbbrevs
+) {
 	const out: string[] = [];
 	const abbrevs: string[] = [];
 	safes.forEach((abbrev) => {
@@ -207,9 +246,9 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
 			.replace(/[\u200b]/g, () => {
 				return `${regexp_space.replace(/\]$/, "\u200b]")}*`;
 			});
-		abbrev = handle_accent(abbrev);
+		abbrev = handle_accent(vars, abbrev);
 		abbrev = abbrev.replace(/(\$[A-Z]+)(?!\w)/g, (_match, p1) => {
-			return `${format_var("regexp", p1)}\\.?`;
+			return `${format_var(vars, "regexp", p1)}\\.?`;
 		});
 		abbrevs.push(abbrev);
 	});
@@ -223,7 +262,7 @@ function make_regexp(osis: string, apocrypha: number, safes: string[]) {
 	let pre = "${bcv_parser.prototype.regexps.pre_book}";
 	if (/^[0-9]/.test(osis) || /[0-9]/.test(abbrevs.join("|"))) {
 		pre = vars.$PRE_BOOK_ALLOWED_CHARACTERS
-			.map((v) => format_value("quote", v))
+			.map((v) => format_value(vars, "quote", v))
 			.join("|");
 		if (pre === "\\\\d|\\\\b") {
 			pre = "\b";
@@ -499,12 +538,12 @@ function format_node_regexp_pattern(pattern: string) {
 	return pattern;
 }
 
-function format_value(type: string, value: string) {
+function format_value(vars: Vars, type: string, value: string) {
 	vars.$TEMP_VALUE = [value];
-	return format_var(type, "$TEMP_VALUE");
+	return format_var(vars, type, "$TEMP_VALUE");
 }
 
-function format_var(type: string, var_name: string) {
+function format_var(vars: Vars, type: string, var_name: string) {
 	let values = vars[var_name];
 	if (type === "regexp" || type === "quote") {
 		values = values.map((value) => {
@@ -515,7 +554,7 @@ function format_var(type: string, var_name: string) {
 			return value;
 		});
 		let out = values.join("|");
-		out = handle_accents(out);
+		out = handle_accents(vars, out);
 		out = out.replace(/ +/g, "${bcv_parser.prototype.regexps.space}+");
 		return values.length > 1 ? `(?:${out})` : out;
 	} else if (type === "pegjs") {
@@ -524,7 +563,7 @@ function format_var(type: string, var_name: string) {
 				.replace(/\.(?!`)/, '" abbrev? "')
 				.replace(/\.`/, '" abbrev "')
 				.replace(/([A-Z])/g, (_match, p1) => p1.toLowerCase());
-			value = handle_accents(value);
+			value = handle_accents(vars, value);
 			value = value.replace(/\[/g, '" [').replace(/\]/g, '] "');
 			value = `"${value}"`;
 			value = value
@@ -642,10 +681,16 @@ function handle_pegjs_prepends(out: string, values: string[]) {
 	return `${longest} ( ${out_array.join(" / ")} )`;
 }
 
-function make_tests() {
+function make_tests(
+	lang: string,
+	vars: Vars,
+	order: Order,
+	abbrevs: Abbrevs,
+	raw_abbrevs: RawAbbrevs
+) {
 	let out_array: string[] = [];
 	const osises = [...order] as any[];
-	const all_abbrevs: Record<string, any> = {};
+	const all_abbrevs: AllAbbrevs = {};
 	Object.keys(abbrevs)
 		.sort()
 		.forEach((osis) => {
@@ -661,7 +706,7 @@ function make_tests() {
 		const [first] = osis.split(",");
 		const match = `${first}.1.1`;
 		sort_abbrevs_by_length(Object.keys(abbrevs[osis])).forEach((abbrev) => {
-			expand_abbrev_vars(abbrev).forEach((expanded) => {
+			expand_abbrev_vars(vars, abbrev).forEach((expanded) => {
 				add_abbrev_to_all_abbrevs(osis, expanded, all_abbrevs);
 				tests.push(
 					`\t\texpect(p.parse("${expanded} 1:1").osis()).toEqual("${match}");`
@@ -707,13 +752,13 @@ function make_tests() {
 		out_array.push("\t});");
 		out_array.push(`\tit("should handle book: ${osis} (${lang})", () => {`);
 		out_array = out_array.concat(tests);
-		out_array = out_array.concat(add_non_latin_digit_tests(osis, tests));
+		out_array = out_array.concat(add_non_latin_digit_tests(lang, osis, tests));
 
 		// Don't check for an empty string because books like EpJer will lead to Jer in language-specific ways.
 		if (valid_osises[first] !== "apocrypha") {
 			out_array.push("\t\tp.include_apocrypha(false);");
 			sort_abbrevs_by_length(Object.keys(abbrevs[osis])).forEach((abbrev) => {
-				expand_abbrev_vars(abbrev).forEach((expanded) => {
+				expand_abbrev_vars(vars, abbrev).forEach((expanded) => {
 					expanded = uc_normalize(expanded);
 					out_array.push(
 						`\t\texpect(p.parse("${expanded} 1:1").osis()).toEqual("${match}");`
@@ -741,16 +786,16 @@ function make_tests() {
 		});
 
 	let misc_tests: string[] = [];
-	misc_tests = misc_tests.concat(add_range_tests());
-	misc_tests = misc_tests.concat(add_chapter_tests());
-	misc_tests = misc_tests.concat(add_verse_tests());
-	misc_tests = misc_tests.concat(add_sequence_tests());
-	misc_tests = misc_tests.concat(add_title_tests());
-	misc_tests = misc_tests.concat(add_ff_tests());
-	misc_tests = misc_tests.concat(add_next_tests());
-	misc_tests = misc_tests.concat(add_trans_tests());
-	misc_tests = misc_tests.concat(add_book_range_tests());
-	misc_tests = misc_tests.concat(add_boundary_tests());
+	misc_tests = misc_tests.concat(add_range_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_chapter_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_verse_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_sequence_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_title_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_ff_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_next_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_trans_tests(lang, vars));
+	misc_tests = misc_tests.concat(add_book_range_tests(lang, vars, raw_abbrevs));
+	misc_tests = misc_tests.concat(add_boundary_tests(lang));
 	let out = get_file_contents(`${tools_dir}/template/spec.ts`);
 	const lang_isos = JSON.stringify(vars.$LANG_ISOS);
 	out = out
@@ -822,7 +867,11 @@ function add_abbrev_to_all_abbrevs(
 	}
 }
 
-function add_non_latin_digit_tests(osis: string, tests: string[]) {
+function add_non_latin_digit_tests(
+	lang: string,
+	osis: string,
+	tests: string[]
+) {
 	const temp = tests.join("\n");
 	const out: string[] = [];
 	if (
@@ -840,11 +889,14 @@ function add_non_latin_digit_tests(osis: string, tests: string[]) {
 	return out.concat(tests);
 }
 
-function add_range_tests() {
+function add_range_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle ranges (${lang})", () => {`);
 	vars.$TO.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach((to) => {
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((to) => {
 			out.push(
 				`\t\texpect(p.parse("Titus 1:1 ${to} 2").osis()).toEqual("Titus.1.1-Titus.1.2");`
 			);
@@ -862,98 +914,105 @@ function add_range_tests() {
 	return out;
 }
 
-function add_chapter_tests() {
+function add_chapter_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle chapters (${lang})", () => {`);
 	vars.$CHAPTER.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(chapter) => {
-				out.push(
-					`\t\texpect(p.parse("Titus 1:1, ${chapter} 2").osis()).toEqual("Titus.1.1,Titus.2");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Matt 3:4 ${uc_normalize(
-						chapter
-					)} 6").osis()).toEqual("Matt.3.4,Matt.6");`
-				);
-			}
-		);
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((chapter) => {
+			out.push(
+				`\t\texpect(p.parse("Titus 1:1, ${chapter} 2").osis()).toEqual("Titus.1.1,Titus.2");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Matt 3:4 ${uc_normalize(
+					chapter
+				)} 6").osis()).toEqual("Matt.3.4,Matt.6");`
+			);
+		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_verse_tests() {
+function add_verse_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle verses (${lang})", () => {`);
 	vars.$VERSE.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(verse) => {
-				out.push(
-					`\t\texpect(p.parse("Exod 1:1 ${verse} 3").osis()).toEqual("Exod.1.1,Exod.1.3");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Phlm ${uc_normalize(
-						verse
-					)} 6").osis()).toEqual("Phlm.1.6");`
-				);
-			}
-		);
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((verse) => {
+			out.push(
+				`\t\texpect(p.parse("Exod 1:1 ${verse} 3").osis()).toEqual("Exod.1.1,Exod.1.3");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Phlm ${uc_normalize(
+					verse
+				)} 6").osis()).toEqual("Phlm.1.6");`
+			);
+		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_sequence_tests() {
+function add_sequence_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle 'and' (${lang})", () => {`);
 	vars.$AND.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(and) => {
-				out.push(
-					`\t\texpect(p.parse("Exod 1:1 ${and} 3").osis()).toEqual("Exod.1.1,Exod.1.3");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Phlm 2 ${uc_normalize(
-						and
-					)} 6").osis()).toEqual("Phlm.1.2,Phlm.1.6");`
-				);
-			}
-		);
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((and) => {
+			out.push(
+				`\t\texpect(p.parse("Exod 1:1 ${and} 3").osis()).toEqual("Exod.1.1,Exod.1.3");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Phlm 2 ${uc_normalize(
+					and
+				)} 6").osis()).toEqual("Phlm.1.2,Phlm.1.6");`
+			);
+		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_title_tests() {
+function add_title_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle titles (${lang})", () => {`);
 	vars.$TITLE.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(title) => {
-				out.push(
-					`\t\texpect(p.parse("Ps 3 ${title}, 4:2, 5:${title}").osis()).toEqual("Ps.3.1,Ps.4.2,Ps.5.1");`
-				);
-				out.push(
-					`\t\texpect(p.parse("${uc_normalize(
-						`Ps 3 ${title}, 4:2, 5:${title}`
-					)}").osis()).toEqual("Ps.3.1,Ps.4.2,Ps.5.1");`
-				);
-			}
-		);
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((title) => {
+			out.push(
+				`\t\texpect(p.parse("Ps 3 ${title}, 4:2, 5:${title}").osis()).toEqual("Ps.3.1,Ps.4.2,Ps.5.1");`
+			);
+			out.push(
+				`\t\texpect(p.parse("${uc_normalize(
+					`Ps 3 ${title}, 4:2, 5:${title}`
+				)}").osis()).toEqual("Ps.3.1,Ps.4.2,Ps.5.1");`
+			);
+		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_ff_tests() {
+function add_ff_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle 'ff' (${lang})", () => {`);
 	if (lang === "it") {
 		out.push('\t\tp.set_options({case_sensitive: "books"});');
 	}
 	vars.$FF.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach((ff) => {
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((ff) => {
 			out.push(
 				`\t\texpect(p.parse("Rev 3${ff}, 4:2${ff}").osis()).toEqual("Rev.3-Rev.22,Rev.4.2-Rev.4.11");`
 			);
@@ -973,7 +1032,7 @@ function add_ff_tests() {
 	return out;
 }
 
-function add_next_tests() {
+function add_next_tests(lang: string, vars: Vars) {
 	if (!vars.$NEXT) {
 		return [];
 	}
@@ -983,38 +1042,39 @@ function add_next_tests() {
 		out.push('\t\tp.set_options({case_sensitive: "books"});');
 	}
 	vars.$NEXT.forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(next) => {
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((next) => {
+			out.push(
+				`\t\texpect(p.parse("Rev 3:1${next}, 4:2${next}").osis()).toEqual("Rev.3.1-Rev.3.2,Rev.4.2-Rev.4.3");`
+			);
+			if (lang !== "it") {
 				out.push(
-					`\t\texpect(p.parse("Rev 3:1${next}, 4:2${next}").osis()).toEqual("Rev.3.1-Rev.3.2,Rev.4.2-Rev.4.3");`
-				);
-				if (lang !== "it") {
-					out.push(
-						`\t\texpect(p.parse("${uc_normalize(
-							`Rev 3 ${next}, 4:2 ${next}`
-						)}").osis()).toEqual("Rev.3-Rev.4,Rev.4.2-Rev.4.3");`
-					);
-				}
-				out.push(
-					`\t\texpect(p.parse("Jude 1${next}, 2${next}").osis()).toEqual("Jude.1.1-Jude.1.2,Jude.1.2-Jude.1.3");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Gen 1:31${next}").osis()).toEqual("Gen.1.31-Gen.2.1");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Gen 1:2-31${next}").osis()).toEqual("Gen.1.2-Gen.2.1");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Gen 1:2${next}-30").osis()).toEqual("Gen.1.2-Gen.1.3,Gen.1.30");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Gen 50${next}, Gen 50:26${next}").osis()).toEqual("Gen.50,Gen.50.26");`
-				);
-				out.push(
-					`\t\texpect(p.parse("Gen 1:32${next}, Gen 51${next}").osis()).toEqual("");`
+					`\t\texpect(p.parse("${uc_normalize(
+						`Rev 3 ${next}, 4:2 ${next}`
+					)}").osis()).toEqual("Rev.3-Rev.4,Rev.4.2-Rev.4.3");`
 				);
 			}
-		);
+			out.push(
+				`\t\texpect(p.parse("Jude 1${next}, 2${next}").osis()).toEqual("Jude.1.1-Jude.1.2,Jude.1.2-Jude.1.3");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Gen 1:31${next}").osis()).toEqual("Gen.1.31-Gen.2.1");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Gen 1:2-31${next}").osis()).toEqual("Gen.1.2-Gen.2.1");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Gen 1:2${next}-30").osis()).toEqual("Gen.1.2-Gen.1.3,Gen.1.30");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Gen 50${next}, Gen 50:26${next}").osis()).toEqual("Gen.50,Gen.50.26");`
+			);
+			out.push(
+				`\t\texpect(p.parse("Gen 1:32${next}, Gen 51${next}").osis()).toEqual("");`
+			);
+		});
 	});
 	if (lang === "it") {
 		out.push('\t\tp.set_options({case_sensitive: "none"});');
@@ -1023,30 +1083,35 @@ function add_next_tests() {
 	return out;
 }
 
-function add_trans_tests() {
+function add_trans_tests(lang: string, vars: Vars) {
 	const out: string[] = [];
 	out.push(`\tit("should handle translations (${lang})", () => {`);
 	[...vars.$TRANS].sort().forEach((abbrev) => {
-		expand_abbrev(remove_exclamations(handle_accents(abbrev))).forEach(
-			(translation) => {
-				const [trans, maybe_osis] = translation.split(",");
-				const osis = maybe_osis ? maybe_osis : trans;
-				out.push(
-					`\t\texpect(p.parse("Lev 1 (${trans})").osis_and_translations()).toEqual([["Lev.1", "${osis}"]]);`
-				);
-				out.push(
-					`\t\texpect(p.parse("${`Lev 1 ${trans}`.toLowerCase()}").osis_and_translations()).toEqual([["Lev.1", "${osis}"]]);`
-				);
-			}
-		);
+		expand_abbrev(
+			vars,
+			remove_exclamations(handle_accents(vars, abbrev))
+		).forEach((translation) => {
+			const [trans, maybe_osis] = translation.split(",");
+			const osis = maybe_osis ? maybe_osis : trans;
+			out.push(
+				`\t\texpect(p.parse("Lev 1 (${trans})").osis_and_translations()).toEqual([["Lev.1", "${osis}"]]);`
+			);
+			out.push(
+				`\t\texpect(p.parse("${`Lev 1 ${trans}`.toLowerCase()}").osis_and_translations()).toEqual([["Lev.1", "${osis}"]]);`
+			);
+		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_book_range_tests() {
-	const [first] = expand_abbrev(handle_accents(vars.$FIRST[0]));
-	const [third] = expand_abbrev(handle_accents(vars.$THIRD[0]));
+function add_book_range_tests(
+	lang: string,
+	vars: Vars,
+	raw_abbrevs: RawAbbrevs
+) {
+	const [first] = expand_abbrev(vars, handle_accents(vars, vars.$FIRST[0]));
+	const [third] = expand_abbrev(vars, handle_accents(vars, vars.$THIRD[0]));
 	let john = "";
 	const keys = Object.keys(raw_abbrevs["1John"]).sort();
 	for (const key of keys) {
@@ -1063,7 +1128,7 @@ function add_book_range_tests() {
 		return [];
 	}
 	const out: string[] = [];
-	const johns = expand_abbrev(handle_accents(john));
+	const johns = expand_abbrev(vars, handle_accents(vars, john));
 	out.push(`\tit("should handle book ranges (${lang})", () => {`);
 	out.push(
 		'\t\tp.set_options({book_alone_strategy: "full", book_range_strategy: "include"});'
@@ -1071,25 +1136,26 @@ function add_book_range_tests() {
 	const alreadys: Record<string, number> = {};
 	johns.sort().forEach((abbrev) => {
 		vars.$TO.forEach((to_regex) => {
-			expand_abbrev(remove_exclamations(handle_accents(to_regex))).forEach(
-				(to) => {
-					const first_to_third = `${first} ${to} ${third} ${abbrev}`;
-					if (alreadys[first_to_third]) {
-						return;
-					}
-					out.push(
-						`\t\texpect(p.parse("${first_to_third}").osis()).toEqual("1John.1-3John.1");`
-					);
-					alreadys[first_to_third] = 1;
+			expand_abbrev(
+				vars,
+				remove_exclamations(handle_accents(vars, to_regex))
+			).forEach((to) => {
+				const first_to_third = `${first} ${to} ${third} ${abbrev}`;
+				if (alreadys[first_to_third]) {
+					return;
 				}
-			);
+				out.push(
+					`\t\texpect(p.parse("${first_to_third}").osis()).toEqual("1John.1-3John.1");`
+				);
+				alreadys[first_to_third] = 1;
+			});
 		});
 	});
 	out.push("\t});");
 	return out;
 }
 
-function add_boundary_tests() {
+function add_boundary_tests(lang: string) {
 	return `\tit("should handle boundaries (${lang})", () => {
 \t\tp.set_options({book_alone_strategy: "full"});
 \t\texpect(p.parse("\\u2014Matt\\u2014").osis()).toEqual("Matt.1-Matt.28");
@@ -1097,10 +1163,10 @@ function add_boundary_tests() {
 \t});`;
 }
 
-function get_abbrevs() {
+function get_abbrevs(lang: string, vars: Vars, raw_abbrevs: RawAbbrevs) {
 	const fd = fs.openSync(`temp.corrections.txt`, "w");
 	let has_corrections = 0;
-	const out: Record<string, Record<string, number>> = {};
+	const out: Abbrevs = {};
 	const data = get_file_contents(`${dir}/${lang}/data.txt`);
 	data.split("\n").forEach((line) => {
 		if (/\t\s/.test(line) && /^[^*]/.test(line)) {
@@ -1157,14 +1223,14 @@ function get_abbrevs() {
 					[abbrev]: 1,
 				};
 			}
-			abbrev = handle_accents(abbrev);
-			const alts = expand_abbrev_vars(abbrev);
+			abbrev = handle_accents(vars, abbrev);
+			const alts = expand_abbrev_vars(vars, abbrev);
 			if (/.\$/.test(alts.join(""))) {
 				throw new Error(`Alts:${alts}`);
 			}
 			alts.forEach((alt) => {
 				if (/[[?]/.test(alt)) {
-					expand_abbrev(alt).forEach((expanded) => {
+					expand_abbrev(vars, alt).forEach((expanded) => {
 						out[osis] = {
 							...out[osis],
 							[expanded]: 1,
@@ -1185,7 +1251,7 @@ function get_abbrevs() {
 	return out;
 }
 
-function expand_abbrev_vars(abbrev: string) {
+function expand_abbrev_vars(vars: Vars, abbrev: string) {
 	abbrev = abbrev.replace(/\\(?![()[\]|s])/g, "");
 	if (!/\$[A-Z]+/.test(abbrev)) {
 		return [abbrev];
@@ -1194,8 +1260,8 @@ function expand_abbrev_vars(abbrev: string) {
 	let out: string[] = [];
 	let recurse = 0;
 	vars[variable].forEach((value) => {
-		expand_abbrev(value).forEach((val) => {
-			val = handle_accents(val);
+		expand_abbrev(vars, value).forEach((val) => {
+			val = handle_accents(vars, val);
 			let temp = abbrev;
 			temp = temp.replace(/\$[A-Z]+(?!\w)/, val);
 			if (/\$/.test(temp)) {
@@ -1216,7 +1282,7 @@ function expand_abbrev_vars(abbrev: string) {
 	if (recurse) {
 		let temps: string[] = [];
 		out.forEach((abbrev) => {
-			const adds = expand_abbrev_vars(abbrev);
+			const adds = expand_abbrev_vars(vars, abbrev);
 			temps = temps.concat(adds);
 		});
 		out = temps;
@@ -1224,8 +1290,8 @@ function expand_abbrev_vars(abbrev: string) {
 	return out;
 }
 
-function get_order() {
-	const out: { osis: string; apocrypha: number }[] = [];
+function get_order(lang: string, abbrevs: Abbrevs, raw_abbrevs: RawAbbrevs) {
+	const out: Order = [];
 	const data = get_file_contents(`${dir}/${lang}/data.txt`);
 	data.split("\n").forEach((line) => {
 		if (!/^=/.test(line)) {
@@ -1248,8 +1314,8 @@ function get_order() {
 	return out;
 }
 
-function get_vars() {
-	const out: Record<string, string[]> = {};
+function get_vars(lang: string) {
+	const out: Vars = {};
 	const data = get_file_contents(`${dir}/${lang}/data.txt`);
 	data.split("\n").forEach((line) => {
 		if (!/^\$/.test(line)) {
@@ -1268,7 +1334,7 @@ function get_vars() {
 			valid_characters = valid_characters.replace(/\]$/, char);
 		}
 	});
-	letters = get_pre_book_characters(out.$UNICODE_BLOCK);
+	const letters = get_pre_book_characters(out.$UNICODE_BLOCK);
 	if (!out.$PRE_BOOK_ALLOWED_CHARACTERS) {
 		out.$PRE_BOOK_ALLOWED_CHARACTERS = [letters];
 	}
@@ -1382,7 +1448,7 @@ function get_unicode_blocks(unicodes_ref: string[]) {
 	return out;
 }
 
-function expand_abbrev(abbrev: string) {
+function expand_abbrev(vars: Vars, abbrev: string) {
 	if (!/[[(?|\\]/.test(abbrev)) {
 		return [abbrev];
 	}
@@ -1401,7 +1467,7 @@ function expand_abbrev(abbrev: string) {
 				} else if (next === "\\") {
 					continue;
 				} else {
-					let accents = handle_accent(next);
+					let accents = handle_accent(vars, next);
 					accents = accents.replace(/^\[|\]$/g, "");
 					accents.split("").forEach((accent) => {
 						nexts.push(accent);
@@ -1443,7 +1509,7 @@ function expand_abbrev(abbrev: string) {
 					nexts.push(next);
 				}
 			}
-			nexts = expand_abbrev(nexts.join(""));
+			nexts = expand_abbrev(vars, nexts.join(""));
 			[is_optional, chars] = is_next_char_optional(chars);
 			if (is_optional) {
 				nexts.push("");
@@ -1456,7 +1522,7 @@ function expand_abbrev(abbrev: string) {
 			});
 			outs = temps;
 		} else if (char === "|") {
-			outs.push(...expand_abbrev(chars.join("")));
+			outs.push(...expand_abbrev(vars, chars.join("")));
 			return outs;
 		} else {
 			const temps: string[] = [];
@@ -1493,7 +1559,7 @@ function is_next_char_optional(chars: string[]): [number, string[]] {
 	return [is_optional, chars];
 }
 
-function handle_accents(text: string) {
+function handle_accents(vars: Vars, text: string) {
 	const chars = text.split("");
 	const texts = [];
 	let context = "";
@@ -1505,7 +1571,7 @@ function handle_accents(text: string) {
 				texts.push(chars.shift());
 				continue;
 			}
-			char = handle_accent(char);
+			char = handle_accent(vars, char);
 			if (context === "[") {
 				char = char.replace(/^\[|\]$/g, "");
 			}
@@ -1546,7 +1612,7 @@ function remove_exclamations(text: string) {
 	return text.includes("!") ? text.split("!")[0] : text;
 }
 
-function handle_accent(char: string) {
+function handle_accent(vars: Vars, char: string) {
 	let alt = char.normalize("NFD");
 	if (
 		!vars.$COLLAPSE_COMBINING_CHARACTERS ||
@@ -1613,8 +1679,8 @@ function is_valid_osis(osis: string) {
 }
 
 function make_valid_osises(osises: string[]) {
-	let type = "ot_nt";
-	return osises.reduce<Record<string, unknown>>((out, osis) => {
+	let type: BookType = "ot_nt";
+	return osises.reduce<ValidOsises>((out, osis) => {
 		if (osis === "Tob") {
 			type = "apocrypha";
 		}
