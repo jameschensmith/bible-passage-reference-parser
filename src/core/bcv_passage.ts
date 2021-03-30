@@ -781,7 +781,7 @@ export class bcv_passage {
 			passage.original_value = [start, end];
 		}
 		// The start.type is only bc, c, or integer; we're just adding a v for the first two.
-		passage.type = start.type === "integer" ? "cv" : start.type + "v";
+		passage.type = start.type === "integer" ? "cv" : `${start.type}v`;
 		// Create the object in the expected format if it's not already a verse.
 		if (start.type === "integer") {
 			passage.value[0] = { type: "c", value: [start], indices: start.indices };
