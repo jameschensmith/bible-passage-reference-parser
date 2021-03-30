@@ -8,7 +8,6 @@ module.exports = {
 		 * @typescript-eslint/eslint-plugin
 		 */
 
-		"@typescript-eslint/dot-notation": "off",
 		"@typescript-eslint/no-dynamic-delete": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"@typescript-eslint/no-loop-func": "off",

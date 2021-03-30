@@ -218,26 +218,26 @@ export class bcv_parser {
 			if (this.translations[translation].chapters == null) {
 				this.translations[translation].chapters = {};
 			}
-			if (this.translations[translation].chapters["Ps"] == null) {
-				this.translations[translation].chapters[
-					"Ps"
-				] = bcv_utils.shallow_clone_array(
-					this.translations["default"].chapters["Ps"]
+			if (this.translations[translation].chapters.Ps == null) {
+				this.translations[
+					translation
+				].chapters.Ps = bcv_utils.shallow_clone_array(
+					this.translations.default.chapters.Ps
 				);
 			}
 			// Add Ps 151 to the end of Psalms. The assumption here is that Ps151 always only is one chapter long.
 			if (arg === true) {
 				var verse_count;
-				if (this.translations[translation].chapters["Ps151"] != null) {
-					verse_count = this.translations[translation].chapters["Ps151"][0];
+				if (this.translations[translation].chapters.Ps151 != null) {
+					verse_count = this.translations[translation].chapters.Ps151[0];
 				} else {
-					verse_count = this.translations["default"].chapters["Ps151"][0];
+					verse_count = this.translations.default.chapters.Ps151[0];
 				}
-				this.translations[translation].chapters["Ps"][150] = verse_count;
+				this.translations[translation].chapters.Ps[150] = verse_count;
 				// Remove Ps 151 from the end of Psalms.
 			} else {
-				if (this.translations[translation].chapters["Ps"].length === 151) {
-					this.translations[translation].chapters["Ps"].pop();
+				if (this.translations[translation].chapters.Ps.length === 151) {
+					this.translations[translation].chapters.Ps.pop();
 				}
 			}
 		}
@@ -897,7 +897,7 @@ export class bcv_parser {
 		// Ps151 doesn't necessarily get promoted into the translation chapter list because during the string parsing, we treat it as `Ps` rather than `Ps151`.
 		if (
 			translation !== "default" &&
-			this.translations[translation]?.chapters["Ps151"] == null
+			this.translations[translation]?.chapters.Ps151 == null
 		) {
 			this.passage.promote_book_to_translation("Ps151", translation);
 		}
@@ -916,7 +916,7 @@ export class bcv_parser {
 					{
 						b: "Ps151",
 						c: 1,
-						v: this.passage.translations[translation].chapters["Ps151"][0],
+						v: this.passage.translations[translation].chapters.Ps151[0],
 					},
 					translation
 				);
@@ -934,7 +934,7 @@ export class bcv_parser {
 			);
 			// Set the end of the range to be the end of Ps.150, which immediately precedes Ps151.
 			end.c = 150;
-			end.v = this.passage.translations[translation].chapters["Ps"][149];
+			end.v = this.passage.translations[translation].chapters.Ps[149];
 		}
 	}
 
