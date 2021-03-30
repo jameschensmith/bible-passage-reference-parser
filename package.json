@@ -38,8 +38,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@types/regexgen": "^1.3.0",
-    "eslint": "^7.18.0",
-    "eslint-config-kentcdodds": "^17.3.2",
+    "eslint": "^7.23.0",
+    "eslint-config-kentcdodds": "^17.6.0",
     "jest": "^26.6.3",
     "pegjs": "^0.10.0",
     "prettier": "^2.2.1",
