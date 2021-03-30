@@ -227,7 +227,7 @@ export class bcv_parser {
 			}
 			// Add Ps 151 to the end of Psalms. The assumption here is that Ps151 always only is one chapter long.
 			if (arg === true) {
-				var verse_count;
+				let verse_count;
 				if (this.translations[translation].chapters.Ps151 != null) {
 					verse_count = this.translations[translation].chapters.Ps151[0];
 				} else {
@@ -389,7 +389,7 @@ export class bcv_parser {
 	match_books(s: string) {
 		const books: any = [];
 		// Replace all book strings.
-		for (var book of this.regexps.books) {
+		for (const book of this.regexps.books) {
 			let has_replacement = false;
 			// Using array concatenation instead of replacing text directly didn't offer performance improvements in tests of the approach.
 			s = s.replace(book.regexp, (full: any, prev: any, bk: any) => {
@@ -761,7 +761,7 @@ export class bcv_parser {
 				out = out.concat(osises);
 				// Add the OSIS string and some data to the array.
 			} else {
-				var osis;
+				let osis;
 				const strings = [];
 				const last_i = osises.length - 1;
 				// Adjust the end index to match a closing parenthesis when presented with `enclosed` entities. These entities always start mid-sequence (unless there's a book we're ignoring), so we don't need to worry about the start index.

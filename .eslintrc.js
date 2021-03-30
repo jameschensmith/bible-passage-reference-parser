@@ -45,7 +45,6 @@ module.exports = {
 		"no-shadow": "off",
 		"no-template-curly-in-string": "off",
 		"no-useless-escape": "off",
-		"no-var": "off",
 		"prefer-const": "off",
 		"prefer-template": "off",
 		"vars-on-top": "off",
