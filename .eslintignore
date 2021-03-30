@@ -1,0 +1,17 @@
+# Documentation: https://eslint.org/docs/user-guide/configuring/ignoring-code
+
+# Node.js
+**/node_modules/
+/js/
+
+# Tools
+/tools/
+
+# Binaries
+/bin/
+
+# Language files (for now)
+src/*/**
+!src/core/**
+src/*/spec.ts
+

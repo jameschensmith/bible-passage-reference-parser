@@ -5,6 +5,7 @@
 
 # Dot-files to not ignore
 !.editorconfig
+!.eslintignore
 !.eslintrc.js
 !.github
 !.gitignore

@@ -30,8 +30,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "gen:lang": "ts-node bin/01.add_lang.ts",
-    "lint": "eslint . --ignore-path .gitignore",
-    "lint:fix": "eslint . --ignore-path .gitignore --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "jest",
     "test:lang": "bash -c 'jest src/$0/spec.ts'"
   },
