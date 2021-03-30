@@ -13,7 +13,6 @@ module.exports = {
 		"@typescript-eslint/no-loop-func": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-shadow": "off",
-		"@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
 		"@typescript-eslint/no-unnecessary-condition": "off",
 		"@typescript-eslint/no-unsafe-assignment": "off",
 		"@typescript-eslint/no-unsafe-call": "off",

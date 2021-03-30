@@ -425,11 +425,11 @@ bcv_parser.prototype.regexps.get_books = (include_apocrypha: boolean, case_sensi
 		},
 	];
 	// Short-circuit the look if we know we want all the books.
-	if ((include_apocrypha === true) && (case_sensitive === "none")) { return books; }
+	if ((include_apocrypha) && (case_sensitive === "none")) { return books; }
 	// Filter out books in the Apocrypha if we don't want them. `Array.map` isn't supported below IE9.
 	const out = [];
 	for (const book of books) {
-		if ((include_apocrypha === false) && (book.apocrypha != null) && (book.apocrypha === true)) { continue; }
+		if ((!include_apocrypha) && (book.apocrypha != null) && (book.apocrypha)) { continue; }
 		if (case_sensitive === "books") {
 			book.regexp = new RegExp(book.regexp.source, "g");
 		}
