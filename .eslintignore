@@ -7,11 +7,9 @@
 # Tools
 /tools/
 
-# Binaries
-/bin/
+# Generated language files
+src/*/translation_alternates.ts
+src/*/psalm_cb.ts
 
-# Language files (for now)
-src/*/**
-!src/core/**
+# Spec files (for now)
 src/*/spec.ts
-

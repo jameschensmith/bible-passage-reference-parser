@@ -1,4 +1,3 @@
-/* eslint-disable */
 import fs from "fs";
 
 const lang = "en";

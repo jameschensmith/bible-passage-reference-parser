@@ -1,4 +1,3 @@
-/* eslint-disable */
 import fs from "fs";
 
 import regexgen from "regexgen";

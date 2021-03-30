@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { bcv_parser } from "../core";
 
 bcv_parser.prototype.regexps.space = "[\\s\\xa0]";

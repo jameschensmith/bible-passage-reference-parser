@@ -1,4 +1,3 @@
-/* eslint-disable */
 // This class takes the output from the grammar and turns it into simpler objects for additional processing or for output.
 
 import { bcv_utils } from "./bcv_utils";
