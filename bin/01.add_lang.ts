@@ -483,7 +483,7 @@ function check_regexp_pattern(
 }
 
 function format_node_regexp_pattern(pattern: string) {
-	if (!/^\/\^/.test(pattern) || !/\$\/$/.test(pattern)) {
+	if (!pattern.startsWith("/^") || !pattern.endsWith("$/")) {
 		throw new Error(`Unexpected regexp pattern: ${pattern}`);
 	}
 	pattern = pattern.replace(/^\/\^/, "").replace(/\$\/$/, "");
@@ -492,7 +492,7 @@ function format_node_regexp_pattern(pattern: string) {
 		const out = [parts.shift()!];
 		while (parts.length !== 0) {
 			let part = parts.shift()!;
-			if (/\\$/.test(out[out.length - 1])) {
+			if (out[out.length - 1].endsWith("\\")) {
 				out.push(part);
 				continue;
 			}
@@ -636,7 +636,7 @@ function handle_pegjs_prepends(out: string, values: string[]) {
 	const count = values.length;
 	const lcs: Record<string, string[]> = {};
 	values.forEach((c) => {
-		if (!/^"/.test(c)) {
+		if (!c.startsWith('"')) {
 			return;
 		}
 		for (let length = 2; length <= c.length; length++) {
@@ -1114,7 +1114,7 @@ function add_book_range_tests(
 	let john = "";
 	const keys = Object.keys(raw_abbrevs["1John"]).sort();
 	for (const key of keys) {
-		if (!/^\$FIRST/.test(key)) {
+		if (!key.startsWith("$FIRST")) {
 			continue;
 		}
 		john = key.replace(/^\$FIRST(?!\w)/, "");
@@ -1177,7 +1177,7 @@ function get_abbrevs(lang: string, vars: Vars, raw_abbrevs: RawAbbrevs) {
 		if (!/^[\w*]/.test(line)) {
 			return;
 		}
-		if (/^\*/.test(line) && /[[?!]/.test(line)) {
+		if (line.startsWith("*") && /[[?!]/.test(line)) {
 			console.log(`Regex character in preferred: ${line}`);
 		}
 		if (!line.includes("\t")) {
@@ -1190,7 +1190,7 @@ function get_abbrevs(lang: string, vars: Vars, raw_abbrevs: RawAbbrevs) {
 			has_corrections = 1;
 			fs.writeSync(fd, `${line}\n`);
 		}
-		const is_literal = /^\*/.test(line) ? 1 : 0;
+		const is_literal = line.startsWith("*") ? 1 : 0;
 		if (is_literal) {
 			line = line.replace(/([\u0080-\uffff])/g, "$1`");
 		}
@@ -1293,7 +1293,7 @@ function get_order(lang: string, abbrevs: Abbrevs, raw_abbrevs: RawAbbrevs) {
 	const out: Order = [];
 	const data = get_file_contents(`${dir}/${lang}/data.txt`);
 	data.split("\n").forEach((line) => {
-		if (!/^=/.test(line)) {
+		if (!line.startsWith("=")) {
 			return;
 		}
 		line = line.normalize("NFD").normalize("NFC");
@@ -1387,7 +1387,7 @@ function get_letters(blocks: [number, number][]) {
 	const out: Record<string, number> = {};
 	const data = get_file_contents(`bin/letters/letters.txt`);
 	data.split("\n").forEach((line) => {
-		if (!/^\\u/.test(line)) {
+		if (!line.startsWith("\\u")) {
 			return;
 		}
 		line = line
