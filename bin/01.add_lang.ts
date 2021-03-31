@@ -142,7 +142,7 @@ function make_regexps(
 	Object.keys(raw_abbrevs)
 		.sort()
 		.forEach((osis) => {
-			if (!/,/.test(osis)) {
+			if (!osis.includes(",")) {
 				return;
 			}
 			const temp = osis.replace(/,+$/, "");
@@ -487,7 +487,7 @@ function format_node_regexp_pattern(pattern: string) {
 		throw new Error(`Unexpected regexp pattern: ${pattern}`);
 	}
 	pattern = pattern.replace(/^\/\^/, "").replace(/\$\/$/, "");
-	if (/\[/.test(pattern)) {
+	if (pattern.includes("[")) {
 		const parts = pattern.split("[");
 		const out = [parts.shift()!];
 		while (parts.length !== 0) {
@@ -693,7 +693,7 @@ function make_tests(
 	Object.keys(abbrevs)
 		.sort()
 		.forEach((osis) => {
-			if (!/,/.test(osis)) {
+			if (!osis.includes(",")) {
 				return;
 			}
 			osises.push({ osis, apocrypha: 0 });
@@ -840,7 +840,7 @@ function add_abbrev_to_all_abbrevs(
 	abbrev: string,
 	all_abbrevs: Record<string, Record<string, number>>
 ) {
-	if (/\./.test(abbrev) && abbrev !== "\u0418.\u041d") {
+	if (abbrev.includes(".") && abbrev !== "\u0418.\u041d") {
 		// split by '.', while removing any empty fields
 		const news = abbrev.match(/[^.]+/g) ?? [];
 		let olds = [news.shift()!];
@@ -1180,7 +1180,7 @@ function get_abbrevs(lang: string, vars: Vars, raw_abbrevs: RawAbbrevs) {
 		if (/^\*/.test(line) && /[[?!]/.test(line)) {
 			console.log(`Regex character in preferred: ${line}`);
 		}
-		if (!/\t/.test(line)) {
+		if (!line.includes("\t")) {
 			return;
 		}
 		const prev = line;
@@ -1198,7 +1198,7 @@ function get_abbrevs(lang: string, vars: Vars, raw_abbrevs: RawAbbrevs) {
 		const osis = almost_osis.replace(/^\*/, "");
 		is_valid_osis(osis);
 		if (
-			!/,/.test(osis) &&
+			!osis.includes(",") &&
 			(!vars.$FORCE_OSIS_ABBREV || vars.$FORCE_OSIS_ABBREV[0] !== "false")
 		) {
 			out[osis] = {
@@ -1263,7 +1263,7 @@ function expand_abbrev_vars(vars: Vars, abbrev: string) {
 			val = handle_accents(vars, val);
 			let temp = abbrev;
 			temp = temp.replace(/\$[A-Z]+(?!\w)/, val);
-			if (/\$/.test(temp)) {
+			if (temp.includes("$")) {
 				recurse = 1;
 			}
 			out.push(temp);
@@ -1427,7 +1427,7 @@ function get_letters(blocks: [number, number][]) {
 
 function get_unicode_blocks(unicodes_ref: string[]) {
 	let unicode = unicodes_ref.join("|");
-	if (!/Basic_Latin/.test(unicode)) {
+	if (!unicode.includes("Basic_Latin")) {
 		unicode += "|Basic_Latin";
 	}
 	const out: [number, number][] = [];

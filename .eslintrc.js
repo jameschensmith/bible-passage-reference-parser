@@ -19,7 +19,6 @@ module.exports = {
 		"@typescript-eslint/no-unsafe-member-access": "off",
 		"@typescript-eslint/no-unused-vars": "off",
 		"@typescript-eslint/no-var-requires": "off",
-		"@typescript-eslint/prefer-includes": "off",
 		"@typescript-eslint/prefer-string-starts-ends-with": "off",
 		"@typescript-eslint/restrict-plus-operands": "off",
 		"@typescript-eslint/sort-type-union-intersection-members": "off",
