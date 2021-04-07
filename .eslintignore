@@ -11,5 +11,8 @@
 src/*/translation_alternates.ts
 src/*/psalm_cb.ts
 
+# Grammar files
+src/*/grammar.js
+
 # Spec files (for now)
 src/*/spec.ts

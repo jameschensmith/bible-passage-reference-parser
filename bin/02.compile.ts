@@ -100,5 +100,5 @@ function add_peg(lang: string, prefix: string) {
 		throw new Error("Unreplaced options");
 	}
 
-	fs.writeFileSync(`js/${lang}/grammar.js`, peg);
+	fs.writeFileSync(`src/${lang}/grammar.js`, peg);
 }

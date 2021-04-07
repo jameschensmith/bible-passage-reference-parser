@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { bcv_parser } from "../../js/en";
+import { bcv_parser } from "../en";
 
 describe("Pre-parsing", () => {
 	let p: InstanceType<typeof bcv_parser>;
