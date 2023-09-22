@@ -17,4 +17,4 @@ bcv.parse("Matt 1, 2. 4").osis();
 // Matt.1.2,Matt.1.4
 ```
 
-This readme file exists to ease the transition for those of you looking for these files. This readme will go away in time to reduce code clutter.
+This README file exists to ease the transition for those of you looking for these files. This README will go away in time to reduce code clutter.

@@ -15,7 +15,7 @@ get_translations = (lang) ->
 	["AMP", "ASV", "CEB", "CEV", "ERV", "ESV", "HCSB", "KJV", "MSG", "NAB", "NABRE", "NAS", "NASB", "NIRV", "NIV", "NKJV", "NLT", "NRSV", "RSV", "TNIV"]
 
 get_options = ->
-	lines = fs.readFileSync("../../Readme.md").toString().split "\n"
+	lines = fs.readFileSync("../../README.md").toString().split "\n"
 	out = {}
 	option = ""
 	go = false

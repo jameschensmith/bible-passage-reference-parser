@@ -189,7 +189,7 @@ class bcv_parser
 				@translations[translation].chapters["Ps"].pop() if @translations[translation].chapters["Ps"].length == 151
 		this
 
-	# Use an alternate versification system. Takes a string argument; the built-in options are: `default` to use KJV-style versification and `vulgate` to use the Vulgate (Greek) Psalm numbering. English offers several other versification systems; see the Readme for details.
+	# Use an alternate versification system. Takes a string argument; the built-in options are: `default` to use KJV-style versification and `vulgate` to use the Vulgate (Greek) Psalm numbering. English offers several other versification systems; see the README for details.
 	versification_system: (system) ->
 		return this unless system? and @translations[system]?
 		# If we've already changed the `versification_system` once, we need to do some cleanup before we change it to something else.

@@ -9,7 +9,7 @@
   },
   "files": [
     "js/",
-    "Readme.md"
+    "README.md"
   ],
   "repository": {
     "type": "git",
