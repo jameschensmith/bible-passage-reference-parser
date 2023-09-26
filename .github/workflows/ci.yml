@@ -1,0 +1,79 @@
+name: Continuous Integration
+
+on:
+    push:
+        branches: ['trunk']
+    pull_request:
+        branches: ['trunk']
+    workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+    group: 'ci'
+    cancel-in-progress: false
+
+jobs:
+    run_tests:
+        strategy:
+            matrix:
+                lang:
+                    - 'ar'
+                    - 'ascii'
+                    - 'bg'
+                    - 'ceb'
+                    - 'core'
+                    - 'cs'
+                    - 'da'
+                    - 'de'
+                    - 'el'
+                    - 'en'
+                    - 'es'
+                    - 'fi'
+                    - 'fr'
+                    - 'full'
+                    - 'he'
+                    - 'hi'
+                    - 'hr'
+                    - 'ht'
+                    - 'hu'
+                    - 'is'
+                    - 'it'
+                    - 'ja'
+                    - 'jv'
+                    - 'ko'
+                    - 'la'
+                    - 'mk'
+                    - 'mr'
+                    - 'ne'
+                    - 'nl'
+                    - 'no'
+                    - 'or'
+                    - 'pa'
+                    - 'pl'
+                    - 'pt'
+                    - 'ro'
+                    - 'ru'
+                    - 'sk'
+                    - 'so'
+                    - 'sq'
+                    - 'sr'
+                    - 'sv'
+                    - 'sw'
+                    - 'ta'
+                    - 'th'
+                    - 'tl'
+                    - 'tr'
+                    - 'uk'
+                    - 'ur'
+                    - 'vi'
+                    - 'zh'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: latest
+            - name: Run tests
+              run: bun test test/js/${{matrix.lang}}.spec.js
