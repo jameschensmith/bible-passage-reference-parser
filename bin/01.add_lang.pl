@@ -691,16 +691,6 @@ sub make_tests
 	{
 		die "$1\nTests: Capital variable";
 	}
-
-	$out = get_file_contents("$dir/template/SpecRunner.html");
-	$out =~ s/\$LANG/$lang/g;
-	open OUT, ">:utf8", "$test_dir/$lang.html";
-	print OUT $out;
-	close OUT;
-	if ($out =~ /(\$[A-Z])/)
-	{
-		die "$1\nTests: Capital variable";
-	}
 	return %all_abbrevs;
 }
 
