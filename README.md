@@ -558,7 +558,7 @@ The files are:
 
 Some features, such as psalm titles, are still English-only, even in these cross-language files.
 
-Executing `bin/add_cross_lang.pl full` or `bin/add_cross_lang.pl ascii` will recompile the needed source files. You can then compile the files as usual using the [build instructions](#building).
+Executing `scripts/add_cross_lang.pl full` or `scripts/add_cross_lang.pl ascii` will recompile the needed source files. You can then compile the files as usual using the [build instructions](#building).
 
 ## Compatibility
 
@@ -584,9 +584,9 @@ The language's grammar file is wrapped into the relevant `*_bcv_parser.js` file.
 
 1. In `src`, create a folder named after the [ISO 639 code](https://www.loc.gov/standards/iso639-2/php/code_list.php) of the desired language. For example: `fr`.
 2. Create a data.txt file inside that folder. Lines that start with `#` are comments. Lines that start with `$` are variables. Lines that start with an OSIS book name are a tab-separated series of regular expressions (a backtick following an accented character means not to allow the unaccented version of that character). Lines that start with `=` are the order in which to check the regular expressions (check for "3 John" before "John," for example). Lines that start with `*` are the preferred long and short names for each OSIS (not used here, but potentially used in a Bible application).
-3. In `bin`, run `01.add_lang.pl [ISO code]` to create the `src` files. This file expects `node` to be available in your `$PATH`.For example, `01.add_lang.pl fr`.
-4. In `bin`, run `02.compile.pl [ISO code]` to create the output Javascript files and tests. This file expects `pegjs` and `coffee` to be available in your `$PATH`. For example: `02.compile.pl fr`.
-5. In `bin`, run `03.run_tests.sh` to run tests on all the available languages in `test/js`. It requires [jasmine-node](https://github.com/mhevery/jasmine-node).
+3. In `scripts`, run `01.add_lang.pl [ISO code]` to create the `src` files. This file expects `node` to be available in your `$PATH`.For example, `01.add_lang.pl fr`.
+4. In `scripts`, run `02.compile.pl [ISO code]` to create the output Javascript files and tests. This file expects `pegjs` and `coffee` to be available in your `$PATH`. For example: `02.compile.pl fr`.
+5. In `scripts`, run `03.run_tests.sh` to run tests on all the available languages in `test/js`. It requires [jasmine-node](https://github.com/mhevery/jasmine-node).
 
 ## Purpose
 
