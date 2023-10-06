@@ -29,6 +29,7 @@
     "build": "bun run scripts/build.js"
   },
   "devDependencies": {
-    "coffeescript": "1.12.7"
+    "coffeescript": "1.12.7",
+    "pegjs": "0.10.0"
   }
 }
