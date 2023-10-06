@@ -26,10 +26,12 @@
   },
   "homepage": "https://github.com/jameschensmith/bible-passage-reference-parser",
   "scripts": {
-    "build": "bun run scripts/build.js"
+    "build": "bun run scripts/build.js",
+    "build:minify": "google-closure-compiler --js=js/en_bcv_parser.js --js_output_file=js/en_bcv_parser.min.js"
   },
   "devDependencies": {
     "coffeescript": "1.12.7",
+    "google-closure-compiler": "20230802.0.0",
     "pegjs": "0.10.0"
   }
 }
