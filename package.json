@@ -24,5 +24,11 @@
   "bugs": {
     "url": "https://github.com/jameschensmith/bible-passage-reference-parser/issues"
   },
-  "homepage": "https://github.com/jameschensmith/bible-passage-reference-parser"
+  "homepage": "https://github.com/jameschensmith/bible-passage-reference-parser",
+  "scripts": {
+    "build": "bun run scripts/build.js"
+  },
+  "devDependencies": {
+    "coffeescript": "1.12.7"
+  }
 }
