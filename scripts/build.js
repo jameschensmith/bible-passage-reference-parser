@@ -4,7 +4,7 @@ import CoffeeScript from 'coffeescript'
 import pegjs from 'pegjs'
 
 const compileTestFile = async (lang) => {
-  const specSourcePathName = path.join(sourceDir, lang, 'spec.coffee')
+  const specSourcePathName = path.join(sourceDir, lang, `${lang}.spec.coffee`)
   const specFile = Bun.file(specSourcePathName)
   const compiledCode = CoffeeScript.compile(await specFile.text())
   const specDestPathName = path.join(testDir, `${lang}.spec.js`)

@@ -361,11 +361,11 @@ The parser is quite aggressive in identifying text as Bible references; if you j
 
 The parser spends most of its time doing regular expressions and manipulating strings. If you give it a very long string full of Bible references, it could block your main event loop. Depending on your performance requirements, parsing large numbers of even short strings could saturate your CPU and lead to problems in the rest of your app.
 
-In addition, a number of the tests in the "real-world" section of [`src/core/spec.coffee`](https://github.com/jameschensmith/bible-passage-reference-parser/blob/master/src/core/spec.coffee) have comments describing limitations of the parser. Unfortunately, it's hard to solve them without incorrectly parsing other cases—one person intends `Matt 1, 3` to mean `Matt.1,Matt.3`, while another intends it to mean `Matt.1.3`.
+In addition, a number of the tests in the "real-world" section of [`src/core/core.spec.coffee`](https://github.com/jameschensmith/bible-passage-reference-parser/blob/trunk/src/core/core.spec.coffee) have comments describing limitations of the parser. Unfortunately, it's hard to solve them without incorrectly parsing other cases—one person intends `Matt 1, 3` to mean `Matt.1,Matt.3`, while another intends it to mean `Matt.1.3`.
 
 ## Tests
 
-One of the hardest parts of building a BCV parser is finding data to test it on to tease out corner cases. The file [`src/core/spec.coffee`](https://github.com/jameschensmith/bible-passage-reference-parser/blob/master/src/core/spec.coffee) has over 3,700 tests that illustrate the range of input that this parser can handle.
+One of the hardest parts of building a BCV parser is finding data to test it on to tease out corner cases. The file [`src/core/core.spec.coffee`](https://github.com/jameschensmith/bible-passage-reference-parser/blob/trunk/src/core/core.spec.coffee) has over 3,700 tests that illustrate the range of input that this parser can handle.
 
 Separate from this repository are four data files that you can use to test your own parser. Derived from Twitter and Facebook mentions of Bible references, the dataset reflects how people really type references in English. It includes 4.7 million unique strings across 180 million total mentions. (For example, the most-popular string, "Philippians 4:13", is mentioned over 1.3 million times.)
 

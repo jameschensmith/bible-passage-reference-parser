@@ -684,7 +684,7 @@ sub make_tests
 	$out =~ s/\$LANG/$lang/g;
 	$out =~ s/\$BOOK_TESTS/join("\x0a", @out)/e;
 	$out =~ s/\$MISC_TESTS/join("\x0a", @misc_tests)/e;
-	open OUT, ">:utf8", "$dir/$lang/spec.coffee";
+	open OUT, ">:utf8", "$dir/$lang/$lang.spec.coffee";
 	print OUT $out;
 	close OUT;
 	if ($out =~ /(\$[A-Z]+)/)
