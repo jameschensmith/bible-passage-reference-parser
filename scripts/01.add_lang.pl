@@ -8,7 +8,7 @@ use MIME::Base64;
 my ($lang) = @ARGV;
 die "The first argument should be a language iso code (e.g., \"fr\")" unless ($lang && $lang =~ /^\w+$/);
 my $dir = '../src';
-my $test_dir = '../test';
+my $templates_dir = '../scripts/templates';
 my $regexp_space = "[\\s\x{a0}]";
 my $valid_characters = "[\\d\\s\\xa0.:,;\\x1e\\x1f&\\(\\)\\uff08\\uff09\\[\\]/\"'\\*=~\\-\\u2013\\u2014]";
 my $letters = '';
@@ -26,7 +26,7 @@ make_translations();
 
 sub make_translations
 {
-	my $out = get_file_contents("$dir/template/translations.coffee");
+	my $out = get_file_contents("$templates_dir/translations.coffee");
 	my (@regexps, @aliases);
 	foreach my $translation (@{$vars{'$TRANS'}})
 	{
@@ -66,7 +66,7 @@ sub make_translations
 
 sub make_grammar
 {
-	my $out = get_file_contents("$dir/template/grammar.pegjs");
+	my $out = get_file_contents("$templates_dir/grammar.pegjs");
 	unless (defined $vars{'$NEXT'})
 	{
 		$out =~ s/\nnext_v\s+=.+\s+\{ return[^\}]+\}\s+\}\s+/\n/;
@@ -93,7 +93,7 @@ sub make_grammar
 
 sub make_regexps
 {
-	my $out = get_file_contents("$dir/template/regexps.coffee");
+	my $out = get_file_contents("$templates_dir/regexps.coffee");
 	unless (defined $vars{'$NEXT'})
 	{
 		$out =~ s/\n.+\$NEXT.+\n/\n/;
@@ -678,7 +678,7 @@ sub make_tests
 	push @misc_tests, add_trans_tests();
 	push @misc_tests, add_book_range_tests();
 	push @misc_tests, add_boundary_tests();
-	my $out = get_file_contents("$dir/template/spec.coffee");
+	my $out = get_file_contents("$templates_dir/spec.coffee");
 	my $lang_isos = to_json($vars{'$LANG_ISOS'});
 	$out =~ s/\$LANG_ISOS/$lang_isos/g;
 	$out =~ s/\$LANG/$lang/g;

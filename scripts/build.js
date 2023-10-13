@@ -112,7 +112,6 @@ const sourceDir = path.join(rootPath, 'src')
 const testDir = path.join(rootPath, 'test', 'js')
 await Promise.all(
   (await readdir(sourceDir))
-    .filter((lang) => lang !== 'template')
     .map(async (lang) => {
       await compileTestFile(lang)
       if (lang === 'core') return

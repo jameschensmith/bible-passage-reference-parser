@@ -481,7 +481,7 @@ The BCV parser supports several versification systems (described above). The app
 
 The Javascript files that don't start with `en` provide support for other languages.
 
-Using the files in [`src/template`](https://github.com/jameschensmith/bible-passage-reference-parser/tree/master/src/template) as a base, you can add support for additional languages; just use the appropriate ISO 639 language prefix. I'm happy to accept pull requests for new languages.
+Using the files in [`scripts/templates`](https://github.com/jameschensmith/bible-passage-reference-parser/tree/trunk/scripts/templates) as a base, you can add support for additional languages; just use the appropriate ISO 639 language prefix. I'm happy to accept pull requests for new languages.
 
 ### Supported Languages
 
