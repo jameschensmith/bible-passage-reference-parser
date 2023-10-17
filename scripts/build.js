@@ -114,6 +114,7 @@ const testDir = path.join(rootPath, 'test', 'js')
 
 const argLang = argv[2]
 
+await mkdir(jsDir, { recursive: true })
 await mkdir(testDir, { recursive: true })
 
 await Promise.all(

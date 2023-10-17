@@ -549,7 +549,7 @@ When using `<script>`s on the web, be sure to serve them with the `utf-8` charac
 
 ### Cross-Language Support
 
-Two files in [`/js`](https://github.com/jameschensmith/bible-passage-reference-parser/tree/master/js) provide support for identifying translations in multiple languages at one time (e.g., "Matthew 2, Juan 1"). You can use this support if you don't know ahead of time what language someone might be using.
+Two files in `/js` provide support for identifying translations in multiple languages at one time (e.g., "Matthew 2, Juan 1"). You can use this support if you don't know ahead of time what language someone might be using.
 
 The files are:
 
