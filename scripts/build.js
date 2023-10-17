@@ -1,4 +1,4 @@
-import { readdir } from 'node:fs/promises'
+import { mkdir, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { argv } from 'node:process'
 import CoffeeScript from 'coffeescript'
@@ -113,6 +113,8 @@ const sourceDir = path.join(rootPath, 'src')
 const testDir = path.join(rootPath, 'test', 'js')
 
 const argLang = argv[2]
+
+await mkdir(testDir, { recursive: true })
 
 await Promise.all(
   (await readdir(sourceDir))
