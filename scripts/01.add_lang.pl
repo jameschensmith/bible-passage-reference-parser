@@ -1,3 +1,5 @@
+use v5.34;
+
 use strict;
 use warnings;
 use Data::Dumper;
