@@ -261,10 +261,10 @@ sub validate_full_node_regexp
 sub get_book_subsets
 {
 	my @abbrevs = @{$_[0]};
+	@abbrevs = sort { length $b <=> length $a || $a cmp $b } @abbrevs;
 	return ([@abbrevs]) unless (scalar @abbrevs > 20);
 	my @groups = ([]);
 	my %subs;
-	@abbrevs = sort { length $b <=> length $a } @abbrevs;
 	while (@abbrevs)
 	{
 		my $long = shift @abbrevs;
@@ -278,7 +278,7 @@ sub get_book_subsets
 		}
 		push @{$groups[0]}, $long;
 	}
-	$groups[1] = [sort { length $b <=> length $a } keys %subs] if (%subs);
+	$groups[1] = [sort { length $b <=> length $a || $a cmp $b } keys %subs] if (%subs);
 	return @groups;
 }
 
