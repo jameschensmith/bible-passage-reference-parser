@@ -203,7 +203,7 @@ sub make_lang_blocks
 		}
 		close FILE;
 	}
-	my @out = sort { $blocks{$b} <=> $blocks{$a} } keys %blocks;
+	my @out = sort { $blocks{$b} <=> $blocks{$a} || $a cmp $b } keys %blocks;
 	return join("\t", @out);
 }
 
@@ -365,7 +365,7 @@ sub get_matches
 		push @out, $abbrev if ($ok);
 	}
 	#die Dumper("No matches: $pattern") unless (@out);
-	@out = sort { length $b <=> length $a } @out;
+	@out = sort { length $b <=> length $a || $a cmp $b } @out;
 	print Dumper(\@out) if (Dumper(\@out) =~ /Mak/ && Dumper(\@out) =~ /Eccl/);
 	return @out;
 }
@@ -401,7 +401,7 @@ sub prioritize_lang
 	my ($abbrev, $ref) = @_;
 	foreach my $lang (@lang_priorities)
 	{
-		foreach my $osis (keys %{$ref})
+		foreach my $osis (sort keys %{$ref})
 		{
 			return $osis if (exists $ref->{$osis}->{$lang});
 		}
