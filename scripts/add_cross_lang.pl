@@ -20,6 +20,7 @@ my %ranges = (
 			'Ai', #Lam
 			'Ad', #Obad
 			'J', 'Iv', 'In', #John
+			"\x{418}.\x{41D}", #Josh
 			'Nas', #Acts
 			],
 		post_abbrevs => {
@@ -110,6 +111,7 @@ my %ranges = (
 			'Ai', #Lam
 			'Ad', #Obad
 			'J', 'Iv', 'In', #John
+			"\x{418}.\x{41D}", #Josh
 			'Nas', #Acts
 			],
 		post_abbrevs => {
