@@ -1,6 +1,6 @@
 # When adding a new translation, add it both here and bcv_parser::translations.aliases
 bcv_parser::regexps.translations = ///(?:
-	  (?:(?:E[RS]|AS|TNI|RS|KJ)V|LXX|MSG|CE[BV]|AMP|HCSB|N(?:(?:KJ|RS)V|LT|IR?V|A(?:B(?:RE)?|SB?)))
+	  (?:N(?:A(?:B(?:RE)?|SB?)|(?:RS|KJ)V|IR?V|LT)|HCSB|(?:TNI|E[RS]|AS|RS|KJ)V|MSG|LXX|CE[BV]|AMP)
 	)\b///gi
 bcv_parser::translations = 
 	aliases:
@@ -216,4 +216,4 @@ bcv_parser::translations =
 			"2Cor": [24,17,18,18,21,18,16,24,15,18,33,21,13]
 			"Rev": [20,29,22,11,14,17,17,13,21,11,19,18,18,20,8,21,18,24,21,15,27,21]
 
-bcv_parser::languages = ["ar","bg","ceb","cs","cy","da","de","el","en","es","fi","fr","he","hi","hr","ht","hu","is","it","ja","jv","ko","la","mk","mr","ne","nl","no","or","pa","pl","pt","ro","ru","sk","so","sq","sr","sv","sw","ta","th","tl","uk","ur","vi","wal","zh"]
+bcv_parser::languages = ["ar","bg","ceb","cs","da","de","el","en","es","fi","fr","he","hi","hr","ht","hu","is","it","ja","jv","ko","la","mk","mr","ne","nl","no","or","pa","pl","pt","ro","ru","sk","so","sq","sr","sv","sw","ta","th","tl","uk","ur","vi","zh"]
